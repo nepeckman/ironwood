@@ -2,11 +2,16 @@ import math
 
 type
   PokeType = enum
-    ptWater,
-    ptFire,
-    ptElectric
+    ptWater, ptFire, ptElectric, ptDark, ptPsychic, ptGrass, ptIce, ptDragon, ptFairy,
+    ptNormal, ptFighting, ptRock, ptGround, ptSteel, ptGhost, ptPoison, ptBug, ptFlying
+  
+  PokeMove = ref object 
+    name: string
+    basePower: int
+    pokeType: PokeType
 
   Pokemon = ref object
+    name: string
     pokeType1: PokeType
     pokeType2: PokeType
     hp: int
@@ -44,3 +49,14 @@ proc getFinalDamage(baseAmount: float, i: int, effectiveness: float, isBurned: b
   if isBurned:
     damageAmount = floor(damageAmount / 2)
   pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
+
+proc getDamageResult(attacker: PokemonSet, defender: PokemonSet, move: PokeMove): float =
+  if move.basePower == 0:
+    return 0
+
+  if attacker.ability == "Aerilate":
+    move.pokeType = ptFlying
+
+
+
+  return 0
