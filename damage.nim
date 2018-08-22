@@ -20,10 +20,15 @@ type
     currentHP: int
 
   PokeMoveModifiers = enum
-    pmmSound, pmmBullet
+    pmmSound, pmmBullet, pmmAerilated, pmmPixilated, pmmRefrigerated, pmmGalvanized, pmmUsesHighestAtkStat,
+    pmmDealsPhysicalDamage, pmmIgnoresBurn
   
+  PokeMoveCategory = enum
+    pmcPhysical, pmcSpecial, pmcStatus
+
   PokeMove = ref object 
     name: string
+    category: PokeMoveCategory
     basePower: int
     pokeType: PokeType
     priority: int
@@ -37,8 +42,6 @@ type
     level: int
     item: string
     nature: PokeNature
-    baseStats: PokeStats
-    evs: PokeStats
     stats: PokeStats
     weight: float
     state: PokeState
@@ -62,25 +65,28 @@ var PokeTypeEffectiveness = {
   ptGhost: {ptDark: 0.5, ptPsychic: 2d, ptNormal: 0d, ptGhost: 2d}.toTable,
   ptPoison: {ptGrass: 2d, ptFairy: 2d, ptGround: 0.5, ptSteel: 0d, ptPoison: 0.5}.toTable,
   ptBug: {ptFire: 0.5, ptDark: 2d, ptPsychic: 2d, ptGrass: 2d, ptFairy: 0.5, ptFighting: 0.5, ptRock: 0.5, ptSteel: 0.5, ptPoison: 0.5, ptFlying: 0.5}.toTable,
-  ptFlying: {ptElectric: 0.5, ptGrass: 2d, ptFighting: 2d, ptRock: 0.5, ptSteel: 0.5, ptBug: 2d}.toTable
+  ptFlying: {ptElectric: 0.5, ptGrass: 2d, ptFighting: 2d, ptRock: 0.5, ptSteel: 0.5, ptBug: 2d}.toTable,
+  ptNull: initTable[PokeType, float]()
   }.toTable
 
-proc getTypeEffectiveness(attackerType: PokeType, defenderType: PokeType): float =
-  if attackerType == ptNull:
-    return 1
+proc getTypeMatchup(attackerType, defenderType: PokeType): float =
   if defenderType in PokeTypeEffectiveness[attackerType]: PokeTypeEffectiveness[attackerType][defenderType] else: 1
 
-proc getMoveEffectiveness(move: PokeMove, defenderType: PokeType, isGhostRevealed: bool, isFlierGrounded: bool): float =
-  if isGhostRevealed and defenderType == ptGhost and move.pokeType in {ptNormal, ptFighting}:
+proc getTypeEffectiveness(attackerType: PokeType, defenderType: PokeType, moveName = "", isGhostRevealed = false, isFlierGrounded = false): float =
+  if isGhostRevealed and defenderType == ptGhost and attackerType in {ptNormal, ptFighting}:
     return 1
-  elif isFlierGrounded and defenderType == ptFlying and move.pokeType == ptGround:
+  elif isFlierGrounded and defenderType == ptFlying and attackerType == ptGround:
     return 1
-  elif defenderType == ptWater and move.name == "Freeze-Dry":
+  elif defenderType == ptWater and moveName == "Freeze-Dry":
     return 2
-  elif move.name == "Flying Press":
-    return getTypeEffectiveness(ptFighting, defenderType) * getTypeEffectiveness(ptFlying, defenderType)
+  elif moveName == "Flying Press":
+    return getTypeMatchup(ptFighting, defenderType) * getTypeMatchup(ptFlying, defenderType)
   else:
-    return getTypeEffectiveness(move.pokeType, defenderType)
+    return getTypeMatchup(attackerType, defenderType)
+
+proc getMoveEffectiveness(move: PokeMove, defender, attacker: Pokemon): float =
+  getTypeEffectiveness(move.pokeType, defender.pokeType1, move.name, attacker.ability == "Scrappy") *
+    getTypeEffectiveness(move.pokeType, defender.pokeType2, move.name, attacker.ability == "Scrappy")
 
 proc hasType(pokemon: Pokemon, pokeType: PokeType): bool =
   if pokeType == ptNull:
@@ -91,6 +97,59 @@ proc getWeightFactor(set: Pokemon): float =
   if set.ability == "Heavy Metal": 2f
   elif set.ability == "Light Metal": 0.5
   else: 1f
+
+proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
+  peBurned in attacker.state.effects and move.category == pmcPhysical and
+    attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
+
+proc checkAbilitySuppression(defender, attacker: Pokemon, move: PokeMove): bool =
+  defender.ability notin ["Full Metal Body", "Prism Armor", "Shadow Shield"] and
+    (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move.name in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"])
+
+proc checkImmunityAbilities(defender: Pokemon, move: PokeMove, typeEffectiveness: float): bool =
+  (defender.ability == "Wonder Guard" and typeEffectiveness <= 1) or
+    (defender.ability == "Sap Sipper" and move.pokeType == ptGrass) or
+    (defender.ability == "Flash Fire" and move.pokeType == ptFire) or
+    (defender.ability in ["Dry Skin", "Storm Drain", "Water Absorb"] and move.pokeType == ptWater) or
+    (defender.ability in ["Lightning Rod", "Motor Drive", "Volt Absorb"] and move.pokeType == ptElectric) or
+    (defender.ability == "Levitate" and move.pokeType == ptGround and move.name != "Thousand Arrows") or
+    (defender.ability == "Bulletproof" and pmmBullet in move.modifiers) or
+    (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
+    (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0)
+
+proc hasTypeChangingAbility(pokemon: Pokemon): bool =
+  pokemon.ability in ["Aerliate", "Pixilate", "Refrigerate", "Galvanize", "Liquid Voice", "Normalize"]
+
+proc typeChangeMove(move: PokeMove, attacker: Pokemon) =
+  if move.pokeType == ptNormal:
+    if attacker.ability == "Aerilate":
+      move.pokeType = ptFlying
+      move.modifiers.incl(pmmAerilated)
+    elif attacker.ability == "Pixilate":
+      move.pokeType = ptFairy
+      move.modifiers.incl(pmmPixilated)
+    elif attacker.ability == "Refrigerate":
+      move.pokeType = ptIce
+      move.modifiers.incl(pmmRefrigerated)
+    elif attacker.ability == "Galvanize":
+      move.pokeType = ptElectric
+      move.modifiers.incl(pmmGalvanized)
+    elif attacker.ability == "Liquid Voice" and pmmSound in move.modifiers:
+      move.pokeType = ptWater
+  elif attacker.ability == "Normalize":
+    move.pokeType = ptNormal
+
+
+proc skyDropFails(move: PokeMove, defender: Pokemon): bool =
+  move.name == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200)
+
+proc synchronoiseFails(move: PokeMove, defender: Pokemon, attacker: Pokemon): bool =
+  move.name == "Synchronoise" and
+    not defender.hasType(attacker.pokeType1) and
+    not defender.hasType(attacker.pokeType2)
+
+proc levelDamage(attacker: Pokemon): int =
+  if attacker.ability == "Parental Bond": attacker.level * 2 else: attacker.level
 
 proc pokeRound(num: float): int =
   if num - floor(num) > 0.5: toInt(ceil(num)) else: toInt(floor(num))
@@ -115,56 +174,89 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, move: PokeMove): arra
   if move.basePower == 0:
     return noDamage
 
-  if defender.ability notin ["Full Metal Body", "Prism Armor", "Shadow Shield"] and
-    (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move.name in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"]):
-    defender.ability = ""
+  let isDefenderAbilitySuppressed = checkAbilitySuppression(defender, attacker, move)
 
-  if move.pokeType == ptNormal:
-    if attacker.ability == "Aerilate":
-      move.pokeType = ptFlying
-    elif attacker.ability == "Pixilate":
-      move.pokeType = ptFairy
-    elif attacker.ability == "Refrigerate":
-      move.pokeType = ptIce
-    elif attacker.ability == "Galvanize":
-      move.pokeType = ptElectric
-    elif attacker.ability == "Liquid Voice" and pmmSound in move.modifiers:
-      move.pokeType = ptWater
-  elif attacker.ability == "Normalize":
-    move.pokeType = ptNormal
+  if attacker.hasTypeChangingAbility(): move.typeChangeMove(attacker)
 
-  var typeEffectiveness = getMoveEffectiveness(move, defender.pokeType1, attacker.ability == "Scrappy", false) * 
-    getMoveEffectiveness(move, defender.pokeType2, attacker.ability == "Scrappy", false)
+  var typeEffectiveness = getMoveEffectiveness(move, defender, attacker)
 
   if typeEffectiveness == 0:
     return noDamage
 
-  if move.name == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200):
+  if skyDropFails(move, defender):
     return noDamage
 
-  if move.name == "Synchronoise" and
-      not defender.hasType(attacker.pokeType1) and
-      not defender.hasType(attacker.pokeType2):
+  if synchronoiseFails(move, defender, attacker):
     return noDamage
 
-  if (defender.ability == "Wonder Guard" and typeEffectiveness <= 1) or
-      (defender.ability == "Sap Sipper" and move.pokeType == ptGrass) or
-      (defender.ability == "Flash Fire" and move.pokeType == ptFire) or
-      (defender.ability in ["Dry Skin", "Storm Drain", "Water Absorb"] and move.pokeType == ptWater) or
-      (defender.ability in ["Lightning Rod", "Motor Drive", "Volt Absorb"] and move.pokeType == ptElectric) or
-      (defender.ability == "Levitate" and move.pokeType == ptGround and move.name != "Thousand Arrows") or
-      (defender.ability == "Bulletproof" and pmmBullet in move.modifiers) or
-      (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
-      (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0):
+  if not isDefenderAbilitySuppressed and checkImmunityAbilities(defender, move, typeEffectiveness):
     return noDamage
-
-
+  
   if move.name in ["Seismic Toss", "Night Shade"]:
-    var damage = if attacker.ability == "Parental Bond": attacker.level * 2 else: attacker.level
+    var damage = levelDamage(attacker)
     return [damage,damage,damage,damage,damage,damage,damage,damage,damage,damage,damage,damage,damage,damage,damage,damage]
 
-  var baseDamage = getBaseDamage(attacker.level, move.basePower, attacker.stats.atk, defender.stats.def)
+  
+  var basePower = move.basePower
+  var isSTAB = attacker.hasType(move.pokeType)
+
+  var attack: int
+  var attackSource = if move.name == "Foul Play": defender else: attacker
+
+  if (pmmUsesHighestAtkStat in move.modifiers):
+    move.category = if attackSource.stats.atk >= attackSource.stats.spa: pmcPhysical else: pmcSpecial
+
+  attack = if move.category == pmcPhysical: attackSource.stats.atk else: attackSource.stats.spa
+
+  var defense = if move.category == pmcPhysical or pmmDealsPhysicalDamage in move.modifiers: defender.stats.def
+    else: defender.stats.spd
+
+  var baseDamage = getBaseDamage(attacker.level, basePower, attack, defense)
+
+  var stabMod = 0x1000
+  if isSTAB:
+    stabMod = if attacker.ability == "Adaptability": 0x2000 else: 0x1800
+
+  let applyBurn = burnApplies(move, attacker)
+
   result = noDamage
   for i in 0..15:
-    result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, peBurned in attacker.state.effects, 1, 1)
-  return noDamage
+    result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, 0x1000)
+
+var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)
+var neutralState = PokeState(boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0), effects: {}, currentHP: 244)
+var attacker = Pokemon(
+    name: "Snorlax",
+    pokeType1: ptNormal,
+    pokeType2: ptNull,
+    ability: "Gluttony",
+    level: 50,
+    item: "",
+    nature: pnBrave,
+    stats: snorlaxStats,
+    weight: 100,
+    state: neutralState
+    )
+var defender = Pokemon(
+    name: "Snorlax",
+    pokeType1: ptNormal,
+    pokeType2: ptNull,
+    ability: "Gluttony",
+    level: 50,
+    item: "",
+    nature: pnBrave,
+    stats: snorlaxStats,
+    weight: 100,
+    state: neutralState
+    )
+var move = PokeMove(
+    name: "Return",
+    category: pmcPhysical,
+    basePower: 102,
+    pokeType: ptNormal,
+    priority: 0,
+    modifiers: {}
+    )
+
+let damage = getDamageResult(attacker, defender, move)
+echo damage
