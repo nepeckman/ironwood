@@ -8,7 +8,9 @@ type
 
   FieldSideEffects* = enum #Effects targeting just one side
     fseLightScreen, fseReflect, fseAuroraVeil, fseStealthRocks,
-    fseSpikes1, fseSpikes2, fseSpikes3, fseToxicSpikes1, fseToxicSpikes2
+    fseSpikes1, fseSpikes2, fseSpikes3, fseToxicSpikes1, fseToxicSpikes2,
+    fseTailwind
+    #TODO: add pledge effects
 
   FieldFormatKind = enum
     ffkSingles, ffkDoubles, ffkTriples, ffkRotation
@@ -19,8 +21,8 @@ type
     terrain*: FieldTerrainKind
     gravityActive*: bool
     trickRoomActive*: bool
-    homeSide*: set[FieldSideEffects]
-    awaySide*: set[FieldSideEffects]
+    homeSideEffects*: set[FieldSideEffects]
+    awaySideEffects*: set[FieldSideEffects]
 
 proc makeField*(): Field =
   Field(
@@ -29,6 +31,6 @@ proc makeField*(): Field =
     terrain: ftkNone,
     gravityActive: false,
     trickRoomActive: false,
-    homeSide: {},
-    awaySide: {}
+    homeSideEffects: {},
+    awaySideEffects: {}
   )

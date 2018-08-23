@@ -1,8 +1,8 @@
 import math, algorithm
-import pokemon, field, poketype, pokemove
+import pokemon, field, poketype, pokemove, condition
 
 proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
-  peBurned in attacker.effects and move.category == pmcPhysical and
+  sckBurned == attacker.status and move.category == pmcPhysical and
     attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
 
 proc checkAbilitySuppression(defender, attacker: Pokemon, move: PokeMove): bool =
@@ -44,7 +44,7 @@ proc getFinalDamage(baseAmount: float, i: int, effectiveness: float, isBurned: b
 proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: Field): array[0..15, int] =
   let move = copy(m)
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-  if move.basePower == 0:
+  if move.basePower == 0 and move.name != "Nature Power":
     return noDamage
 
   let isDefenderAbilitySuppressed = checkAbilitySuppression(defender, attacker, move)
@@ -133,7 +133,8 @@ var attacker = Pokemon(
     stats: snorlaxStats,
     weight: 100,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
-    effects: {},
+    status: sckHealthy,
+    conditions: {},
     currentHP: 244
     )
 var defender = Pokemon(
@@ -145,7 +146,8 @@ var defender = Pokemon(
     item: "",
     stats: snorlaxStats,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
-    effects: {},
+    conditions: {},
+    status: sckHealthy,
     currentHP: 244,
     weight: 100,
     )

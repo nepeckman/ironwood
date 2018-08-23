@@ -5,7 +5,8 @@ type
 
   PokeMoveModifiers* = enum
     pmmSound, pmmBullet, pmmAerilated, pmmPixilated, pmmRefrigerated, pmmGalvanized, pmmUsesHighestAtkStat,
-    pmmDealsPhysicalDamage, pmmIgnoresBurn
+    pmmDealsPhysicalDamage, pmmIgnoresBurn, pmmMakesContact, pmmPunch, pmmJaw, pmmSpread, pmmSecondaryEffect, pmmPulse,
+    pmmHeals, pmmBypassesProtect, pmmIgnoresDefenseBoosts
   
   PokeMoveCategory* = enum
     pmcPhysical, pmcSpecial, pmcStatus

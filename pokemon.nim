@@ -1,11 +1,8 @@
-import field, item, poketype, pokemove
+import field, item, poketype, pokemove, condition
 
 type
 
   PokeStats* = tuple[hp: int, atk: int, def: int, spa: int, spd: int, spe: int]
-
-  PokeEffect* = enum
-    peAsleep, peConfused, pePoisoned, peBurned, peParalyzed
 
   Pokemon* = ref object
     name*: string
@@ -18,7 +15,8 @@ type
     weight*: float
     currentHP*: int
     boosts*: PokeStats
-    effects*: set[PokeEffect]
+    status*: StatusConditionKind
+    conditions*: set[GeneralConditionKind]
 
 
 proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon): float =
@@ -53,5 +51,5 @@ proc synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): b
 
 proc dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
   move.name == "Dream Eater" and
-    not (peAsleep in defender.effects) and
+    not (sckAsleep == defender.status) and
     defender.ability != "Comatose"
