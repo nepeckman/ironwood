@@ -1,4 +1,4 @@
-import field, item, poketype, pokemove, condition
+import field, item, poketype, pokemove, condition, effects
 
 type
 

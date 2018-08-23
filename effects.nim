@@ -1,3 +1,4 @@
+import condition, poketype
 type
 
   EffectActivationKind* = enum
@@ -12,3 +13,10 @@ type
   Effect* = ref object of RootObj
     activation*: EffectActivationKind
     target*: EffectTargetKind
+    case kind*: EffectKind
+    of ekStatus: status: StatusConditionKind
+    of ekCondition: condition: GeneralConditionKind
+    of ekBoost: boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int]
+    of ekHP: hpChange: int
+    of ekTypeChange: typeChange: PokeType
+    of ekForceSwitch: isRandom: bool
