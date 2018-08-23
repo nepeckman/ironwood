@@ -1,5 +1,15 @@
 import poketype
 
+type
+
+  ItemEffectKind = enum
+    iekResistBerry, iekGem, iekTypeBoost, iekMegaStone, iekZCrystal, iekTerrainSeed,
+    iekPinchBerry, iekChoiceScarf, iekChoiceBand, iekChoiceSpecs, iekLifeOrb,
+    iekLeftovers, iekShellBell, iekPokemonExclusive, iekAirBalloon, iekFocusSash, iekFocusBand,
+    iekEviolite, iekAssaultVest, iekRingTarget, iekRedCard, iekWhiteHerb, iekPowerHerb, iekRockyHelmet,
+    iekDrive, iekMemory, iekSafetyGoggles, iekEjectButton, iekMuscleBand, iekWiseGlasses, iekMetalPowder,
+    iekExpertBelt
+
 proc getItemBoostType*(item: string): PokeType =
   case item 
   of "Draco Plate", "Dragon Fang": ptDragon
