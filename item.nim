@@ -1,14 +1,28 @@
-import poketype
+import poketype, field
 
 type
 
-  ItemEffectKind = enum
-    iekResistBerry, iekGem, iekTypeBoost, iekMegaStone, iekZCrystal, iekTerrainSeed,
-    iekPinchBerry, iekChoiceScarf, iekChoiceBand, iekChoiceSpecs, iekLifeOrb,
-    iekLeftovers, iekShellBell, iekPokemonExclusive, iekAirBalloon, iekFocusSash, iekFocusBand,
-    iekEviolite, iekAssaultVest, iekRingTarget, iekRedCard, iekWhiteHerb, iekPowerHerb, iekRockyHelmet,
-    iekDrive, iekMemory, iekSafetyGoggles, iekEjectButton, iekMuscleBand, iekWiseGlasses, iekMetalPowder,
-    iekExpertBelt
+  ItemKind* = enum
+    ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal, ikTerrainSeed,
+    ikPinchBerry , ikChoiceScarf, ikChoiceBand, ikChoiceSpecs, ikLifeOrb,
+    ikLeftovers, ikShellBell, ikPokemonExclusive, ikAirBalloon, ikFocusSash,
+    ikEviolite, ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb, ikRockyHelmet,
+    ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikMuscleBand, ikWiseGlasses, ikExpertBelt
+
+  Item* = ref object
+    consumable*: bool
+    name*: string
+    case kind*: ItemKind
+    of ikResistBerry: resistedType*: PokeType
+    of ikGem, ikTypeBoost, ikZCrystal, ikDrive, ikMemory, ikPlate: associatedType*: PokeType
+    of ikTerrainSeed: associatedTerrain*: FieldTerrainKind
+    of ikPinchBerry: activationPercent*, restorePercent*: int
+    of ikMegaStone, ikPokemonExclusive: associatedPokemonName*: string
+    of ikChoiceScarf, ikChoiceBand, ikChoiceSpecs, ikLifeOrb, ikLeftovers, ikShellBell, ikAirBalloon, ikFocusSash, ikEviolite,
+      ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
+      ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikMuscleBand,
+      ikWiseGlasses, ikExpertBelt: discard
+    
 
 proc getItemBoostType*(item: string): PokeType =
   case item 

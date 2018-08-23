@@ -10,7 +10,7 @@ type
     pokeType2*: PokeType
     ability*: string
     level*: int
-    item*: string
+    item*: Item
     stats*: PokeStats
     weight*: float
     currentHP*: int
@@ -30,7 +30,7 @@ proc hasType*(pokemon: Pokemon, pokeType: PokeType): bool =
 
 proc isGrounded*(pokemon: Pokemon, field: Field): bool =
   field.gravityActive or
-    not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item == "Air Balloon")
+    not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item.kind == ikAirBalloon)
 
 proc getWeightFactor*(pokemon: Pokemon): float =
   if pokemon.ability == "Heavy Metal": 2f

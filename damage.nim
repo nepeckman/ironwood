@@ -1,5 +1,5 @@
 import math, algorithm
-import pokemon, field, poketype, pokemove, condition
+import pokemon, field, poketype, pokemove, condition, item
 
 proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
   sckBurned == attacker.status and move.category == pmcPhysical and
@@ -77,7 +77,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
     typeEffectiveness = typeEffectiveness / 2
 
   if move.pokeType == ptGround and move.name != "Thousand Arrows" and
-    not field.gravityActive and defender.item == "Air Balloon":
+    not field.gravityActive and defender.item.kind == ikAirBalloon:
     return noDamage
 
   if move.priority > 0 and field.terrain == ftkPsychic and defender.isGrounded(field):
@@ -129,7 +129,7 @@ var attacker = Pokemon(
     pokeType2: ptNull,
     ability: "Gluttony",
     level: 50,
-    item: "",
+    item: nil,
     stats: snorlaxStats,
     weight: 100,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
@@ -143,7 +143,7 @@ var defender = Pokemon(
     pokeType2: ptNull,
     ability: "Gluttony",
     level: 50,
-    item: "",
+    item: nil,
     stats: snorlaxStats,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
     conditions: {},

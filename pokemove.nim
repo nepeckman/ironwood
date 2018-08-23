@@ -51,11 +51,11 @@ proc changeTypeWithAbility*(move: PokeMove, ability: string) =
   elif ability == "Normalize":
     move.pokeType = ptNormal
 
-proc changeTypeWithItem*(move: PokeMove, item: string) =
-  if move.name == "Judgement" and item.find("Plate") != -1:
-    move.pokeType = getItemBoostType(item)
-  if move.name == "Techno Blast" and item.find("Drive") != -1:
-    move.pokeType = getTechnoBlast(item)
+proc changeTypeWithItem*(move: PokeMove, item: Item) =
+  if move.name == "Judgement" and item.kind == ikPlate:
+    move.pokeType = item.associatedType
+  if move.name == "Techno Blast" and item.kind == ikDrive:
+    move.pokeType = item.associatedType
 
 proc changeTypeWithTerrain*(move: PokeMove, terrain: FieldTerrainKind) =
   move.pokeType = case terrain
