@@ -1,5 +1,5 @@
-import math, tables, algorithm
-import pokemon, field, poketype
+import math, algorithm
+import pokemon, field, poketype, pokemove
 
 proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
   peBurned in attacker.effects and move.category == pmcPhysical and
@@ -54,8 +54,6 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
   if move.name == "Nature Power": move.changeTypeWithTerrain(field.terrain)
   if move.name == "Revelation Dance": move.pokeType = attacker.pokeType1
   if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
-
-  if attacker.ability == "Gale Wings": move.changePriority(attacker)
 
   var typeEffectiveness = getMoveEffectiveness(move, defender, attacker)
 

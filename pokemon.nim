@@ -1,5 +1,4 @@
-import tables, strutils
-import field, item, poketype
+import field, item, poketype, pokemove
 
 type
 
@@ -7,30 +6,6 @@ type
 
   PokeEffect* = enum
     peAsleep, peConfused, pePoisoned, peBurned, peParalyzed
-
-  PokeMoveModifiers* = enum
-    pmmSound, pmmBullet, pmmAerilated, pmmPixilated, pmmRefrigerated, pmmGalvanized, pmmUsesHighestAtkStat,
-    pmmDealsPhysicalDamage, pmmIgnoresBurn
-  
-  PokeMoveCategory* = enum
-    pmcPhysical, pmcSpecial, pmcStatus
-
-  PokeMoveEffectKind = enum
-    pmekBoost, pmekStatus
-
-  PokeMoveEffect = ref object
-    case kind: PokeMoveEffectKind
-    of pmekBoost: boosts: PokeStats
-    of pmekStatus: status: PokeEffect
-
-  PokeMove* = ref object 
-    name*: string
-    category*: PokeMoveCategory
-    basePower*: int
-    pokeType*: PokeType
-    priority*: int
-    effect*: PokeMoveEffect
-    modifiers*: set[PokeMoveModifiers]
 
   Pokemon* = ref object
     name*: string
@@ -66,67 +41,6 @@ proc getWeightFactor*(pokemon: Pokemon): float =
 
 proc hasTypeChangingAbility*(pokemon: Pokemon): bool =
   pokemon.ability in ["Aerliate", "Pixilate", "Refrigerate", "Galvanize", "Liquid Voice", "Normalize"]
-
-proc isItemDependant*(move: PokeMove): bool =
-  move.name in ["Judgement", "Techno Blast", "Multi-Attack", "Natural Gift"]
-
-proc copy*(move: PokeMove): PokeMove =
-  PokeMove(
-    name: move.name,
-    category: move.category,
-    basePower: move.basePower,
-    pokeType: move.pokeType,
-    priority: move.priority,
-    effect: move.effect,
-    modifiers: move.modifiers
-  )
-
-proc changeTypeWithAbility*(move: PokeMove, ability: string) =
-  if move.pokeType == ptNormal:
-    if ability == "Aerilate":
-      move.pokeType = ptFlying
-      move.modifiers.incl(pmmAerilated)
-    elif ability == "Pixilate":
-      move.pokeType = ptFairy
-      move.modifiers.incl(pmmPixilated)
-    elif ability == "Refrigerate":
-      move.pokeType = ptIce
-      move.modifiers.incl(pmmRefrigerated)
-    elif ability == "Galvanize":
-      move.pokeType = ptElectric
-      move.modifiers.incl(pmmGalvanized)
-    elif ability == "Liquid Voice" and pmmSound in move.modifiers:
-      move.pokeType = ptWater
-  elif ability == "Normalize":
-    move.pokeType = ptNormal
-
-proc changeTypeWithItem*(move: PokeMove, item: string) =
-  if move.name == "Judgement" and item.find("Plate") != -1:
-    move.pokeType = getItemBoostType(item)
-  if move.name == "Techno Blast" and item.find("Drive") != -1:
-    move.pokeType = getTechnoBlast(item)
-
-proc changeTypeWithTerrain*(move: PokeMove, terrain: FieldTerrainKind) =
-  move.pokeType = case terrain
-    of ftkElectric: ptElectric
-    of ftkPsychic: ptPsychic
-    of ftkGrass: ptGrass
-    of ftkFairy: ptFairy
-    else: ptNormal
-
-proc changeTypeWithWeather*(move: PokeMove, weather: FieldWeatherKind) =
-  move.pokeType = case weather
-    of fwkSun, fwkHarshSun: ptFire
-    of fwkRain, fwkHeavyRain: ptWater
-    of fwkSand: ptRock
-    of fwkHail: ptIce
-    else: ptNormal
-  move.basePower = if weather == fwkNone or weather == fwkStrongWinds: 50 else: 100
-
-proc changePriority*(move: PokeMove, pokemon: Pokemon) =
-  if pokemon.ability == "Gale Wings" and move.pokeType == ptFlying and
-    pokemon.currentHP == pokemon.stats.hp: 
-    move.priority = move.priority + 1
 
 
 proc skyDropFails*(move: PokeMove, defender: Pokemon): bool =
