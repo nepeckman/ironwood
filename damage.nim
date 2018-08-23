@@ -1,8 +1,8 @@
 import math, tables, algorithm
-import pokemon
+import pokemon, field, poketype
 
 proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
-  peBurned in attacker.state.effects and move.category == pmcPhysical and
+  peBurned in attacker.effects and move.category == pmcPhysical and
     attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
 
 proc checkAbilitySuppression(defender, attacker: Pokemon, move: PokeMove): bool =
@@ -41,14 +41,21 @@ proc getFinalDamage(baseAmount: float, i: int, effectiveness: float, isBurned: b
     damageAmount = floor(damageAmount / 2)
   pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
 
-proc getDamageResult(attacker: Pokemon, defender: Pokemon, move: PokeMove): array[0..15, int] =
+proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: Field): array[0..15, int] =
+  let move = copy(m)
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   if move.basePower == 0:
     return noDamage
 
   let isDefenderAbilitySuppressed = checkAbilitySuppression(defender, attacker, move)
 
-  if attacker.hasTypeChangingAbility(): move.typeChangeMove(attacker)
+  if move.name == "Weather Ball": move.changeTypeWithWeather(field.weather)
+  if move.isItemDependant() : move.changeTypeWithItem(attacker.item)
+  if move.name == "Nature Power": move.changeTypeWithTerrain(field.terrain)
+  if move.name == "Revelation Dance": move.pokeType = attacker.pokeType1
+  if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
+
+  if attacker.ability == "Gale Wings": move.changePriority(attacker)
 
   var typeEffectiveness = getMoveEffectiveness(move, defender, attacker)
 
@@ -66,6 +73,17 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, move: PokeMove): arra
 
   if not isDefenderAbilitySuppressed and checkImmunityAbilities(defender, move, typeEffectiveness):
     return noDamage
+
+  if field.weather == fwkStrongWinds and
+    defender.hasType(ptFlying) and getTypeMatchup(move.pokeType, ptFlying) > 1:
+    typeEffectiveness = typeEffectiveness / 2
+
+  if move.pokeType == ptGround and move.name != "Thousand Arrows" and
+    not field.gravityActive and defender.item == "Air Balloon":
+    return noDamage
+
+  if move.priority > 0 and field.terrain == ftkPsychic and defender.isGrounded(field):
+    return noDamage
   
   if move.name in ["Seismic Toss", "Night Shade"]:
     var damage = levelDamage(attacker)
@@ -73,11 +91,11 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, move: PokeMove): arra
     return
 
   if move.name == "Final Gambit":
-    fill(result, attacker.state.currentHP)
+    fill(result, attacker.currentHP)
     return
 
   if move.name in ["Nature's Madness", "Super Fang"]:
-    fill(result, toInt(floor(defender.state.currentHP / 2)))
+    fill(result, toInt(floor(defender.currentHP / 2)))
     return
   
   var basePower = move.basePower
@@ -107,7 +125,6 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, move: PokeMove): arra
     result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, 0x1000)
 
 var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)
-var neutralState = PokeState(boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0), effects: {}, currentHP: 244)
 var attacker = Pokemon(
     name: "Snorlax",
     pokeType1: ptNormal,
@@ -117,7 +134,9 @@ var attacker = Pokemon(
     item: "",
     stats: snorlaxStats,
     weight: 100,
-    state: neutralState
+    boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
+    effects: {},
+    currentHP: 244
     )
 var defender = Pokemon(
     name: "Snorlax",
@@ -127,8 +146,10 @@ var defender = Pokemon(
     level: 50,
     item: "",
     stats: snorlaxStats,
+    boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
+    effects: {},
+    currentHP: 244,
     weight: 100,
-    state: neutralState
     )
 var move = PokeMove(
     name: "Return",
@@ -139,5 +160,5 @@ var move = PokeMove(
     modifiers: {}
     )
 
-let damage = getDamageResult(attacker, defender, move)
+let damage = getDamageResult(attacker, defender, move, makeField())
 echo damage

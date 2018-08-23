@@ -1,20 +1,12 @@
-import tables
+import tables, strutils
+import field, item, poketype
 
 type
-  PokeType* = enum
-    ptWater, ptFire, ptElectric, ptDark, ptPsychic, ptGrass, ptIce, ptDragon, ptFairy,
-    ptNormal, ptFighting, ptRock, ptGround, ptSteel, ptGhost, ptPoison, ptBug, ptFlying,
-    ptNull
 
   PokeStats* = tuple[hp: int, atk: int, def: int, spa: int, spd: int, spe: int]
 
   PokeEffect* = enum
     peAsleep, peConfused, pePoisoned, peBurned, peParalyzed
-
-  PokeState* = ref object
-    boosts*: PokeStats
-    effects*: set[PokeEffect]
-    currentHP*: int
 
   PokeMoveModifiers* = enum
     pmmSound, pmmBullet, pmmAerilated, pmmPixilated, pmmRefrigerated, pmmGalvanized, pmmUsesHighestAtkStat,
@@ -49,47 +41,10 @@ type
     item*: string
     stats*: PokeStats
     weight*: float
-    state*: PokeState
+    currentHP*: int
+    boosts*: PokeStats
+    effects*: set[PokeEffect]
 
-
-var PokeTypeEffectiveness = {
-  ptWater: {ptWater: 0.5, ptFire: 2d, ptGrass: 0.5, ptDragon: 0.5, ptRock: 2d, ptGround: 2d}.toTable,
-  ptFire: {ptWater: 0.5, ptFire: 0.5, ptGrass: 2d, ptIce: 2d, ptDragon: 0.5, ptRock: 0.5, ptSteel: 2d, ptBug: 2d}.toTable,
-  ptElectric: {ptWater: 2d, ptElectric: 0.5, ptGrass: 0.5, ptDragon: 0.5, ptGround: 0d, ptFlying: 2d}.toTable,
-  ptDark: {ptDark: 0.5, ptPsychic: 2d, ptFairy: 0.5, ptFighting: 0.5, ptGhost: 2d}.toTable,
-  ptPsychic: {ptDark: 0d, ptPsychic: 0.5, ptFighting: 2d, ptSteel: 0.5, ptPoison: 2d}.toTable,
-  ptGrass: {ptWater: 2d, ptFire: 0.5, ptGrass: 0.5, ptDragon: 0.5, ptRock: 2d, ptGround: 2d, ptSteel: 0.5, ptPoison: 0.5, ptBug: 0.5, ptFlying: 0.5}.toTable,
-  ptIce: {ptWater: 0.5, ptFire: 0.5, ptGrass: 2d, ptIce: 0.5, ptDragon: 2d, ptGround: 2d, ptSteel: 0.5, ptFlying: 2d}.toTable,
-  ptDragon: {ptDragon: 2d, ptFairy: 0d, ptSteel: 0.5}.toTable,
-  ptFairy: {ptFire: 0.5, ptDark: 2d, ptDragon: 2d, ptFighting: 2d, ptSteel: 0.5, ptPoison: 0.5}.toTable,
-  ptNormal: {ptSteel: 0.5, ptGhost: 0d}.toTable,
-  ptFighting: {ptDark: 2d, ptPsychic: 0.5, ptIce: 2d, ptFairy: 0.5, ptNormal: 2d, ptRock: 2d, ptSteel: 2d, ptGhost: 0d, ptPoison: 0.5, ptBug: 0.5, ptFlying: 0.5}.toTable,
-  ptRock: {ptFire: 2d, ptIce: 2d, ptFighting: 0.5, ptGround: 0.5, ptSteel: 0.5, ptBug: 2d, ptFlying: 2d}.toTable,
-  ptGround: {ptFire: 2d, ptElectric: 2d, ptGrass: 0.5, ptRock: 2d, ptSteel: 2d, ptPoison: 2d, ptBug: 0.5, ptFlying: 0d}.toTable,
-  ptSteel: {ptWater: 0.5, ptFire: 0.5, ptElectric: 0.5, ptIce: 2d, ptFairy: 2d, ptRock: 2d, ptSteel: 0.5}.toTable,
-  ptGhost: {ptDark: 0.5, ptPsychic: 2d, ptNormal: 0d, ptGhost: 2d}.toTable,
-  ptPoison: {ptGrass: 2d, ptFairy: 2d, ptGround: 0.5, ptSteel: 0d, ptPoison: 0.5}.toTable,
-  ptBug: {ptFire: 0.5, ptDark: 2d, ptPsychic: 2d, ptGrass: 2d, ptFairy: 0.5, ptFighting: 0.5, ptRock: 0.5, ptSteel: 0.5, ptPoison: 0.5, ptFlying: 0.5}.toTable,
-  ptFlying: {ptElectric: 0.5, ptGrass: 2d, ptFighting: 2d, ptRock: 0.5, ptSteel: 0.5, ptBug: 2d}.toTable,
-  ptNull: initTable[PokeType, float]()
-  }.toTable
-
-proc getTypeMatchup*(attackerType, defenderType: PokeType): float =
-  if defenderType in PokeTypeEffectiveness[attackerType]: PokeTypeEffectiveness[attackerType][defenderType] else: 1
-
-proc getTypeEffectiveness*(attackerType: PokeType, defenderType: PokeType, moveName = "", isGhostRevealed = false, isFlierGrounded = false): float =
-  if isGhostRevealed and defenderType == ptGhost and attackerType in {ptNormal, ptFighting}:
-    return 1
-  elif isFlierGrounded and defenderType == ptFlying and attackerType == ptGround:
-    return 1
-  elif defenderType == ptFlying and moveName == "Thousand Arrows":
-    return 1
-  elif defenderType == ptWater and moveName == "Freeze-Dry":
-    return 2
-  elif moveName == "Flying Press":
-    return getTypeMatchup(ptFighting, defenderType) * getTypeMatchup(ptFlying, defenderType)
-  else:
-    return getTypeMatchup(attackerType, defenderType)
 
 proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon): float =
   getTypeEffectiveness(move.pokeType, defender.pokeType1, move.name, attacker.ability == "Scrappy") *
@@ -100,6 +55,10 @@ proc hasType*(pokemon: Pokemon, pokeType: PokeType): bool =
     return false
   pokeType == pokemon.pokeType1 or pokeType == pokemon.pokeType2
 
+proc isGrounded*(pokemon: Pokemon, field: Field): bool =
+  field.gravityActive or
+    not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item == "Air Balloon")
+
 proc getWeightFactor*(pokemon: Pokemon): float =
   if pokemon.ability == "Heavy Metal": 2f
   elif pokemon.ability == "Light Metal": 0.5
@@ -108,24 +67,67 @@ proc getWeightFactor*(pokemon: Pokemon): float =
 proc hasTypeChangingAbility*(pokemon: Pokemon): bool =
   pokemon.ability in ["Aerliate", "Pixilate", "Refrigerate", "Galvanize", "Liquid Voice", "Normalize"]
 
-proc typeChangeMove*(move: PokeMove, attacker: Pokemon) =
+proc isItemDependant*(move: PokeMove): bool =
+  move.name in ["Judgement", "Techno Blast", "Multi-Attack", "Natural Gift"]
+
+proc copy*(move: PokeMove): PokeMove =
+  PokeMove(
+    name: move.name,
+    category: move.category,
+    basePower: move.basePower,
+    pokeType: move.pokeType,
+    priority: move.priority,
+    effect: move.effect,
+    modifiers: move.modifiers
+  )
+
+proc changeTypeWithAbility*(move: PokeMove, ability: string) =
   if move.pokeType == ptNormal:
-    if attacker.ability == "Aerilate":
+    if ability == "Aerilate":
       move.pokeType = ptFlying
       move.modifiers.incl(pmmAerilated)
-    elif attacker.ability == "Pixilate":
+    elif ability == "Pixilate":
       move.pokeType = ptFairy
       move.modifiers.incl(pmmPixilated)
-    elif attacker.ability == "Refrigerate":
+    elif ability == "Refrigerate":
       move.pokeType = ptIce
       move.modifiers.incl(pmmRefrigerated)
-    elif attacker.ability == "Galvanize":
+    elif ability == "Galvanize":
       move.pokeType = ptElectric
       move.modifiers.incl(pmmGalvanized)
-    elif attacker.ability == "Liquid Voice" and pmmSound in move.modifiers:
+    elif ability == "Liquid Voice" and pmmSound in move.modifiers:
       move.pokeType = ptWater
-  elif attacker.ability == "Normalize":
+  elif ability == "Normalize":
     move.pokeType = ptNormal
+
+proc changeTypeWithItem*(move: PokeMove, item: string) =
+  if move.name == "Judgement" and item.find("Plate") != -1:
+    move.pokeType = getItemBoostType(item)
+  if move.name == "Techno Blast" and item.find("Drive") != -1:
+    move.pokeType = getTechnoBlast(item)
+
+proc changeTypeWithTerrain*(move: PokeMove, terrain: FieldTerrainKind) =
+  move.pokeType = case terrain
+    of ftkElectric: ptElectric
+    of ftkPsychic: ptPsychic
+    of ftkGrass: ptGrass
+    of ftkFairy: ptFairy
+    else: ptNormal
+
+proc changeTypeWithWeather*(move: PokeMove, weather: FieldWeatherKind) =
+  move.pokeType = case weather
+    of fwkSun, fwkHarshSun: ptFire
+    of fwkRain, fwkHeavyRain: ptWater
+    of fwkSand: ptRock
+    of fwkHail: ptIce
+    else: ptNormal
+  move.basePower = if weather == fwkNone or weather == fwkStrongWinds: 50 else: 100
+
+proc changePriority*(move: PokeMove, pokemon: Pokemon) =
+  if pokemon.ability == "Gale Wings" and move.pokeType == ptFlying and
+    pokemon.currentHP == pokemon.stats.hp: 
+    move.priority = move.priority + 1
+
 
 proc skyDropFails*(move: PokeMove, defender: Pokemon): bool =
   move.name == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200)
@@ -137,5 +139,5 @@ proc synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): b
 
 proc dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
   move.name == "Dream Eater" and
-    not (peAsleep in defender.state.effects) and
+    not (peAsleep in defender.effects) and
     defender.ability != "Comatose"
