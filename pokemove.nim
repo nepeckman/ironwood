@@ -1,5 +1,5 @@
 import strutils
-import poketype, field, item
+import poketype, field, item, ability
 
 type
 
@@ -32,7 +32,7 @@ proc copy*(move: PokeMove): PokeMove =
     modifiers: move.modifiers
   )
 
-proc changeTypeWithAbility*(move: PokeMove, ability: string) =
+proc changeTypeWithAbility*(move: PokeMove, ability: Ability) =
   if move.pokeType == ptNormal:
     if ability == "Aerilate":
       move.pokeType = ptFlying

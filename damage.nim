@@ -1,5 +1,5 @@
 import math, algorithm
-import pokemon, field, poketype, pokemove, condition, item
+import pokemon, field, poketype, pokemove, condition, item, ability
 
 proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
   sckBurned == attacker.status and move.category == pmcPhysical and
@@ -127,7 +127,7 @@ var attacker = Pokemon(
     name: "Snorlax",
     pokeType1: ptNormal,
     pokeType2: ptNull,
-    ability: "Gluttony",
+    ability: Ability(name: "Gluttony", effect: nil),
     level: 50,
     item: nil,
     stats: snorlaxStats,
@@ -141,7 +141,7 @@ var defender = Pokemon(
     name: "Snorlax",
     pokeType1: ptNormal,
     pokeType2: ptNull,
-    ability: "Gluttony",
+    ability: Ability(name: "Gluttony", effect: nil),
     level: 50,
     item: nil,
     stats: snorlaxStats,

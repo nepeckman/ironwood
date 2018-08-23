@@ -1,4 +1,4 @@
-import field, item, poketype, pokemove, condition, effects
+import field, item, poketype, pokemove, condition, effects, ability
 
 type
 
@@ -8,7 +8,7 @@ type
     name*: string
     pokeType1*: PokeType
     pokeType2*: PokeType
-    ability*: string
+    ability*: Ability
     level*: int
     item*: Item
     stats*: PokeStats
