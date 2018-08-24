@@ -1,3 +1,4 @@
+import strutils
 import poketype, field
 
 type
@@ -22,34 +23,23 @@ type
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikMuscleBand,
       ikWiseGlasses, ikExpertBelt: discard
-    
 
-proc getItemBoostType*(item: string): PokeType =
-  case item 
-  of "Draco Plate", "Dragon Fang": ptDragon
-  of "Dread Plate", "Black Glasses": ptDark
-  of "Earth Plate", "Soft Sand": ptGround
-  of "Fist Plate", "Black Belt": ptFighting
-  of "Flame Plate", "Charcoal": ptFire
-  of "Icicle Plate", "Never-Melt Ice": ptIce
-  of "Insect Plate", "Silver Powder": ptBug
-  of "Iron Plate", "Metal Coat": ptSteel
-  of "Meadow Plate", "Rose Incense", "Miracle Seed": ptGrass
-  of "Mind Plate", "Odd Incense", "Twisted Spoon": ptPsychic
-  of "Pixie Plate": ptFairy
-  of "Sky Plate", "Sharp Beak": ptFlying
-  of "Splash Plate", "Sea Incense", "Wave Incense", "Mystic Water": ptWater
-  of "Spooky Plate", "Spell Tag": ptGhost
-  of "Stone Plate", "Rock Incense", "Hard Stone": ptRock
-  of "Toxic Plate", "Poison Barb": ptPoison
-  of "Zap Plate", "Magnet": ptElectric
-  of "Silk Scarf", "Pink Bow", "Polkadot Bow": ptNormal
-  else: ptNull
-
-proc getTechnoBlast*(item: string): PokeType =
-  case item
-  of "Burn Drive": ptFire
-  of "Chill Drive": ptIce
-  of "Douse Drive": ptWater
-  of "Shock Drive": ptElectric
-  else: ptNull
+proc getFlingPower*(item: Item): int =
+  if item.name == "Iron Ball": 130
+  elif item.name == "Hard Stone": 100
+  elif item.kind == ikPlate or item.name in ["Deep Sea Tooth", "Thick Club"]: 90
+  elif item.name in ["Assault Vest", "Weakness Policy"]: 80
+  elif item.name in ["Poison Barb", "Dragon Fang"]: 70
+  elif item.name in ["Adamant Orb", "Lustrous Orb", "Macho Brace", "Stick"]: 60
+  elif item.name == "Sharp Beak": 50
+  elif item.name == "Eviolite": 40
+  elif item.name in ["Black Belt", "Black Sludge", "Black Glasses", "Charcoal", "Deep Sea Scale", "Flame Orb", "King's Rock",
+    "Life Orb", "Light Ball", "Magnet", "Metal Coat", "Miracle Seed", "Mystic Water", "Never-Melt Ice",
+    "Razor Fang", "Soul Dew", "Spell Tag", "Toxic Orb", "Twisted Spoon"]: 30
+  elif item.name.find("Berry") != -1 or item.name in ["Air Balloon", "Choice Band",
+  "Choice Scarf", "Choice Specs", "Destiny Knot", "Electric Seed", "Expert Belt",
+  "Focus Band", "Focus Sash", "Grassy Seed", "Lagging tail", "leftovers", "Mental Herb",
+  "Metal Powder", "Misty Seed", "Muscle Band", "Power Herb", "Psychic Seed", "Quick Powder",
+  "Reaper Cloth", "Red Card", "Ring Target", "Shed Shell", "Silk Scarf", "Silver Powder",
+  "Smooth Rock", "Soft Sand", "Soothe Bell", "White Herb", "Wide Lens", "Wise Glasses", "Zoom Lens"]: 10
+  else: 0

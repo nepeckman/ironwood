@@ -9,6 +9,11 @@ proc checkAbilitySuppression(defender, attacker: Pokemon, move: PokeMove): bool 
   defender.ability notin ["Full Metal Body", "Prism Armor", "Shadow Shield"] and
     (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move.name in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"])
 
+proc defenderProtected(defender: Pokemon, move: PokeMove): bool =
+  (gckProtected in defender.conditions and not (pmmBypassesProtect in move.modifiers)) or
+    (gckWideGuarded in defender.conditions and pmmSpread in move.modifiers) or
+    (gckQuickGuarded in defender.conditions and not (pmmBypassesProtect in move.modifiers) and move.priority > 0)
+
 proc checkImmunityAbilities(defender: Pokemon, move: PokeMove, typeEffectiveness: float): bool =
   (defender.ability == "Wonder Guard" and typeEffectiveness <= 1) or
     (defender.ability == "Sap Sipper" and move.pokeType == ptGrass) or
@@ -19,6 +24,29 @@ proc checkImmunityAbilities(defender: Pokemon, move: PokeMove, typeEffectiveness
     (defender.ability == "Bulletproof" and pmmBullet in move.modifiers) or
     (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
     (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0)
+
+proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
+  case move.name
+  of "Payback":
+    if defender.hasAttacked: 100 else: 50
+  of "Electro Ball": speedRatioToBasePower(floor(attacker.speed / defender.speed))
+  of "Gyro Ball": min(150, 1 + toInt(floor(25 * defender.speed / attacker.speed)))
+  of "Punishment": min(200, 60 + 20 * countBoosts(defender))
+  of "Low Kick", "Grass Knot": weightToBasePower(defender.weight * getWeightFactor(defender))
+  of "Hex":
+    if defender.status == sckHealthy: move.basePower else: move.basePower * 2
+  of "Heavy Slam", "Heat Crash": weightRatioToBasePower(
+    attacker.weight * attacker.getWeightFactor() / (defender.weight * defender.getWeightFactor()))
+  of "Stored Power", "Power Trip": 20 + 20 * attacker.countBoosts()
+  of "Acrobatics":
+    if attacker.item == nil: 110 else: 55
+  of "Wake-Up Slap":
+    if defender.status == sckHealthy: move.basePower * 2 else: move.basePower
+  of "Fling": getFlingPower(attacker.item)
+  of "Eruption", "Water Spout": max(1, toInt(floor(150 * attacker.currentHP / attacker.stats.hp)))
+  of "Flail", "Reversal": healthRatioToBasePower(floor(48 * attacker.currentHP / attacker.stats.hp))
+  of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.stats.hp)
+  else: move.basePower
 
 proc levelDamage(attacker: Pokemon): int =
   if attacker.ability == "Parental Bond": attacker.level * 2 else: attacker.level
@@ -47,6 +75,9 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
   if move.basePower == 0 and move.name != "Nature Power":
     return noDamage
 
+  if defenderProtected(defender, move):
+    return noDamage
+
   let isDefenderAbilitySuppressed = checkAbilitySuppression(defender, attacker, move)
 
   if move.name == "Weather Ball": move.changeTypeWithWeather(field.weather)
@@ -55,7 +86,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
   if move.name == "Revelation Dance": move.pokeType = attacker.pokeType1
   if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
 
-  var typeEffectiveness = getMoveEffectiveness(move, defender, attacker)
+  var typeEffectiveness = getMoveEffectiveness(move, defender, attacker, field)
 
   if typeEffectiveness == 0:
     return noDamage
@@ -129,6 +160,7 @@ var attacker = Pokemon(
     pokeType2: ptNull,
     ability: Ability(name: "Gluttony", effect: nil),
     level: 50,
+    hasAttacked: false,
     item: nil,
     stats: snorlaxStats,
     weight: 100,
@@ -143,6 +175,7 @@ var defender = Pokemon(
     pokeType2: ptNull,
     ability: Ability(name: "Gluttony", effect: nil),
     level: 50,
+    hasAttacked: true,
     item: nil,
     stats: snorlaxStats,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
@@ -155,6 +188,7 @@ var move = PokeMove(
     name: "Return",
     category: pmcPhysical,
     basePower: 102,
+    variablePower: false,
     pokeType: ptNormal,
     priority: 0,
     modifiers: {}

@@ -15,13 +15,18 @@ type
     weight*: float
     currentHP*: int
     boosts*: PokeStats
+    hasAttacked*: bool
     status*: StatusConditionKind
     conditions*: set[GeneralConditionKind]
 
+proc speed*(mon: Pokemon): int =
+  mon.stats.spe
 
-proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon): float =
-  getTypeEffectiveness(move.pokeType, defender.pokeType1, move.name, attacker.ability == "Scrappy") *
-    getTypeEffectiveness(move.pokeType, defender.pokeType2, move.name, attacker.ability == "Scrappy")
+proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon, field: Field): float =
+  let isGhostRevealed = attacker.ability == "Scrappy" or gckRevealed in defender.conditions
+  let isFlierGrounded = field.gravityActive or gckGrounded in defender.conditions
+  getTypeEffectiveness(move.pokeType, defender.pokeType1, move.name, isGhostRevealed, isFlierGrounded) *
+    getTypeEffectiveness(move.pokeType, defender.pokeType2, move.name, isGhostRevealed, isFlierGrounded)
 
 proc hasType*(pokemon: Pokemon, pokeType: PokeType): bool =
   if pokeType == ptNull:
@@ -53,3 +58,8 @@ proc dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
   move.name == "Dream Eater" and
     not (sckAsleep == defender.status) and
     defender.ability != "Comatose"
+
+proc countBoosts*(mon: Pokemon): int =
+  result = 0
+  for boost in mon.boosts.fields:
+    result = if boost > 0: boost + result else: result

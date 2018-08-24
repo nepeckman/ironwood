@@ -15,6 +15,7 @@ type
     name*: string
     category*: PokeMoveCategory
     basePower*: int
+    variablePower*: bool
     pokeType*: PokeType
     priority*: int
     modifiers*: set[PokeMoveModifiers]
@@ -27,6 +28,7 @@ proc copy*(move: PokeMove): PokeMove =
     name: move.name,
     category: move.category,
     basePower: move.basePower,
+    variablePower: move.variablePower,
     pokeType: move.pokeType,
     priority: move.priority,
     modifiers: move.modifiers
@@ -52,9 +54,7 @@ proc changeTypeWithAbility*(move: PokeMove, ability: Ability) =
     move.pokeType = ptNormal
 
 proc changeTypeWithItem*(move: PokeMove, item: Item) =
-  if move.name == "Judgement" and item.kind == ikPlate:
-    move.pokeType = item.associatedType
-  if move.name == "Techno Blast" and item.kind == ikDrive:
+  if item.kind in {ikDrive, ikPlate, ikMemory}:
     move.pokeType = item.associatedType
 
 proc changeTypeWithTerrain*(move: PokeMove, terrain: FieldTerrainKind) =
@@ -64,6 +64,12 @@ proc changeTypeWithTerrain*(move: PokeMove, terrain: FieldTerrainKind) =
     of ftkGrass: ptGrass
     of ftkFairy: ptFairy
     else: ptNormal
+  move.basePower = case terrain
+    of ftkElectric: 90
+    of ftkPsychic: 90
+    of ftkGrass: 90
+    of ftkFairy: 95
+    else: 80
 
 proc changeTypeWithWeather*(move: PokeMove, weather: FieldWeatherKind) =
   move.pokeType = case weather
@@ -73,3 +79,32 @@ proc changeTypeWithWeather*(move: PokeMove, weather: FieldWeatherKind) =
     of fwkHail: ptIce
     else: ptNormal
   move.basePower = if weather == fwkNone or weather == fwkStrongWinds: 50 else: 100
+
+proc speedRatioToBasePower*(speedRatio: float): int =
+  if speedRatio >= 4: 150
+  elif speedRatio >= 3: 120
+  elif speedRatio >= 2: 80
+  else: 60
+
+proc weightToBasePower*(weight: float): int =
+  if weight >= 200: 120
+  elif weight >= 100: 100
+  elif weight >= 50: 80
+  elif weight >= 25: 60
+  elif weight >= 10: 40
+  else: 20
+
+proc weightRatioToBasePower*(weightRatio: float): int =
+  if weightRatio >= 5: 120
+  elif weightRatio >= 4: 100
+  elif weightRatio >= 3: 80
+  elif weightRatio >= 2: 60
+  else: 40
+
+proc healthRatioToBasePower*(healthRatio: float): int =
+  if healthRatio <= 1: 200
+  elif healthRatio <= 4: 150
+  elif healthRatio <= 9: 100
+  elif healthRatio <= 16: 80
+  elif healthRatio <= 32: 40
+  else: 20
