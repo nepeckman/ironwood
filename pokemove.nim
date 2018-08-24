@@ -90,7 +90,7 @@ proc speedRatioToBasePower*(speedRatio: float): int =
   elif speedRatio >= 2: 80
   else: 60
 
-proc weightToBasePower*(weight: float): int =
+proc weightToBasePower*(weight: int): int =
   if weight >= 200: 120
   elif weight >= 100: 100
   elif weight >= 50: 80

@@ -2,7 +2,7 @@ import condition, poketype
 type
 
   EffectActivationKind* = enum
-    eakTurnStart, eakTurnEnd eakBeforeAttack, eakAfterAttack, eakOnSwitchIn, eakOnSwitchOut
+    eakTurnStart, eakTurnEnd eakBeforeAttack, eakAfterAttack, eakOnSwitchIn, eakOnSwitchOut, eakPassive
 
   EffectTargetKind* = enum
     etkField, etkSelf, etkPokemon

@@ -45,10 +45,10 @@ proc getFlingPower*(item: Item): int =
   else: 0
 
 proc kind*(item: Item): ItemKind =
-  if item == nil: ikNone else: item.kind
+  if isNil(item): ikNone else: item.kind
 
 proc name*(item: Item): string =
-  if item == nil: "" else: item.name
+  if isNil(item): "" else: item.name
 
 proc consumable*(item: Item): bool =
-  if item == nil: false else: item.consumable
+  if isNil(item): false else: item.consumable

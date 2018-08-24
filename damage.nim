@@ -5,6 +5,33 @@ proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
   sckBurned == attacker.status and move.category == pmcPhysical and
     attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
 
+proc skyDropFails*(move: PokeMove, defender: Pokemon): bool =
+  move.name == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200)
+
+proc synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): bool =
+  move.name == "Synchronoise" and
+    not defender.hasType(attacker.pokeType1) and
+    not defender.hasType(attacker.pokeType2)
+
+proc dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
+  move.name == "Dream Eater" and
+    not (sckAsleep == defender.status) and
+    defender.ability != "Comatose"
+
+proc moveFails*(move: PokeMove, defender, attacker: Pokemon): bool =
+  skyDropFails(move, defender) or synchronoiseFails(move, defender, attacker) or
+    dreamEaterFails(move, defender)
+
+proc isGrounded*(pokemon: Pokemon, field: Field): bool =
+  field.gravityActive or
+    not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item.kind == ikAirBalloon)
+
+proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon, field: Field): float =
+  let isGhostRevealed = attacker.ability == "Scrappy" or gckRevealed in defender.conditions
+  let isFlierGrounded = field.gravityActive or gckGrounded in defender.conditions
+  getTypeEffectiveness(move.pokeType, defender.pokeType1, move.name, isGhostRevealed, isFlierGrounded) *
+    getTypeEffectiveness(move.pokeType, defender.pokeType2, move.name, isGhostRevealed, isFlierGrounded)
+
 proc checkAbilitySuppression(defender, attacker: Pokemon, move: PokeMove): bool =
   defender.ability notin ["Full Metal Body", "Prism Armor", "Shadow Shield"] and
     (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move.name in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"])
@@ -32,20 +59,19 @@ proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): 
   of "Electro Ball": speedRatioToBasePower(floor(attacker.speed / defender.speed))
   of "Gyro Ball": min(150, 1 + toInt(floor(25 * defender.speed / attacker.speed)))
   of "Punishment": min(200, 60 + 20 * countBoosts(defender))
-  of "Low Kick", "Grass Knot": weightToBasePower(defender.weight * getWeightFactor(defender))
+  of "Low Kick", "Grass Knot": weightToBasePower(defender.weight)
   of "Hex":
     if defender.status == sckHealthy: move.basePower else: move.basePower * 2
-  of "Heavy Slam", "Heat Crash": weightRatioToBasePower(
-    attacker.weight * attacker.getWeightFactor() / (defender.weight * defender.getWeightFactor()))
+  of "Heavy Slam", "Heat Crash": weightRatioToBasePower(attacker.weight / defender.weight)
   of "Stored Power", "Power Trip": 20 + 20 * attacker.countBoosts()
   of "Acrobatics":
     if attacker.item == nil: 110 else: 55
   of "Wake-Up Slap":
     if defender.status == sckHealthy: move.basePower * 2 else: move.basePower
   of "Fling": getFlingPower(attacker.item)
-  of "Eruption", "Water Spout": max(1, toInt(floor(150 * attacker.currentHP / attacker.stats.hp)))
-  of "Flail", "Reversal": healthRatioToBasePower(floor(48 * attacker.currentHP / attacker.stats.hp))
-  of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.stats.hp)
+  of "Eruption", "Water Spout": max(1, toInt(floor(150 * attacker.currentHP / attacker.maxHP)))
+  of "Flail", "Reversal": healthRatioToBasePower(floor(48 * attacker.currentHP / attacker.maxHP))
+  of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.maxHP)
   else: move.basePower
 
 proc boostedKnockOff(defender: Pokemon): bool =
@@ -99,7 +125,7 @@ proc attackerItemBasePowerMod(attacker: Pokemon, move: PokeMove): int =
 
 proc moveBasePowerMod(move: PokeMove, attacker, defender: Pokemon, field: Field): int =
   if (move.name == "Facade" and attacker.status != sckHealthy) or
-    (move.name == "Brine" and defender.currentHP <= toInt(defender.stats.hp / 2)) or
+    (move.name == "Brine" and defender.currentHP <= toInt(defender.maxHP / 2)) or
     (move.name == "Venoshock" and defender.status in {sckPoisoned, sckBadlyPoisoned}): 0x2000
   elif (move.name == "Solar Beam" and field.weather in {fwkRain, fwkHeavyRain, fwkSand, fwkHail}): 0x800
   elif (move.name == "Knock Off" and boostedKnockOff(defender)): 0x1800
@@ -157,14 +183,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
   if typeEffectiveness == 0:
     return noDamage
 
-  if skyDropFails(move, defender):
-    return noDamage
-
-  if synchronoiseFails(move, defender, attacker):
-    return noDamage
-
-  if dreamEaterFails(move, defender):
-    return noDamage
+  if moveFails(move, defender, attacker): return noDamage
 
   if not isDefenderAbilitySuppressed and checkImmunityAbilities(defender, move, typeEffectiveness):
     return noDamage
@@ -207,16 +226,20 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
 
   var basePower = max(1, pokeRound(move.basePower * chainMods(bpMods) / 0x1000))
 
+  ### (SP)ATTACK
   var attack: int
   var attackSource = if move.name == "Foul Play": defender else: attacker
 
   if (pmmUsesHighestAtkStat in move.modifiers):
-    move.category = if attackSource.stats.atk >= attackSource.stats.spa: pmcPhysical else: pmcSpecial
+    move.category = if attackSource.attack >= attackSource.spattack: pmcPhysical else: pmcSpecial
 
-  attack = if move.category == pmcPhysical: attackSource.stats.atk else: attackSource.stats.spa
+  attack = if move.category == pmcPhysical: attackSource.attack else: attackSource.spattack
 
-  var defense = if move.category == pmcPhysical or pmmDealsPhysicalDamage in move.modifiers: defender.stats.def
-    else: defender.stats.spd
+
+  ### (SP)DEFENSE
+  var defense =
+    if move.category == pmcPhysical or pmmDealsPhysicalDamage in move.modifiers: defender.defense
+    else: defender.spdefense
 
   var baseDamage = getBaseDamage(attacker.level, basePower, attack, defense)
 
@@ -230,37 +253,12 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
   for i in 0..15:
     result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, 0x1000)
 
+
+
+
 var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)
-var attacker = Pokemon(
-    name: "Snorlax",
-    pokeType1: ptNormal,
-    pokeType2: ptNull,
-    ability: Ability(name: "Gluttony", effect: nil),
-    level: 50,
-    hasAttacked: false,
-    item: nil,
-    stats: snorlaxStats,
-    weight: 100,
-    boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
-    status: sckHealthy,
-    conditions: {},
-    currentHP: 244
-    )
-var defender = Pokemon(
-    name: "Snorlax",
-    pokeType1: ptNormal,
-    pokeType2: ptNull,
-    ability: Ability(name: "Gluttony", effect: nil),
-    level: 50,
-    hasAttacked: true,
-    item: nil,
-    stats: snorlaxStats,
-    boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
-    conditions: {},
-    status: sckHealthy,
-    currentHP: 244,
-    weight: 100,
-    )
+var attacker = makePokemon("Snorlax", ptNormal, stats = snorlaxStats)
+var defender = makePokemon("Snorlax", ptNormal, stats = snorlaxStats)
 var move = PokeMove(
     name: "Return",
     category: pmcPhysical,
