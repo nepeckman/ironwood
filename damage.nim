@@ -234,7 +234,50 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
     move.category = if attackSource.attack >= attackSource.spattack: pmcPhysical else: pmcSpecial
 
   attack = if move.category == pmcPhysical: attackSource.attack else: attackSource.spattack
+  if not isDefenderAbilitySuppressed and defender.ability == "Unaware":
+    attack =
+      if move.category == pmcPhysical: attackSource.rawStats.atk else: attackSource.rawStats.spa
 
+  if attacker.ability == "Hustle" and move.category == pmcPhysical:
+    attack = pokeRound(attack * 3 / 2)
+
+  var atkMods: seq[int] = @[]
+  if not isDefenderAbilitySuppressed:
+    if (defender.ability == "Thick Fat" and move.pokeType in {ptFire, ptIce}) or
+      (defender.ability == "Water Bubble" and move.pokeType == ptFire):
+      atkMods.add(0x800)
+
+  if (attacker.ability == "Guts" and attacker.status != sckHealthy) or
+    attacker.currentHP <= toInt(attacker.maxHP / 3) and
+    (attacker.ability == "Overgrow" and move.pokeType == ptGrass or
+    attacker.ability == "Blaze" and move.pokeType == ptFire or
+    attacker.ability == "Torrent" and move.pokeType == ptWater or
+    attacker.ability == "Swarm" and move.pokeType == ptBug):
+    atkMods.add(0x1800)
+  elif (gckFireFlashed in attacker.conditions) and move.pokeType == ptFire:
+    atkMods.add(0x1800)
+  elif field.weather in {fwkSun, fwkHarshSun} and 
+    (attacker.ability == "Solar Power" and move.category == pmcSpecial or
+    attacker.ability == "Flower Gift" and move.category == pmcPhysical):
+    atkMods.add(0x1800)
+  elif (attacker.ability == "Defeatist" and attacker.currentHP <= toInt(attacker.maxHP / 2)) or
+    (attacker.ability == "Slow Start" and move.category == pmcPhysical):
+    atkMods.add(0x800)
+  elif attacker.ability in ["Huge Power", "Pure Power"] and move.category == pmcPhysical:
+    atkMods.add(0x2000)
+
+  if
+    (attacker.item.name == "Thick Club" and attacker.name in ["Cubone", "Marowak", "Marowak-Alola"] and
+    move.category == pmcPhysical) or
+    (attacker.item.name == "Deep Sea Tooth" and attacker.name == "Clamperl" and
+    move.category == pmcSpecial) or
+    (attacker.item.name == "Light Ball" and attacker.name == "Pikachu"):
+    atkMods.add(0x2000)
+  elif (attacker.item.name == "Choice Band" and move.category == pmcPhysical) or
+    (attacker.item.name == "Choice Specs" and move.category == pmcSpecial):
+    atkMods.add(0x1800)
+
+  attack = max(1, pokeRound(attack * chainMods(atkMods) / 0x1000))
 
   ### (SP)DEFENSE
   var defense =
