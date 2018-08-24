@@ -19,7 +19,7 @@ type
     ffkSingles, ffkDoubles, ffkTriples, ffkRotation
 
   Field* = ref object
-    weather*: FieldWeatherKind
+    weather: FieldWeatherKind
     weatherSuppressed*: bool
     terrain*: FieldTerrainKind
     auras*: set[FieldAuraKind]
@@ -39,3 +39,6 @@ proc makeField*(): Field =
     homeSideEffects: {},
     awaySideEffects: {}
   )
+
+proc weather*(field: Field): FieldWeatherKind =
+  if field.weatherSuppressed: fwkNone else: field.weather
