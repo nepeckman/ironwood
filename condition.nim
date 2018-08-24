@@ -5,5 +5,5 @@ type
 
   GeneralConditionKind* = enum
     gckConfusion, gckAttraction, gckProtected, gckWideGuarded, gckQuickGuarded,
-    gckFlinching, gckUnderground, gckUnderwater, gckInSky, gckRevealed, gckGrounded,
+    gckFlinching, gckUnderground, gckUnderwater, gckInSky, gckRevealed, gckGrounded, gckHandedHelp
     gckTaunted, gckTormented, gckDisabled, gckCharging, gckRecharging, gckEncored, gckRampaging

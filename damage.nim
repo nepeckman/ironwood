@@ -48,6 +48,14 @@ proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): 
   of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.stats.hp)
   else: move.basePower
 
+proc boostedKnockOff(defender: Pokemon): bool =
+  defender.hasItem() and
+    not (defender.name == "Giratina-Origin" and defender.item.name == "Griseous Orb") and
+    not (defender.name == "Arceus" and defender.item.kind == ikPlate) and
+    not (defender.name == "Genesect" and defender.item.kind == ikDrive) and
+    not (defender.ability == "RKS System" and defender.item.kind == ikMemory) and
+    not (defender.item.kind in {ikZCrystal, ikMegaStone})
+
 proc levelDamage(attacker: Pokemon): int =
   if attacker.ability == "Parental Bond": attacker.level * 2 else: attacker.level
 
@@ -127,8 +135,86 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: F
     fill(result, toInt(floor(defender.currentHP / 2)))
     return
   
-  var basePower = move.basePower
+  ### BASE POWER
+  var basePower = if move.variablePower: calculateBasePower(move, attacker, defender) else: move.basePower
   var isSTAB = attacker.hasType(move.pokeType)
+  var bpMods: seq[int] = @[]
+  if (attacker.ability == "Technician" and basePower <= 60) or
+    (attacker.ability == "Flare Boost" and attacker.status == sckBurned and move.category == pmcSpecial) or
+    (attacker.ability == "Toxic Boost" and attacker.status in {sckPoisoned, sckBadlyPoisoned} and move.category == pmcPhysical):
+    bpMods.add(0x1800)
+  elif attacker.ability == "Analytic" and defender.hasAttacked:
+    bpMods.add(0x14CD)
+  elif attacker.ability == "Sand Force" and field.weather == fwkSand and move.pokeType in {ptRock, ptGround, ptSteel}:
+    bpMods.add(0x14CD)
+  elif (attacker.ability == "Reckless" and pmmRecoil in move.modifiers) or
+    (attacker.ability == "Iron Fist" and pmmPunch in move.modifiers):
+    bpMods.add(0x1333)
+
+  if not isDefenderAbilitySuppressed:
+    if (defender.ability == "Heatproof" and move.pokeType == ptFire):
+      bpMods.add(0x800)
+    elif (defender.ability == "Dry Skin" and move.pokeType == ptFire):
+      bpMods.add(0x1400)
+    elif (defender.ability == "Fluffy" and
+      not (pmmMakesContact in move.modifiers and attacker.ability != "Long Reach") and move.pokeType == ptFire):
+      bpMods.add(0x2000)
+    elif (defender.ability == "Fluffy" and
+      pmmMakesContact in move.modifiers and attacker.ability != "Long Reach" and move.pokeType != ptFire):
+      bpMods.add(0x800)
+
+  if attacker.ability == "Sheer Force" and pmmSecondaryEffect in move.modifiers:
+    bpMods.add(0x14CD)
+
+  if attacker.ability == "Rivalry" and pgkGenderless notin {attacker.gender, defender.gender}:
+    if attacker.gender == defender.gender:
+      bpMods.add(0x1400)
+    else:
+      bpMods.add(0xCCD)
+
+  if attacker.item.kind in {ikPlate, ikTypeBoost}:
+    bpMods.add(0x1333)
+  elif (attacker.item.kind == ikMuscleBand and move.category == pmcPhysical) or
+    (attacker.item.kind == ikWiseGlasses and move.category == pmcSpecial):
+    bpMods.add(0x1199)
+  elif attacker.item.kind == ikPokemonExclusive:
+    if (attacker.item.name == "Adamant Orb" and attacker.name == "Dialga") or
+      (attacker.item.name == "Lustrous Orb" and attacker.name == "Palkia") or
+      (attacker.item.name == "Soul Dew" and attacker.name in ["Latios", "Latias", "Latios-Mega", "Latias-Mega"]) or
+      (attacker.item.name == "Griseous Orb" and attacker.name == "Giratina-Origin") and isSTAB:
+      bpMods.add(0x1333)
+
+  if (move.name == "Facade" and attacker.status != sckHealthy) or
+    (move.name == "Brine" and defender.currentHP <= toInt(defender.stats.hp / 2)) or
+    (move.name == "Venoshock" and defender.status in {sckPoisoned, sckBadlyPoisoned}):
+    bpMods.add(0x2000)
+  elif (move.name == "Solar Beam" and field.weather in {fwkRain, fwkHeavyRain, fwkSand, fwkHail}):
+    bpMods.add(0x800)
+  elif (move.name == "Knock Off" and boostedKnockOff(defender)):
+    bpMods.add(0x1800)
+
+  if gckHandedHelp in attacker.conditions:
+    bpMods.add(0x1800)
+
+  if pmmAerilated in move.modifiers or pmmPixilated in move.modifiers or
+    pmmRefrigerated in move.modifiers or pmmGalvanized in move.modifiers:
+    bpMods.add(0x1200)
+  elif attacker.ability == "Strong Jaw" and pmmJaw in move.modifiers or
+    attacker.ability == "Mega Launcher" and pmmPulse in move.modifiers:
+    bpMods.add(0x1400)
+  elif attacker.ability == "Tough Claws" and pmmMakesContact in move.modifiers:
+    bpMods.add(0x14CD)
+  elif attacker.ability == "Neuroforce" and typeEffectiveness > 1:
+    bpMods.add(0x1400)
+
+  if move.isAuraBoosted(field):
+    if attacker.ability == "Aura Break" or
+      (not isDefenderAbilitySuppressed and defender.ability == "Aura Break"):
+      bpMods.add(0x0C00)
+    else:
+      bpMods.add(0x1547)
+
+  basePower = max(1, pokeRound(basePower * chainMods(bpMods) / 0x1000))
 
   var attack: int
   var attackSource = if move.name == "Foul Play": defender else: attacker

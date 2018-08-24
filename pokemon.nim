@@ -4,11 +4,15 @@ type
 
   PokeStats* = tuple[hp: int, atk: int, def: int, spa: int, spd: int, spe: int]
 
+  PokeGenderKind* = enum
+    pgkMale, pgkFemale, pgkGenderless
+
   Pokemon* = ref object
     name*: string
     pokeType1*: PokeType
     pokeType2*: PokeType
     ability*: Ability
+    gender*: PokeGenderKind
     level*: int
     item*: Item
     stats*: PokeStats
@@ -32,6 +36,9 @@ proc hasType*(pokemon: Pokemon, pokeType: PokeType): bool =
   if pokeType == ptNull:
     return false
   pokeType == pokemon.pokeType1 or pokeType == pokemon.pokeType2
+
+proc hasItem*(mon: Pokemon): bool =
+  isNil(mon.item)
 
 proc isGrounded*(pokemon: Pokemon, field: Field): bool =
   field.gravityActive or

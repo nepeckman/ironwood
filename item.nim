@@ -8,12 +8,12 @@ type
     ikPinchBerry , ikChoiceScarf, ikChoiceBand, ikChoiceSpecs, ikLifeOrb,
     ikLeftovers, ikShellBell, ikPokemonExclusive, ikAirBalloon, ikFocusSash,
     ikEviolite, ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb, ikRockyHelmet,
-    ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikMuscleBand, ikWiseGlasses, ikExpertBelt
+    ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikMuscleBand, ikWiseGlasses, ikExpertBelt, ikNone
 
   Item* = ref object
-    consumable*: bool
-    name*: string
-    case kind*: ItemKind
+    consumable: bool
+    name: string
+    case kind: ItemKind
     of ikResistBerry: resistedType*: PokeType
     of ikGem, ikTypeBoost, ikZCrystal, ikDrive, ikMemory, ikPlate: associatedType*: PokeType
     of ikTerrainSeed: associatedTerrain*: FieldTerrainKind
@@ -22,7 +22,7 @@ type
     of ikChoiceScarf, ikChoiceBand, ikChoiceSpecs, ikLifeOrb, ikLeftovers, ikShellBell, ikAirBalloon, ikFocusSash, ikEviolite,
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikMuscleBand,
-      ikWiseGlasses, ikExpertBelt: discard
+      ikWiseGlasses, ikExpertBelt, ikNone: discard
 
 proc getFlingPower*(item: Item): int =
   if item.name == "Iron Ball": 130
@@ -43,3 +43,12 @@ proc getFlingPower*(item: Item): int =
   "Reaper Cloth", "Red Card", "Ring Target", "Shed Shell", "Silk Scarf", "Silver Powder",
   "Smooth Rock", "Soft Sand", "Soothe Bell", "White Herb", "Wide Lens", "Wise Glasses", "Zoom Lens"]: 10
   else: 0
+
+proc kind*(item: Item): ItemKind =
+  if item == nil: ikNone else: item.kind
+
+proc name*(item: Item): string =
+  if item == nil: "" else: item.name
+
+proc consumable*(item: Item): bool =
+  if item == nil: false else: item.consumable

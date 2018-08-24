@@ -6,7 +6,7 @@ type
   PokeMoveModifiers* = enum
     pmmSound, pmmBullet, pmmAerilated, pmmPixilated, pmmRefrigerated, pmmGalvanized, pmmUsesHighestAtkStat,
     pmmDealsPhysicalDamage, pmmIgnoresBurn, pmmMakesContact, pmmPunch, pmmJaw, pmmSpread, pmmSecondaryEffect, pmmPulse,
-    pmmHeals, pmmBypassesProtect, pmmIgnoresDefenseBoosts
+    pmmHeals, pmmBypassesProtect, pmmIgnoresDefenseBoosts, pmmRecoil, pmmSelfKOs
   
   PokeMoveCategory* = enum
     pmcPhysical, pmcSpecial, pmcStatus
@@ -33,6 +33,10 @@ proc copy*(move: PokeMove): PokeMove =
     priority: move.priority,
     modifiers: move.modifiers
   )
+
+proc isAuraBoosted*(move: PokeMove, field: Field): bool =
+  (fakDark in field.auras and move.pokeType == ptDark) or
+    (fakFairy in field.auras and move.pokeType == ptFairy)
 
 proc changeTypeWithAbility*(move: PokeMove, ability: Ability) =
   if move.pokeType == ptNormal:
