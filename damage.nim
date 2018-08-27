@@ -344,10 +344,41 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   let applyBurn = burnApplies(move, attacker)
 
   var finalMods: seq[int] = @[]
+  let defenderSideEffects = field.sideEffects(state.getTeam(defender))
+  if (fseAuroraVeil in defenderSideEffects) or
+    (fseLightScreen in defenderSideEffects and move.category == pmcSpecial) or
+    (fseReflect in defenderSideEffects and move.category == pmcPhysical):
+    finalMods.add(if field.format == ffkSingles: 0xAAC else: 0x800)
+
+  if not isDefenderAbilitySuppressed:
+    if defender.ability in ["Multiscale", "Shadow Shield"] and defender.currentHP == defender.maxHP:
+      finalMods.add(0x800)
+    elif defender.ability in ["Solid Rock", "Filter", "Prism Armor"] and typeEffectiveness > 1:
+      finalMods.add(0xC00)
+
+  if (attacker.ability == "Tinted Lens" and typeEffectiveness < 1) or
+    (attacker.ability == "Water Bubble" and move.pokeType == ptWater):
+    finalMods.add(0x2000)
+  elif attacker.ability == "Steelworker" and move.pokeType == ptSteel:
+    finalMods.add(0x1800)
+
+  if gckFriendGuarded in defender.conditions:
+    finalMods.add(0xC00)
+
+  if attacker.item.name == "Expert Belt" and typeEffectiveness > 1:
+    finalMods.add(0x1333)
+  elif attacker.item.name == "Life Orb":
+    finalMods.add(0x14CC)
+
+  if defender.item.kind == ikResistBerry and move.pokeType == defender.item.resistedType and attacker.ability != "Unnerve":
+    finalMods.add(0x800)
+
+  let finalMod = chainMods(finalMods)
+
 
   result = noDamage
   for i in 0..15:
-    result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, 0x1000)
+    result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, finalMod)
 
 
 
