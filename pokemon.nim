@@ -1,4 +1,4 @@
-import math
+import math, hashes, uuids
 import item, poketype, pokemove, condition, effects, ability
 
 type
@@ -9,6 +9,7 @@ type
     pgkMale, pgkFemale, pgkGenderless
 
   Pokemon* = ref object
+    uuid: UUID
     name*: string
     pokeType1*: PokeType
     pokeType2*: PokeType
@@ -26,7 +27,9 @@ type
 
 proc makePokemon*(name: string, pokeType1 = ptNull, pokeType2 = ptNull, ability: Ability = nil,
   level = 50, item: Item = nil, stats = (hp: 1, atk: 1, def: 1, spa: 1, spd: 1, spe: 1), weight = 1): Pokemon =
+  let uuid = genUUID()
   Pokemon(
+    uuid: uuid,
     name: name,
     pokeType1: pokeType1,
     pokeType2: pokeType2,
@@ -90,3 +93,6 @@ proc hasItem*(mon: Pokemon): bool =
 
 proc hasTypeChangingAbility*(pokemon: Pokemon): bool =
   pokemon.ability in ["Aerliate", "Pixilate", "Refrigerate", "Galvanize", "Liquid Voice", "Normalize"]
+
+proc hash*(pokemon: Pokemon): Hash =
+  pokemon.uuid.hash

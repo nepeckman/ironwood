@@ -15,21 +15,25 @@ type
     fseTailwind
     #TODO: add pledge effects
 
-  FieldFormatKind = enum
+  FieldFormatKind* = enum
     ffkSingles, ffkDoubles, ffkTriples, ffkRotation
 
+  TeamSideKind* = enum tskHome, tskAway
+
   Field* = ref object
+    format*: FieldFormatKind
     weather: FieldWeatherKind
     weatherSuppressed*: bool
     terrain*: FieldTerrainKind
     auras*: set[FieldAuraKind]
     gravityActive*: bool
     trickRoomActive*: bool
-    homeSideEffects*: set[FieldSideEffects]
-    awaySideEffects*: set[FieldSideEffects]
+    homeSideEffects: set[FieldSideEffects]
+    awaySideEffects: set[FieldSideEffects]
 
 proc makeField*(): Field =
   Field(
+    format: ffkSingles,
     weather: fwkNone,
     weatherSuppressed: false,
     terrain: ftkNone,
@@ -42,3 +46,6 @@ proc makeField*(): Field =
 
 proc weather*(field: Field): FieldWeatherKind =
   if field.weatherSuppressed: fwkNone else: field.weather
+
+proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffects] =
+  if side == tskHome: field.homeSideEffects else: field.awaySideEffects
