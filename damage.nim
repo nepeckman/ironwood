@@ -364,9 +364,9 @@ var move = PokeMove(
     priority: 0,
     modifiers: {}
     )
-var homeTeam = Team(pokemon: initSet[Pokemon](attacker), side: tskHome, activePokemon: attacker)
-var awayTeam = Team(pokemon: initSet[Pokemon](defender), side: tskAway, activePokemon: defender)
-var state = State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
+var homeTeam = makeTeam([attacker, attacker, attacker, attacker, attacker, attacker], tskHome)
+var awayTeam = makeTeam([defender, defender, defender, defender, defender, defender], tskAway)
+var gameState = State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
 
-let damage = getDamageResult(attacker, defender, move, state)
+let damage = getDamageResult(attacker, defender, move, gameState)
 echo damage
