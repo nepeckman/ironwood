@@ -131,6 +131,76 @@ proc moveBasePowerMod(move: PokeMove, attacker, defender: Pokemon, field: Field)
   elif (move.name == "Knock Off" and boostedKnockOff(defender)): 0x1800
   else: 0x1000
 
+proc attackerAbilityAttackMod(attacker: Pokemon, move: PokeMove, field: Field): int =
+  if (attacker.ability == "Guts" and attacker.status != sckHealthy) or
+    attacker.currentHP <= toInt(attacker.maxHP / 3) and
+    (attacker.ability == "Overgrow" and move.pokeType == ptGrass or
+    attacker.ability == "Blaze" and move.pokeType == ptFire or
+    attacker.ability == "Torrent" and move.pokeType == ptWater or
+    attacker.ability == "Swarm" and move.pokeType == ptBug): 0x1800
+  elif (gckFireFlashed in attacker.conditions) and move.pokeType == ptFire: 0x1800
+  elif field.weather in {fwkSun, fwkHarshSun} and 
+    (attacker.ability == "Solar Power" and move.category == pmcSpecial or
+    attacker.ability == "Flower Gift" and move.category == pmcPhysical): 0x1800
+  elif (attacker.ability == "Defeatist" and attacker.currentHP <= toInt(attacker.maxHP / 2)) or
+    (attacker.ability == "Slow Start" and move.category == pmcPhysical): 0x800
+  elif attacker.ability in ["Huge Power", "Pure Power"] and move.category == pmcPhysical: 0x2000
+  else: 0x1000
+
+proc defenderAbilityAttackMod(defender: Pokemon, move: PokeMove): int =
+    if (defender.ability == "Thick Fat" and move.pokeType in {ptFire, ptIce}) or
+      (defender.ability == "Water Bubble" and move.pokeType == ptFire): 0x800
+    else: 0x1000
+
+proc attackerItemAttackMod(attacker: Pokemon, move: PokeMove): int =
+  if
+    (attacker.item.name == "Thick Club" and attacker.name in ["Cubone", "Marowak", "Marowak-Alola"] and
+    move.category == pmcPhysical) or
+    (attacker.item.name == "Deep Sea Tooth" and attacker.name == "Clamperl" and
+    move.category == pmcSpecial) or
+    (attacker.item.name == "Light Ball" and attacker.name == "Pikachu"): 0x2000
+  elif (attacker.item.name == "Choice Band" and move.category == pmcPhysical) or
+    (attacker.item.name == "Choice Specs" and move.category == pmcSpecial): 0x1800
+  else: 0x1000
+
+proc defenderAbilityDefenseMod(defender: Pokemon, field: Field, hitsPhysical: bool): int = 
+    if defender.ability == "Marvel Scale" and defender.status != sckHealthy and hitsPhysical: 0x1800
+    elif defender.ability == "Flower Gift" and field.weather in {fwkSun, fwkHarshSun} and not hitsPhysical: 0x1800
+    elif defender.ability == "Grass Pelt" and field.terrain == ftkGrass: 0x1800
+    elif defender.ability == "Fur Coat" and hitsPhysical: 0x2000
+    else: 0x1000
+
+proc defenderItemDefenseMod(defender: Pokemon, hitsPhysical: bool): int =
+  if (defender.item.name == "Metal Powder" and defender.name == "Ditto" and hitsPhysical) or
+    (defender.item.name == "Deep Sea Scale" and defender.name == "Clamperl" and not hitsPhysical): 0x2000
+  elif (defender.item.name == "Eviolite" and defender.hasEvolution) or
+    (not hitsPhysical and defender.item.name == "Assault Vest"): 0x1800
+  else: 0x1000
+
+proc attackerAbilityFinalMod(attacker: Pokemon, move: PokeMove, typeEffectiveness: float): int =
+  if (attacker.ability == "Tinted Lens" and typeEffectiveness < 1) or
+    (attacker.ability == "Water Bubble" and move.pokeType == ptWater): 0x2000
+  elif attacker.ability == "Steelworker" and move.pokeType == ptSteel: 0x1800
+  else: 0x1000
+
+proc defenderAbilityFinalMod(defender: Pokemon, typeEffectiveness: float): int =
+    if defender.ability in ["Multiscale", "Shadow Shield"] and defender.currentHP == defender.maxHP: 0x800
+    elif defender.ability in ["Solid Rock", "Filter", "Prism Armor"] and typeEffectiveness > 1: 0xC00
+    else: 0x1000
+
+proc attackerItemFinalMod(attacker: Pokemon, typeEffectiveness: float): int = 
+  if attacker.item.name == "Expert Belt" and typeEffectiveness > 1: 0x1333
+  elif attacker.item.name == "Life Orb": 0x14CC
+  else: 0x1000
+
+proc defenderItemFinalMod(defender, attacker: Pokemon, move: PokeMove): int =
+  if defender.item.kind == ikResistBerry and
+    move.pokeType == defender.item.resistedType and
+    attacker.ability != "Unnerve": 0x800
+  else: 0x1000
+
+
+
 proc helpingHandMod(attacker: Pokemon): int = 
   if gckHandedHelp in attacker.conditions: 0x1800 else: 0x1000
 
@@ -243,40 +313,9 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
     attack = pokeRound(attack * 3 / 2)
 
   var atkMods: seq[int] = @[]
-  if not isDefenderAbilitySuppressed:
-    if (defender.ability == "Thick Fat" and move.pokeType in {ptFire, ptIce}) or
-      (defender.ability == "Water Bubble" and move.pokeType == ptFire):
-      atkMods.add(0x800)
-
-  if (attacker.ability == "Guts" and attacker.status != sckHealthy) or
-    attacker.currentHP <= toInt(attacker.maxHP / 3) and
-    (attacker.ability == "Overgrow" and move.pokeType == ptGrass or
-    attacker.ability == "Blaze" and move.pokeType == ptFire or
-    attacker.ability == "Torrent" and move.pokeType == ptWater or
-    attacker.ability == "Swarm" and move.pokeType == ptBug):
-    atkMods.add(0x1800)
-  elif (gckFireFlashed in attacker.conditions) and move.pokeType == ptFire:
-    atkMods.add(0x1800)
-  elif field.weather in {fwkSun, fwkHarshSun} and 
-    (attacker.ability == "Solar Power" and move.category == pmcSpecial or
-    attacker.ability == "Flower Gift" and move.category == pmcPhysical):
-    atkMods.add(0x1800)
-  elif (attacker.ability == "Defeatist" and attacker.currentHP <= toInt(attacker.maxHP / 2)) or
-    (attacker.ability == "Slow Start" and move.category == pmcPhysical):
-    atkMods.add(0x800)
-  elif attacker.ability in ["Huge Power", "Pure Power"] and move.category == pmcPhysical:
-    atkMods.add(0x2000)
-
-  if
-    (attacker.item.name == "Thick Club" and attacker.name in ["Cubone", "Marowak", "Marowak-Alola"] and
-    move.category == pmcPhysical) or
-    (attacker.item.name == "Deep Sea Tooth" and attacker.name == "Clamperl" and
-    move.category == pmcSpecial) or
-    (attacker.item.name == "Light Ball" and attacker.name == "Pikachu"):
-    atkMods.add(0x2000)
-  elif (attacker.item.name == "Choice Band" and move.category == pmcPhysical) or
-    (attacker.item.name == "Choice Specs" and move.category == pmcSpecial):
-    atkMods.add(0x1800)
+  atkMods.add(attacker.attackerAbilityAttackMod(move, field))
+  if not isDefenderAbilitySuppressed: atkMods.add(defender.defenderAbilityAttackMod(move))
+  atkMods.add(attacker.attackerItemAttackMod(move))
 
   attack = max(1, pokeRound(attack * chainMods(atkMods) / 0x1000))
 
@@ -293,19 +332,8 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
 
   var defMods: seq[int] = @[]
   
-  if not isDefenderAbilitySuppressed:
-    if defender.ability == "Marvel Scale" and defender.status != sckHealthy and hitsPhysical:
-      defMods.add(0x1800)
-    elif defender.ability == "Flower Gift" and field.weather in {fwkSun, fwkHarshSun} and not hitsPhysical:
-      defMods.add(0x1800)
-    elif defender.ability == "Grass Pelt" and field.terrain == ftkGrass:
-      defMods.add(0x1800)
-    elif defender.ability == "Fur Coat" and hitsPhysical:
-      defMods.add(0x2000)
-
-  if (defender.item.name == "Metal Powder" and defender.name == "Ditto" and hitsPhysical) or
-    (defender.item.name == "Deep Sea Scale" and defender.name == "Clamperl" and not hitsPhysical):
-    defMods.add(0x2000)
+  if not isDefenderAbilitySuppressed: defMods.add(defender.defenderAbilityDefenseMod(field, hitsPhysical))
+  defMods.add(defender.defenderItemDefenseMod(hitsPhysical))
   
   defense = max(1, pokeRound(defense * chainMods(defMods) / 0x1000))
 
@@ -350,28 +378,14 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
     (fseReflect in defenderSideEffects and move.category == pmcPhysical):
     finalMods.add(if field.format == ffkSingles: 0xAAC else: 0x800)
 
-  if not isDefenderAbilitySuppressed:
-    if defender.ability in ["Multiscale", "Shadow Shield"] and defender.currentHP == defender.maxHP:
-      finalMods.add(0x800)
-    elif defender.ability in ["Solid Rock", "Filter", "Prism Armor"] and typeEffectiveness > 1:
-      finalMods.add(0xC00)
-
-  if (attacker.ability == "Tinted Lens" and typeEffectiveness < 1) or
-    (attacker.ability == "Water Bubble" and move.pokeType == ptWater):
-    finalMods.add(0x2000)
-  elif attacker.ability == "Steelworker" and move.pokeType == ptSteel:
-    finalMods.add(0x1800)
+  finalMods.add(attacker.attackerAbilityFinalMod(move, typeEffectiveness))
+  if not isDefenderAbilitySuppressed: finalMods.add(defender.defenderAbilityFinalMod(typeEffectiveness))
+  finalMods.add(attacker.attackerItemFinalMod(typeEffectiveness))
+  finalMods.add(defender.defenderItemFinalMod(attacker, move))
 
   if gckFriendGuarded in defender.conditions:
     finalMods.add(0xC00)
 
-  if attacker.item.name == "Expert Belt" and typeEffectiveness > 1:
-    finalMods.add(0x1333)
-  elif attacker.item.name == "Life Orb":
-    finalMods.add(0x14CC)
-
-  if defender.item.kind == ikResistBerry and move.pokeType == defender.item.resistedType and attacker.ability != "Unnerve":
-    finalMods.add(0x800)
 
   let finalMod = chainMods(finalMods)
 

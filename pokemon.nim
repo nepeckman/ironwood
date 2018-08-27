@@ -19,6 +19,7 @@ type
     item*: Item
     stats: PokeStats
     weight: int
+    hasEvolution*: bool
     currentHP*: int
     boosts*: PokeStats
     hasAttacked*: bool
@@ -42,6 +43,7 @@ proc makePokemon*(name: string, pokeType1 = ptNull, pokeType2 = ptNull, ability:
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
     status: sckHealthy,
     conditions: {},
+    hasEvolution: false,
     currentHP: stats.hp
   )
 
