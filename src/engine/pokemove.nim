@@ -61,7 +61,7 @@ proc changeTypeWithItem*(move: PokeMove, item: Item) =
   if item.kind in {ikDrive, ikPlate, ikMemory}:
     move.pokeType = item.associatedType
 
-proc changeTypeWithTerrain*(move: PokeMove, terrain: FieldTerrainKind) =
+proc naturePowerTransformation*(move: PokeMove, terrain: FieldTerrainKind) =
   move.pokeType = case terrain
     of ftkElectric: ptElectric
     of ftkPsychic: ptPsychic
@@ -75,7 +75,7 @@ proc changeTypeWithTerrain*(move: PokeMove, terrain: FieldTerrainKind) =
     of ftkFairy: 95
     else: 80
 
-proc changeTypeWithWeather*(move: PokeMove, weather: FieldWeatherKind) =
+proc weatherBallTransformation*(move: PokeMove, weather: FieldWeatherKind) =
   move.pokeType = case weather
     of fwkSun, fwkHarshSun: ptFire
     of fwkRain, fwkHeavyRain: ptWater

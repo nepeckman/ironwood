@@ -1,86 +1,5 @@
 import math, algorithm, sets
-import state, team, pokemon, field, poketype, pokemove, condition, item, ability
-
-proc burnApplies(move: PokeMove, attacker: Pokemon): bool =
-  sckBurned == attacker.status and move.category == pmcPhysical and
-    attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
-
-proc skyDropFails*(move: PokeMove, defender: Pokemon): bool =
-  move.name == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200)
-
-proc synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): bool =
-  move.name == "Synchronoise" and
-    not defender.hasType(attacker.pokeType1) and
-    not defender.hasType(attacker.pokeType2)
-
-proc dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
-  move.name == "Dream Eater" and
-    not (sckAsleep == defender.status) and
-    defender.ability != "Comatose"
-
-proc moveFails*(move: PokeMove, defender, attacker: Pokemon): bool =
-  skyDropFails(move, defender) or synchronoiseFails(move, defender, attacker) or
-    dreamEaterFails(move, defender)
-
-proc isGrounded*(pokemon: Pokemon, field: Field): bool =
-  field.gravityActive or
-    not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item.kind == ikAirBalloon)
-
-proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon, field: Field): float =
-  let isGhostRevealed = attacker.ability == "Scrappy" or gckRevealed in defender.conditions
-  let isFlierGrounded = field.gravityActive or gckGrounded in defender.conditions
-  getTypeEffectiveness(move.pokeType, defender.pokeType1, move.name, isGhostRevealed, isFlierGrounded) *
-    getTypeEffectiveness(move.pokeType, defender.pokeType2, move.name, isGhostRevealed, isFlierGrounded)
-
-proc checkAbilitySuppression(defender, attacker: Pokemon, move: PokeMove): bool =
-  defender.ability notin ["Full Metal Body", "Prism Armor", "Shadow Shield"] and
-    (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move.name in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"])
-
-proc defenderProtected(defender: Pokemon, move: PokeMove): bool =
-  (gckProtected in defender.conditions and not (pmmBypassesProtect in move.modifiers)) or
-    (gckWideGuarded in defender.conditions and pmmSpread in move.modifiers) or
-    (gckQuickGuarded in defender.conditions and not (pmmBypassesProtect in move.modifiers) and move.priority > 0)
-
-proc checkImmunityAbilities(defender: Pokemon, move: PokeMove, typeEffectiveness: float): bool =
-  (defender.ability == "Wonder Guard" and typeEffectiveness <= 1) or
-    (defender.ability == "Sap Sipper" and move.pokeType == ptGrass) or
-    (defender.ability == "Flash Fire" and move.pokeType == ptFire) or
-    (defender.ability in ["Dry Skin", "Storm Drain", "Water Absorb"] and move.pokeType == ptWater) or
-    (defender.ability in ["Lightning Rod", "Motor Drive", "Volt Absorb"] and move.pokeType == ptElectric) or
-    (defender.ability == "Levitate" and move.pokeType == ptGround and move.name != "Thousand Arrows") or
-    (defender.ability == "Bulletproof" and pmmBullet in move.modifiers) or
-    (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
-    (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0)
-
-proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
-  case move.name
-  of "Payback":
-    if defender.hasAttacked: 100 else: 50
-  of "Electro Ball": speedRatioToBasePower(floor(attacker.speed / defender.speed))
-  of "Gyro Ball": min(150, 1 + toInt(floor(25 * defender.speed / attacker.speed)))
-  of "Punishment": min(200, 60 + 20 * countBoosts(defender))
-  of "Low Kick", "Grass Knot": weightToBasePower(defender.weight)
-  of "Hex":
-    if defender.status == sckHealthy: move.basePower else: move.basePower * 2
-  of "Heavy Slam", "Heat Crash": weightRatioToBasePower(attacker.weight / defender.weight)
-  of "Stored Power", "Power Trip": 20 + 20 * attacker.countBoosts()
-  of "Acrobatics":
-    if attacker.item == nil: 110 else: 55
-  of "Wake-Up Slap":
-    if defender.status == sckHealthy: move.basePower * 2 else: move.basePower
-  of "Fling": getFlingPower(attacker.item)
-  of "Eruption", "Water Spout": max(1, toInt(floor(150 * attacker.currentHP / attacker.maxHP)))
-  of "Flail", "Reversal": healthRatioToBasePower(floor(48 * attacker.currentHP / attacker.maxHP))
-  of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.maxHP)
-  else: move.basePower
-
-proc boostedKnockOff(defender: Pokemon): bool =
-  defender.hasItem() and
-    not (defender.name == "Giratina-Origin" and defender.item == "Griseous Orb") and
-    not (defender.name == "Arceus" and defender.item.kind == ikPlate) and
-    not (defender.name == "Genesect" and defender.item.kind == ikDrive) and
-    not (defender.ability == "RKS System" and defender.item.kind == ikMemory) and
-    not (defender.item.kind in {ikZCrystal, ikMegaStone})
+import state, team, pokemon, field, poketype, pokemove, condition, item, ability, engineutils
 
 proc attackerAbilityBasePowerMod(attacker: Pokemon, move: PokeMove, defender: Pokemon, field: Field, typeEffectiveness: float): int =
   if (attacker.ability == "Technician" and move.basePower <= 60) or
@@ -199,16 +118,13 @@ proc defenderItemFinalMod(defender, attacker: Pokemon, move: PokeMove): int =
     attacker.ability != "Unnerve": 0x800
   else: 0x1000
 
-
-
 proc helpingHandMod(attacker: Pokemon): int = 
   if gckHandedHelp in attacker.conditions: 0x1800 else: 0x1000
 
-proc auraMod(attacker, defender: Pokemon, isDefenderAbilitySuppressed: bool): int =
+proc auraMod(attacker, defender: Pokemon, defAbilitySuppressed: bool): int =
     if attacker.ability == "Aura Break" or
-      (not isDefenderAbilitySuppressed and defender.ability == "Aura Break"): 0x0C00
+      (not defAbilitySuppressed and defender.ability == "Aura Break"): 0x0C00
     else: 0x1547
-
 
 proc levelDamage(attacker: Pokemon): int =
   if attacker.ability == "Parental Bond": attacker.level * 2 else: attacker.level
@@ -241,11 +157,11 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   if defenderProtected(defender, move):
     return noDamage
 
-  let isDefenderAbilitySuppressed = checkAbilitySuppression(defender, attacker, move)
+  let defAbilitySuppressed = isDefenderAbilitySuppressed(defender, attacker, move)
 
-  if move.name == "Weather Ball": move.changeTypeWithWeather(field.weather)
+  if move.name == "Weather Ball": move.weatherBallTransformation(field.weather)
   if move.isItemDependant() : move.changeTypeWithItem(attacker.item)
-  if move.name == "Nature Power": move.changeTypeWithTerrain(field.terrain)
+  if move.name == "Nature Power": move.naturePowerTransformation(field.terrain)
   if move.name == "Revelation Dance": move.pokeType = attacker.pokeType1
   if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
 
@@ -256,7 +172,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
 
   if moveFails(move, defender, attacker): return noDamage
 
-  if not isDefenderAbilitySuppressed and checkImmunityAbilities(defender, move, typeEffectiveness):
+  if not defAbilitySuppressed and hasImmunityViaAbility(defender, move, typeEffectiveness):
     return noDamage
 
   if field.weather == fwkStrongWinds and
@@ -289,11 +205,11 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   var bpMods: seq[int] = @[]
 
   bpMods.add(attacker.attackerAbilityBasePowerMod(move, defender, field, typeEffectiveness))
-  if not isDefenderAbilitySuppressed: bpMods.add(defender.defenderAbilityBasePowerMod(move, attacker))
+  if not defAbilitySuppressed: bpMods.add(defender.defenderAbilityBasePowerMod(move, attacker))
   bpMods.add(attacker.attackerItemBasePowerMod(move))
   bpMods.add(move.moveBasePowerMod(attacker, defender, field))
   bpMods.add(helpingHandMod(attacker))
-  if move.isAuraBoosted(field): bpMods.add(auraMod(attacker, defender, isDefenderAbilitySuppressed))
+  if move.isAuraBoosted(field): bpMods.add(auraMod(attacker, defender, defAbilitySuppressed))
 
   var basePower = max(1, pokeRound(move.basePower * chainMods(bpMods) / 0x1000))
 
@@ -305,7 +221,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
     move.category = if attackSource.attack >= attackSource.spattack: pmcPhysical else: pmcSpecial
 
   attack = if move.category == pmcPhysical: attackSource.attack else: attackSource.spattack
-  if not isDefenderAbilitySuppressed and defender.ability == "Unaware":
+  if not defAbilitySuppressed and defender.ability == "Unaware":
     attack =
       if move.category == pmcPhysical: attackSource.rawStats.atk else: attackSource.rawStats.spa
 
@@ -314,7 +230,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
 
   var atkMods: seq[int] = @[]
   atkMods.add(attacker.attackerAbilityAttackMod(move, field))
-  if not isDefenderAbilitySuppressed: atkMods.add(defender.defenderAbilityAttackMod(move))
+  if not defAbilitySuppressed: atkMods.add(defender.defenderAbilityAttackMod(move))
   atkMods.add(attacker.attackerItemAttackMod(move))
 
   attack = max(1, pokeRound(attack * chainMods(atkMods) / 0x1000))
@@ -332,7 +248,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
 
   var defMods: seq[int] = @[]
   
-  if not isDefenderAbilitySuppressed: defMods.add(defender.defenderAbilityDefenseMod(field, hitsPhysical))
+  if not defAbilitySuppressed: defMods.add(defender.defenderAbilityDefenseMod(field, hitsPhysical))
   defMods.add(defender.defenderItemDefenseMod(hitsPhysical))
   
   defense = max(1, pokeRound(defense * chainMods(defMods) / 0x1000))
@@ -379,16 +295,14 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
     finalMods.add(if field.format == ffkSingles: 0xAAC else: 0x800)
 
   finalMods.add(attacker.attackerAbilityFinalMod(move, typeEffectiveness))
-  if not isDefenderAbilitySuppressed: finalMods.add(defender.defenderAbilityFinalMod(typeEffectiveness))
+  if not defAbilitySuppressed: finalMods.add(defender.defenderAbilityFinalMod(typeEffectiveness))
   finalMods.add(attacker.attackerItemFinalMod(typeEffectiveness))
   finalMods.add(defender.defenderItemFinalMod(attacker, move))
 
   if gckFriendGuarded in defender.conditions:
     finalMods.add(0xC00)
 
-
   let finalMod = chainMods(finalMods)
-
 
   result = noDamage
   for i in 0..15:
