@@ -24,26 +24,6 @@ type
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikMuscleBand,
       ikWiseGlasses, ikExpertBelt, ikNone: discard
 
-proc getFlingPower*(item: Item): int =
-  if item.name == "Iron Ball": 130
-  elif item.name == "Hard Stone": 100
-  elif item.kind == ikPlate or item.name in ["Deep Sea Tooth", "Thick Club"]: 90
-  elif item.name in ["Assault Vest", "Weakness Policy"]: 80
-  elif item.name in ["Poison Barb", "Dragon Fang"]: 70
-  elif item.name in ["Adamant Orb", "Lustrous Orb", "Macho Brace", "Stick"]: 60
-  elif item.name == "Sharp Beak": 50
-  elif item.name == "Eviolite": 40
-  elif item.name in ["Black Belt", "Black Sludge", "Black Glasses", "Charcoal", "Deep Sea Scale", "Flame Orb", "King's Rock",
-    "Life Orb", "Light Ball", "Magnet", "Metal Coat", "Miracle Seed", "Mystic Water", "Never-Melt Ice",
-    "Razor Fang", "Soul Dew", "Spell Tag", "Toxic Orb", "Twisted Spoon"]: 30
-  elif item.name.find("Berry") != -1 or item.name in ["Air Balloon", "Choice Band",
-  "Choice Scarf", "Choice Specs", "Destiny Knot", "Electric Seed", "Expert Belt",
-  "Focus Band", "Focus Sash", "Grassy Seed", "Lagging tail", "leftovers", "Mental Herb",
-  "Metal Powder", "Misty Seed", "Muscle Band", "Power Herb", "Psychic Seed", "Quick Powder",
-  "Reaper Cloth", "Red Card", "Ring Target", "Shed Shell", "Silk Scarf", "Silver Powder",
-  "Smooth Rock", "Soft Sand", "Soothe Bell", "White Herb", "Wide Lens", "Wise Glasses", "Zoom Lens"]: 10
-  else: 0
-
 proc kind*(item: Item): ItemKind =
   if isNil(item): ikNone else: item.kind
 
@@ -52,3 +32,35 @@ proc name*(item: Item): string =
 
 proc consumable*(item: Item): bool =
   if isNil(item): false else: item.consumable
+
+proc `==`*(item: Item, s: string): bool =
+  if isNil(item): "" == s else: item.name == s
+
+proc `==`*(s: string, item: Item): bool =
+  if isNil(item): "" == s else: item.name == s
+
+proc `contains`*(arr: openArray[string], item: Item): bool =
+  if isNil(item): false else: find(arr, item.name) >= 0
+
+proc find*(item: Item, s: string): int = item.name.find(s)
+
+proc getFlingPower*(item: Item): int =
+  if item == "Iron Ball": 130
+  elif item == "Hard Stone": 100
+  elif item.kind == ikPlate or item in ["Deep Sea Tooth", "Thick Club"]: 90
+  elif item in ["Assault Vest", "Weakness Policy"]: 80
+  elif item in ["Poison Barb", "Dragon Fang"]: 70
+  elif item in ["Adamant Orb", "Lustrous Orb", "Macho Brace", "Stick"]: 60
+  elif item == "Sharp Beak": 50
+  elif item == "Eviolite": 40
+  elif item in ["Black Belt", "Black Sludge", "Black Glasses", "Charcoal", "Deep Sea Scale", "Flame Orb", "King's Rock",
+    "Life Orb", "Light Ball", "Magnet", "Metal Coat", "Miracle Seed", "Mystic Water", "Never-Melt Ice",
+    "Razor Fang", "Soul Dew", "Spell Tag", "Toxic Orb", "Twisted Spoon"]: 30
+  elif item.name.find("Berry") != -1 or item in ["Air Balloon", "Choice Band",
+  "Choice Scarf", "Choice Specs", "Destiny Knot", "Electric Seed", "Expert Belt",
+  "Focus Band", "Focus Sash", "Grassy Seed", "Lagging tail", "leftovers", "Mental Herb",
+  "Metal Powder", "Misty Seed", "Muscle Band", "Power Herb", "Psychic Seed", "Quick Powder",
+  "Reaper Cloth", "Red Card", "Ring Target", "Shed Shell", "Silk Scarf", "Silver Powder",
+  "Smooth Rock", "Soft Sand", "Soothe Bell", "White Herb", "Wide Lens", "Wise Glasses", "Zoom Lens"]: 10
+  else: 0
+

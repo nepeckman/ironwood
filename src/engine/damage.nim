@@ -76,7 +76,7 @@ proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): 
 
 proc boostedKnockOff(defender: Pokemon): bool =
   defender.hasItem() and
-    not (defender.name == "Giratina-Origin" and defender.item.name == "Griseous Orb") and
+    not (defender.name == "Giratina-Origin" and defender.item == "Griseous Orb") and
     not (defender.name == "Arceus" and defender.item.kind == ikPlate) and
     not (defender.name == "Genesect" and defender.item.kind == ikDrive) and
     not (defender.ability == "RKS System" and defender.item.kind == ikMemory) and
@@ -115,10 +115,10 @@ proc attackerItemBasePowerMod(attacker: Pokemon, move: PokeMove): int =
   elif (attacker.item.kind == ikMuscleBand and move.category == pmcPhysical) or
     (attacker.item.kind == ikWiseGlasses and move.category == pmcSpecial): 0x1199
   elif attacker.item.kind == ikPokemonExclusive:
-    if (attacker.item.name == "Adamant Orb" and attacker.name == "Dialga") or
-      (attacker.item.name == "Lustrous Orb" and attacker.name == "Palkia") or
-      (attacker.item.name == "Soul Dew" and attacker.name in ["Latios", "Latias", "Latios-Mega", "Latias-Mega"]) or
-      (attacker.item.name == "Griseous Orb" and attacker.name == "Giratina-Origin") and attacker.hasType(move.pokeType):
+    if (attacker.item == "Adamant Orb" and attacker.name == "Dialga") or
+      (attacker.item == "Lustrous Orb" and attacker.name == "Palkia") or
+      (attacker.item == "Soul Dew" and attacker.name in ["Latios", "Latias", "Latios-Mega", "Latias-Mega"]) or
+      (attacker.item == "Griseous Orb" and attacker.name == "Giratina-Origin") and attacker.hasType(move.pokeType):
       0x1333 
     else: 0x1000
   else: 0x1000
@@ -154,13 +154,13 @@ proc defenderAbilityAttackMod(defender: Pokemon, move: PokeMove): int =
 
 proc attackerItemAttackMod(attacker: Pokemon, move: PokeMove): int =
   if
-    (attacker.item.name == "Thick Club" and attacker.name in ["Cubone", "Marowak", "Marowak-Alola"] and
+    (attacker.item == "Thick Club" and attacker.name in ["Cubone", "Marowak", "Marowak-Alola"] and
     move.category == pmcPhysical) or
-    (attacker.item.name == "Deep Sea Tooth" and attacker.name == "Clamperl" and
+    (attacker.item == "Deep Sea Tooth" and attacker.name == "Clamperl" and
     move.category == pmcSpecial) or
-    (attacker.item.name == "Light Ball" and attacker.name == "Pikachu"): 0x2000
-  elif (attacker.item.name == "Choice Band" and move.category == pmcPhysical) or
-    (attacker.item.name == "Choice Specs" and move.category == pmcSpecial): 0x1800
+    (attacker.item == "Light Ball" and attacker.name == "Pikachu"): 0x2000
+  elif (attacker.item == "Choice Band" and move.category == pmcPhysical) or
+    (attacker.item == "Choice Specs" and move.category == pmcSpecial): 0x1800
   else: 0x1000
 
 proc defenderAbilityDefenseMod(defender: Pokemon, field: Field, hitsPhysical: bool): int = 
@@ -171,10 +171,10 @@ proc defenderAbilityDefenseMod(defender: Pokemon, field: Field, hitsPhysical: bo
     else: 0x1000
 
 proc defenderItemDefenseMod(defender: Pokemon, hitsPhysical: bool): int =
-  if (defender.item.name == "Metal Powder" and defender.name == "Ditto" and hitsPhysical) or
-    (defender.item.name == "Deep Sea Scale" and defender.name == "Clamperl" and not hitsPhysical): 0x2000
-  elif (defender.item.name == "Eviolite" and defender.hasEvolution) or
-    (not hitsPhysical and defender.item.name == "Assault Vest"): 0x1800
+  if (defender.item == "Metal Powder" and defender.name == "Ditto" and hitsPhysical) or
+    (defender.item == "Deep Sea Scale" and defender.name == "Clamperl" and not hitsPhysical): 0x2000
+  elif (defender.item == "Eviolite" and defender.hasEvolution) or
+    (not hitsPhysical and defender.item == "Assault Vest"): 0x1800
   else: 0x1000
 
 proc attackerAbilityFinalMod(attacker: Pokemon, move: PokeMove, typeEffectiveness: float): int =
@@ -189,8 +189,8 @@ proc defenderAbilityFinalMod(defender: Pokemon, typeEffectiveness: float): int =
     else: 0x1000
 
 proc attackerItemFinalMod(attacker: Pokemon, typeEffectiveness: float): int = 
-  if attacker.item.name == "Expert Belt" and typeEffectiveness > 1: 0x1333
-  elif attacker.item.name == "Life Orb": 0x14CC
+  if attacker.item == "Expert Belt" and typeEffectiveness > 1: 0x1333
+  elif attacker.item == "Life Orb": 0x14CC
   else: 0x1000
 
 proc defenderItemFinalMod(defender, attacker: Pokemon, move: PokeMove): int =
@@ -393,8 +393,6 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   result = noDamage
   for i in 0..15:
     result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, finalMod)
-
-
 
 
 var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)
