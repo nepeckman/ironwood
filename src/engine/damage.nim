@@ -43,11 +43,11 @@ proc attackerItemBasePowerMod(attacker: Pokemon, move: PokeMove): int =
   else: 0x1000
 
 proc moveBasePowerMod(move: PokeMove, attacker, defender: Pokemon, field: Field): int =
-  if (move.name == "Facade" and attacker.status != sckHealthy) or
-    (move.name == "Brine" and defender.currentHP <= toInt(defender.maxHP / 2)) or
-    (move.name == "Venoshock" and defender.status in {sckPoisoned, sckBadlyPoisoned}): 0x2000
-  elif (move.name == "Solar Beam" and field.weather in {fwkRain, fwkHeavyRain, fwkSand, fwkHail}): 0x800
-  elif (move.name == "Knock Off" and boostedKnockOff(defender)): 0x1800
+  if (move == "Facade" and attacker.status != sckHealthy) or
+    (move == "Brine" and defender.currentHP <= toInt(defender.maxHP / 2)) or
+    (move == "Venoshock" and defender.status in {sckPoisoned, sckBadlyPoisoned}): 0x2000
+  elif (move == "Solar Beam" and field.weather in {fwkRain, fwkHeavyRain, fwkSand, fwkHail}): 0x800
+  elif (move == "Knock Off" and boostedKnockOff(defender)): 0x1800
   else: 0x1000
 
 proc attackerAbilityAttackMod(attacker: Pokemon, move: PokeMove, field: Field): int =
@@ -151,7 +151,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   let move = copy(m)
   let field = state.field
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-  if move.basePower == 0 and move.name != "Nature Power":
+  if move.basePower == 0 and move != "Nature Power":
     return noDamage
 
   if defenderProtected(defender, move):
@@ -159,10 +159,10 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
 
   let defAbilitySuppressed = isDefenderAbilitySuppressed(defender, attacker, move)
 
-  if move.name == "Weather Ball": move.weatherBallTransformation(field.weather)
+  if move == "Weather Ball": move.weatherBallTransformation(field.weather)
   if move.isItemDependant() : move.changeTypeWithItem(attacker.item)
-  if move.name == "Nature Power": move.naturePowerTransformation(field.terrain)
-  if move.name == "Revelation Dance": move.pokeType = attacker.pokeType1
+  if move == "Nature Power": move.naturePowerTransformation(field.terrain)
+  if move == "Revelation Dance": move.pokeType = attacker.pokeType1
   if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
 
   var typeEffectiveness = getMoveEffectiveness(move, defender, attacker, field)
@@ -179,23 +179,23 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
     defender.hasType(ptFlying) and getTypeMatchup(move.pokeType, ptFlying) > 1:
     typeEffectiveness = typeEffectiveness / 2
 
-  if move.pokeType == ptGround and move.name != "Thousand Arrows" and
+  if move.pokeType == ptGround and move != "Thousand Arrows" and
     not field.gravityActive and defender.item.kind == ikAirBalloon:
     return noDamage
 
   if move.priority > 0 and field.terrain == ftkPsychic and defender.isGrounded(field):
     return noDamage
   
-  if move.name in ["Seismic Toss", "Night Shade"]:
+  if move in ["Seismic Toss", "Night Shade"]:
     var damage = levelDamage(attacker)
     fill(result, damage)
     return
 
-  if move.name == "Final Gambit":
+  if move == "Final Gambit":
     fill(result, attacker.currentHP)
     return
 
-  if move.name in ["Nature's Madness", "Super Fang"]:
+  if move in ["Nature's Madness", "Super Fang"]:
     fill(result, toInt(floor(defender.currentHP / 2)))
     return
   
@@ -215,7 +215,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
 
   ### (SP)ATTACK
   var attack: int
-  var attackSource = if move.name == "Foul Play": defender else: attacker
+  var attackSource = if move == "Foul Play": defender else: attacker
 
   if (pmmUsesHighestAtkStat in move.modifiers):
     move.category = if attackSource.attack >= attackSource.spattack: pmcPhysical else: pmcSpecial
@@ -278,7 +278,7 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   if isGrounded(defender, field):
     if field.terrain == ftkFairy and move.pokeType == ptDragon:
       baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
-    elif field.terrain == ftkGrass and move.name in ["Bulldoze", "Earthquake"]:
+    elif field.terrain == ftkGrass and move in ["Bulldoze", "Earthquake"]:
       baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
 
   var stabMod = 0x1000

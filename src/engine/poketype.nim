@@ -31,17 +31,3 @@ var PokeTypeEffectiveness = {
 
 proc getTypeMatchup*(attackerType, defenderType: PokeType): float =
   if defenderType in PokeTypeEffectiveness[attackerType]: PokeTypeEffectiveness[attackerType][defenderType] else: 1
-
-proc getTypeEffectiveness*(attackerType: PokeType, defenderType: PokeType, moveName = "", isGhostRevealed = false, isFlierGrounded = false): float =
-  if isGhostRevealed and defenderType == ptGhost and attackerType in {ptNormal, ptFighting}:
-    return 1
-  elif isFlierGrounded and defenderType == ptFlying and attackerType == ptGround:
-    return 1
-  elif defenderType == ptFlying and moveName == "Thousand Arrows":
-    return 1
-  elif defenderType == ptWater and moveName == "Freeze-Dry":
-    return 2
-  elif moveName == "Flying Press":
-    return getTypeMatchup(ptFighting, defenderType) * getTypeMatchup(ptFlying, defenderType)
-  else:
-    return getTypeMatchup(attackerType, defenderType)

@@ -6,15 +6,15 @@ proc burnApplies*(move: PokeMove, attacker: Pokemon): bool =
     attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
 
 proc skyDropFails*(move: PokeMove, defender: Pokemon): bool =
-  move.name == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200)
+  move == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200)
 
 proc synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): bool =
-  move.name == "Synchronoise" and
+  move == "Synchronoise" and
     not defender.hasType(attacker.pokeType1) and
     not defender.hasType(attacker.pokeType2)
 
 proc dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
-  move.name == "Dream Eater" and
+  move == "Dream Eater" and
     not (sckAsleep == defender.status) and
     defender.ability != "Comatose"
 
@@ -26,15 +26,30 @@ proc isGrounded*(pokemon: Pokemon, field: Field): bool =
   field.gravityActive or
     not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item.kind == ikAirBalloon)
 
+proc getTypeEffectiveness*(attackerType: PokeType, defenderType: PokeType, move: PokeMove,
+  isGhostRevealed = false, isFlierGrounded = false): float =
+  if isGhostRevealed and defenderType == ptGhost and attackerType in {ptNormal, ptFighting}:
+    return 1
+  elif isFlierGrounded and defenderType == ptFlying and attackerType == ptGround:
+    return 1
+  elif defenderType == ptFlying and move == "Thousand Arrows":
+    return 1
+  elif defenderType == ptWater and move == "Freeze-Dry":
+    return 2
+  elif move == "Flying Press":
+    return getTypeMatchup(ptFighting, defenderType) * getTypeMatchup(ptFlying, defenderType)
+  else:
+    return getTypeMatchup(attackerType, defenderType)
+
 proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon, field: Field): float =
   let isGhostRevealed = attacker.ability == "Scrappy" or gckRevealed in defender.conditions
   let isFlierGrounded = field.gravityActive or gckGrounded in defender.conditions
-  getTypeEffectiveness(move.pokeType, defender.pokeType1, move.name, isGhostRevealed, isFlierGrounded) *
-    getTypeEffectiveness(move.pokeType, defender.pokeType2, move.name, isGhostRevealed, isFlierGrounded)
+  getTypeEffectiveness(move.pokeType, defender.pokeType1, move, isGhostRevealed, isFlierGrounded) *
+    getTypeEffectiveness(move.pokeType, defender.pokeType2, move, isGhostRevealed, isFlierGrounded)
 
 proc isDefenderAbilitySuppressed*(defender, attacker: Pokemon, move: PokeMove): bool =
   defender.ability notin ["Full Metal Body", "Prism Armor", "Shadow Shield"] and
-    (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move.name in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"])
+    (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"])
 
 proc defenderProtected*(defender: Pokemon, move: PokeMove): bool =
   (gckProtected in defender.conditions and not (pmmBypassesProtect in move.modifiers)) or
@@ -47,7 +62,7 @@ proc hasImmunityViaAbility*(defender: Pokemon, move: PokeMove, typeEffectiveness
     (defender.ability == "Flash Fire" and move.pokeType == ptFire) or
     (defender.ability in ["Dry Skin", "Storm Drain", "Water Absorb"] and move.pokeType == ptWater) or
     (defender.ability in ["Lightning Rod", "Motor Drive", "Volt Absorb"] and move.pokeType == ptElectric) or
-    (defender.ability == "Levitate" and move.pokeType == ptGround and move.name != "Thousand Arrows") or
+    (defender.ability == "Levitate" and move.pokeType == ptGround and move != "Thousand Arrows") or
     (defender.ability == "Bulletproof" and pmmBullet in move.modifiers) or
     (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
     (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0)

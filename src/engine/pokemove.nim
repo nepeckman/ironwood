@@ -20,8 +20,6 @@ type
     priority*: int
     modifiers*: set[PokeMoveModifiers]
 
-proc isItemDependant*(move: PokeMove): bool =
-  move.name in ["Judgement", "Techno Blast", "Multi-Attack", "Natural Gift"]
 
 proc copy*(move: PokeMove): PokeMove =
   PokeMove(
@@ -33,6 +31,18 @@ proc copy*(move: PokeMove): PokeMove =
     priority: move.priority,
     modifiers: move.modifiers
   )
+
+proc `==`*(move: PokeMove, s: string): bool =
+  if isNil(move): "" == s else: move.name == s
+
+proc `==`*(s: string, move: PokeMove): bool =
+  if isNil(move): "" == s else: move.name == s
+
+proc `contains`*(arr: openArray[string], move: PokeMove): bool =
+  if isNil(move): false else: find(arr, move.name) >= 0
+
+proc isItemDependant*(move: PokeMove): bool =
+  move.name in ["Judgement", "Techno Blast", "Multi-Attack", "Natural Gift"]
 
 proc isAuraBoosted*(move: PokeMove, field: Field): bool =
   (fakDark in field.auras and move.pokeType == ptDark) or
