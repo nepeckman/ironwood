@@ -259,7 +259,7 @@ proc getFinalDamage(baseAmount: int, i: int, effectiveness: float, isBurned: boo
     damageAmount = floor(damageAmount / 2)
   pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
 
-proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): DamageSpread =
+proc getDamageResult*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): DamageSpread =
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   let move = copy(m)
   let field = state.field
@@ -300,21 +300,3 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   result = noDamage
   for i in 0..15:
     result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, finalMod)
-
-var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)
-var attacker = makePokemon("Snorlax", ptNormal, stats = snorlaxStats)
-var defender = makePokemon("Snorlax", ptNormal, stats = snorlaxStats)
-var move = PokeMove(
-    name: "Return",
-    category: pmcPhysical,
-    basePower: 102,
-    pokeType: ptNormal,
-    priority: 0,
-    modifiers: {}
-    )
-var homeTeam = makeTeam([attacker, attacker, attacker, attacker, attacker, attacker], tskHome)
-var awayTeam = makeTeam([defender, defender, defender, defender, defender, defender], tskAway)
-var gameState = State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
-
-let damage = getDamageResult(attacker, defender, move, gameState)
-echo damage

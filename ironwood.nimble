@@ -17,3 +17,7 @@ task damage, "Compiles and runs damage program":
 
 task release, "Compiles release":
   exec "nimble c -o:./build/release -d:release src/engine/damage"
+
+task testengine, "Runs tests against the game engine":
+  exec "nimble c -o:./build/tests/engine tests/engine/pokemove_tests.nim"
+  exec "./build/tests/engine"
