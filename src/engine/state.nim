@@ -10,3 +10,5 @@ type
 
 proc getTeam*(state: State, pokemon: Pokemon): TeamSideKind =
   if pokemon in state.homeTeam.members: tskHome else: tskAway
+
+# TODO: add copy proc
