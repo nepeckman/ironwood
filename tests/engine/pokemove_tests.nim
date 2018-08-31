@@ -1,4 +1,4 @@
-import ../../src/engine/[damage, pokemon, pokemove, team, state, field, poketype]
+import ../../src/engine/[damage, pokemon, pokemove, team, state, field, poketype, action]
 import unittest
 
 suite "Regular moves":
