@@ -14,3 +14,6 @@ requires "uuids 0.1.9"
 
 task damage, "Compiles and runs damage program":
   exec "nimble c -o:./build/damage -r src/engine/damage"
+
+task release, "Compiles release":
+  exec "nimble c -o:./build/release -d:release src/engine/damage"

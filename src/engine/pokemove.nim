@@ -6,7 +6,7 @@ type
   PokeMoveModifiers* = enum
     pmmSound, pmmBullet, pmmAerilated, pmmPixilated, pmmRefrigerated, pmmGalvanized, pmmUsesHighestAtkStat,
     pmmDealsPhysicalDamage, pmmIgnoresBurn, pmmMakesContact, pmmPunch, pmmJaw, pmmSpread, pmmSecondaryEffect, pmmPulse,
-    pmmHeals, pmmBypassesProtect, pmmIgnoresDefenseBoosts, pmmRecoil, pmmSelfKOs
+    pmmHeals, pmmBypassesProtect, pmmIgnoresDefenseBoosts, pmmRecoil, pmmSelfKOs, pmmVariablePower, pmmConsistentDamage
   
   PokeMoveCategory* = enum
     pmcPhysical, pmcSpecial, pmcStatus
@@ -15,7 +15,6 @@ type
     name*: string
     category*: PokeMoveCategory
     basePower*: int
-    variablePower*: bool
     pokeType*: PokeType
     priority*: int
     modifiers*: set[PokeMoveModifiers]
@@ -26,7 +25,6 @@ proc copy*(move: PokeMove): PokeMove =
     name: move.name,
     category: move.category,
     basePower: move.basePower,
-    variablePower: move.variablePower,
     pokeType: move.pokeType,
     priority: move.priority,
     modifiers: move.modifiers

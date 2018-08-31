@@ -1,6 +1,19 @@
 import math, algorithm, sets
 import state, team, pokemon, field, poketype, pokemove, condition, item, ability, engineutils
 
+type
+  DamageSpread* = array[0..15, int]
+  DamageInternalState = tuple[isSTAB, defAbilitySuppressed: bool, typeEffectiveness: float]
+
+proc chainMods(mods: seq[int]): int =
+  result = 0x1000
+  for m in mods:
+    if m != 0x1000:
+      result = ((result * m) + 0x800) shl 12
+
+proc pokeRound(num: float): int =
+  if num - floor(num) > 0.5: toInt(ceil(num)) else: toInt(floor(num))
+
 proc attackerAbilityBasePowerMod(attacker: Pokemon, move: PokeMove, defender: Pokemon, field: Field, typeEffectiveness: float): int =
   if (attacker.ability == "Technician" and move.basePower <= 60) or
     (attacker.ability == "Flare Boost" and attacker.status == sckBurned and move.category == pmcSpecial) or
@@ -50,6 +63,25 @@ proc moveBasePowerMod(move: PokeMove, attacker, defender: Pokemon, field: Field)
   elif (move == "Knock Off" and boostedKnockOff(defender)): 0x1800
   else: 0x1000
 
+proc auraMod(attacker, defender: Pokemon, defAbilitySuppressed: bool): int =
+    if attacker.ability == "Aura Break" or
+      (not defAbilitySuppressed and defender.ability == "Aura Break"): 0x0C00
+    else: 0x1547
+
+proc helpingHandMod(attacker: Pokemon): int = 
+  if gckHandedHelp in attacker.conditions: 0x1800 else: 0x1000
+
+proc calculateBasePower(move: PokeMove, attacker, defender: Pokemon, field: Field,
+  typeEffectiveness: float, defAbilitySuppressed: bool): int =
+  var bpMods: seq[int] = @[]
+  bpMods.add(attacker.attackerAbilityBasePowerMod(move, defender, field, typeEffectiveness))
+  if not defAbilitySuppressed: bpMods.add(defender.defenderAbilityBasePowerMod(move, attacker))
+  bpMods.add(attacker.attackerItemBasePowerMod(move))
+  bpMods.add(move.moveBasePowerMod(attacker, defender, field))
+  bpMods.add(helpingHandMod(attacker))
+  if move.isAuraBoosted(field): bpMods.add(auraMod(attacker, defender, defAbilitySuppressed))
+  max(1, pokeRound(move.basePower * chainMods(bpMods) / 0x1000))
+
 proc attackerAbilityAttackMod(attacker: Pokemon, move: PokeMove, field: Field): int =
   if (attacker.ability == "Guts" and attacker.status != sckHealthy) or
     attacker.currentHP <= toInt(attacker.maxHP / 3) and
@@ -82,6 +114,27 @@ proc attackerItemAttackMod(attacker: Pokemon, move: PokeMove): int =
     (attacker.item == "Choice Specs" and move.category == pmcSpecial): 0x1800
   else: 0x1000
 
+proc calculateAttack(attacker: Pokemon, move: PokeMove, defender: Pokemon, field: Field, defAbilitySuppressed: bool): int =
+  var attack: int
+  var attackSource = if move == "Foul Play": defender else: attacker
+
+  if (pmmUsesHighestAtkStat in move.modifiers):
+    move.category = if attackSource.attack >= attackSource.spattack: pmcPhysical else: pmcSpecial
+
+  attack = if move.category == pmcPhysical: attackSource.attack else: attackSource.spattack
+  if not defAbilitySuppressed and defender.ability == "Unaware":
+    attack =
+      if move.category == pmcPhysical: attackSource.rawStats.atk else: attackSource.rawStats.spa
+
+  if attacker.ability == "Hustle" and move.category == pmcPhysical:
+    attack = pokeRound(attack * 3 / 2)
+
+  var atkMods: seq[int] = @[]
+  atkMods.add(attacker.attackerAbilityAttackMod(move, field))
+  if not defAbilitySuppressed: atkMods.add(defender.defenderAbilityAttackMod(move))
+  atkMods.add(attacker.attackerItemAttackMod(move))
+  max(1, pokeRound(attack * chainMods(atkMods) / 0x1000))
+
 proc defenderAbilityDefenseMod(defender: Pokemon, field: Field, hitsPhysical: bool): int = 
     if defender.ability == "Marvel Scale" and defender.status != sckHealthy and hitsPhysical: 0x1800
     elif defender.ability == "Flower Gift" and field.weather in {fwkSun, fwkHarshSun} and not hitsPhysical: 0x1800
@@ -95,6 +148,20 @@ proc defenderItemDefenseMod(defender: Pokemon, hitsPhysical: bool): int =
   elif (defender.item == "Eviolite" and defender.hasEvolution) or
     (not hitsPhysical and defender.item == "Assault Vest"): 0x1800
   else: 0x1000
+
+proc calculateDefense(defender, attacker: Pokemon, move: PokeMove, field: Field, defAbilitySuppressed: bool): int =
+  let hitsPhysical = move.category == pmcPhysical or pmmDealsPhysicalDamage in move.modifiers
+  var defense = 
+    if pmmIgnoresDefenseBoosts in move.modifiers or attacker.ability == "Unaware":
+      if  hitsPhysical: defender.rawStats.def else: defender.rawStats.spd
+    else:
+      if hitsPhysical: defender.defense else: defender.spdefense
+  if field.weather == fwkSand and defender.hasType(ptRock) and not hitsPhysical:
+    defense = pokeRound(defense * 3 / 2)
+  var defMods: seq[int] = @[]
+  if not defAbilitySuppressed: defMods.add(defender.defenderAbilityDefenseMod(field, hitsPhysical))
+  defMods.add(defender.defenderItemDefenseMod(hitsPhysical))
+  max(1, pokeRound(defense * chainMods(defMods) / 0x1000))
 
 proc attackerAbilityFinalMod(attacker: Pokemon, move: PokeMove, typeEffectiveness: float): int =
   if (attacker.ability == "Tinted Lens" and typeEffectiveness < 1) or
@@ -118,142 +185,34 @@ proc defenderItemFinalMod(defender, attacker: Pokemon, move: PokeMove): int =
     attacker.ability != "Unnerve": 0x800
   else: 0x1000
 
-proc helpingHandMod(attacker: Pokemon): int = 
-  if gckHandedHelp in attacker.conditions: 0x1800 else: 0x1000
-
-proc auraMod(attacker, defender: Pokemon, defAbilitySuppressed: bool): int =
-    if attacker.ability == "Aura Break" or
-      (not defAbilitySuppressed and defender.ability == "Aura Break"): 0x0C00
-    else: 0x1547
+proc doesNoDamage(move: PokeMove, attacker, defender: Pokemon, field: Field,
+  typeEffectiveness: float, defAbilitySuppressed: bool): bool =
+  move.basePower == 0 or typeEffectiveness == 0 or
+    defenderProtected(defender, move) or moveFails(move, defender, attacker) or
+    (not defAbilitySuppressed and hasImmunityViaAbility(defender, move, typeEffectiveness)) or
+    (move.priority > 0 and field.terrain == ftkPsychic and defender.isGrounded(field)) or
+    (defender.item.kind == ikAirBalloon and move.pokeType == ptGround and
+    move != "Thousand Arrows" and not field.gravityActive) or
+    (field.weather == fwkHarshSun and move.pokeType == ptWater) or
+    (field.weather == fwkHeavyRain and move.pokeType == ptFire)
 
 proc levelDamage(attacker: Pokemon): int =
   if attacker.ability == "Parental Bond": attacker.level * 2 else: attacker.level
 
-proc chainMods(mods: seq[int]): int =
-  result = 0x1000
-  for m in mods:
-    if m != 0x1000:
-      result = ((result * m) + 0x800) shl 12
-
-proc pokeRound(num: float): int =
-  if num - floor(num) > 0.5: toInt(ceil(num)) else: toInt(floor(num))
+proc calculateConsistentDamage(move: PokeMove, attacker, defender: Pokemon): DamageSpread =
+  var damage = 0
+  if move in ["Seismic Toss", "Night Shade"]:
+    damage = levelDamage(attacker)
+  if move == "Final Gambit":
+    damage = attacker.currentHP
+  if move in ["Nature's Madness", "Super Fang"]:
+    damage = toInt(floor(defender.currentHP / 2))
+  fill(result, damage)
 
 proc getBaseDamage(level: int, basePower: int, attack: int, defense: int): int =
   toInt(floor(floor((floor((2 * level) / 5 + 2) * toFloat(basePower) * toFloat(attack)) / toFloat(defense)) / 50 + 2))
 
-proc getFinalDamage(baseAmount: int, i: int, effectiveness: float, isBurned: bool, stabMod: int, finalMod: int): int =
-  var damageAmount = floor(toFloat(pokeRound(floor(toFloat(baseAmount) * ((85 + i) / 100)) * (stabMod / 0x1000))) * effectiveness)
-  if isBurned:
-    damageAmount = floor(damageAmount / 2)
-  pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
-
-proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): array[0..15, int] =
-  let move = copy(m)
-  let field = state.field
-  let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-  if move.basePower == 0 and move != "Nature Power":
-    return noDamage
-
-  if defenderProtected(defender, move):
-    return noDamage
-
-  let defAbilitySuppressed = isDefenderAbilitySuppressed(defender, attacker, move)
-
-  if move == "Weather Ball": move.weatherBallTransformation(field.weather)
-  if move.isItemDependant() : move.changeTypeWithItem(attacker.item)
-  if move == "Nature Power": move.naturePowerTransformation(field.terrain)
-  if move == "Revelation Dance": move.pokeType = attacker.pokeType1
-  if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
-
-  var typeEffectiveness = getMoveEffectiveness(move, defender, attacker, field)
-
-  if typeEffectiveness == 0:
-    return noDamage
-
-  if moveFails(move, defender, attacker): return noDamage
-
-  if not defAbilitySuppressed and hasImmunityViaAbility(defender, move, typeEffectiveness):
-    return noDamage
-
-  if field.weather == fwkStrongWinds and
-    defender.hasType(ptFlying) and getTypeMatchup(move.pokeType, ptFlying) > 1:
-    typeEffectiveness = typeEffectiveness / 2
-
-  if move.pokeType == ptGround and move != "Thousand Arrows" and
-    not field.gravityActive and defender.item.kind == ikAirBalloon:
-    return noDamage
-
-  if move.priority > 0 and field.terrain == ftkPsychic and defender.isGrounded(field):
-    return noDamage
-  
-  if move in ["Seismic Toss", "Night Shade"]:
-    var damage = levelDamage(attacker)
-    fill(result, damage)
-    return
-
-  if move == "Final Gambit":
-    fill(result, attacker.currentHP)
-    return
-
-  if move in ["Nature's Madness", "Super Fang"]:
-    fill(result, toInt(floor(defender.currentHP / 2)))
-    return
-  
-  ### BASE POWER
-  move.basePower = if move.variablePower: calculateBasePower(move, attacker, defender) else: move.basePower
-  var isSTAB = attacker.hasType(move.pokeType)
-  var bpMods: seq[int] = @[]
-
-  bpMods.add(attacker.attackerAbilityBasePowerMod(move, defender, field, typeEffectiveness))
-  if not defAbilitySuppressed: bpMods.add(defender.defenderAbilityBasePowerMod(move, attacker))
-  bpMods.add(attacker.attackerItemBasePowerMod(move))
-  bpMods.add(move.moveBasePowerMod(attacker, defender, field))
-  bpMods.add(helpingHandMod(attacker))
-  if move.isAuraBoosted(field): bpMods.add(auraMod(attacker, defender, defAbilitySuppressed))
-
-  var basePower = max(1, pokeRound(move.basePower * chainMods(bpMods) / 0x1000))
-
-  ### (SP)ATTACK
-  var attack: int
-  var attackSource = if move == "Foul Play": defender else: attacker
-
-  if (pmmUsesHighestAtkStat in move.modifiers):
-    move.category = if attackSource.attack >= attackSource.spattack: pmcPhysical else: pmcSpecial
-
-  attack = if move.category == pmcPhysical: attackSource.attack else: attackSource.spattack
-  if not defAbilitySuppressed and defender.ability == "Unaware":
-    attack =
-      if move.category == pmcPhysical: attackSource.rawStats.atk else: attackSource.rawStats.spa
-
-  if attacker.ability == "Hustle" and move.category == pmcPhysical:
-    attack = pokeRound(attack * 3 / 2)
-
-  var atkMods: seq[int] = @[]
-  atkMods.add(attacker.attackerAbilityAttackMod(move, field))
-  if not defAbilitySuppressed: atkMods.add(defender.defenderAbilityAttackMod(move))
-  atkMods.add(attacker.attackerItemAttackMod(move))
-
-  attack = max(1, pokeRound(attack * chainMods(atkMods) / 0x1000))
-
-  ### (SP)DEFENSE
-  let hitsPhysical = move.category == pmcPhysical or pmmDealsPhysicalDamage in move.modifiers
-  var defense = 
-    if pmmIgnoresDefenseBoosts in move.modifiers or attacker.ability == "Unaware":
-      if  hitsPhysical: defender.rawStats.def else: defender.rawStats.spd
-    else:
-      if hitsPhysical: defender.defense else: defender.spdefense
-
-  if field.weather == fwkSand and defender.hasType(ptRock) and not hitsPhysical:
-    defense = pokeRound(defense * 3 / 2)
-
-  var defMods: seq[int] = @[]
-  
-  if not defAbilitySuppressed: defMods.add(defender.defenderAbilityDefenseMod(field, hitsPhysical))
-  defMods.add(defender.defenderItemDefenseMod(hitsPhysical))
-  
-  defense = max(1, pokeRound(defense * chainMods(defMods) / 0x1000))
-
-  ### DAMAGE
+proc calculateBaseDamage(attacker, defender: Pokemon, move: PokeMove, field: Field, basePower, attack, defense: int): int =
   var baseDamage = getBaseDamage(attacker.level, basePower, attack, defense)
 
   if field.format != ffkSingles and pmmSpread in move.modifiers:
@@ -265,28 +224,19 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
   elif (field.weather == fwkSun and move.pokeType == ptWater) or
     (field.weather == fwkRain and move.pokeType == ptFire):
     baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
-  elif (field.weather == fwkHarshSun and move.pokeType == ptWater) or
-    (field.weather == fwkHeavyRain and move.pokeType == ptFire):
-    return noDamage
   
   if isGrounded(attacker, field):
     if (field.terrain == ftkGrass and move.pokeType == ptGrass) or
       (field.terrain == ftkPsychic and move.pokeType == ptPsychic) or
       (field.terrain == ftkElectric and move.pokeType == ptElectric):
       baseDamage = pokeRound(baseDamage * 0x1800 / 0x1000)
-
-  if isGrounded(defender, field):
-    if field.terrain == ftkFairy and move.pokeType == ptDragon:
+    elif (field.terrain == ftkFairy and move.pokeType == ptDragon) or
+      (field.terrain == ftkGrass and move in ["Bulldoze", "Earthquake"]):
       baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
-    elif field.terrain == ftkGrass and move in ["Bulldoze", "Earthquake"]:
-      baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
+  return baseDamage
 
-  var stabMod = 0x1000
-  if isSTAB:
-    stabMod = if attacker.ability == "Adaptability": 0x2000 else: 0x1800
-
-  let applyBurn = burnApplies(move, attacker)
-
+proc calculateFinalMod(attacker, defender: Pokemon, move: PokeMove, field: Field,
+  state: State, typeEffectiveness: float, defAbilitySuppressed: bool): int =
   var finalMods: seq[int] = @[]
   let defenderSideEffects = field.sideEffects(state.getTeam(defender))
   if (fseAuroraVeil in defenderSideEffects) or
@@ -301,13 +251,55 @@ proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: S
 
   if gckFriendGuarded in defender.conditions:
     finalMods.add(0xC00)
+  chainMods(finalMods)
 
-  let finalMod = chainMods(finalMods)
+proc getFinalDamage(baseAmount: int, i: int, effectiveness: float, isBurned: bool, stabMod: int, finalMod: int): int =
+  var damageAmount = floor(toFloat(pokeRound(floor(toFloat(baseAmount) * ((85 + i) / 100)) * (stabMod / 0x1000))) * effectiveness)
+  if isBurned:
+    damageAmount = floor(damageAmount / 2)
+  pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
+
+proc getDamageResult(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): DamageSpread =
+  let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  let move = copy(m)
+  let field = state.field
+
+  move.transformMove(attacker, defender, field)
+
+  var isSTAB = attacker.hasType(move.pokeType)
+  let defAbilitySuppressed = isDefenderAbilitySuppressed(defender, attacker, move)
+  var typeEffectiveness = getMoveEffectiveness(move, defender, attacker, field)
+
+  if field.weather == fwkStrongWinds and
+    defender.hasType(ptFlying) and getTypeMatchup(move.pokeType, ptFlying) > 1:
+    typeEffectiveness = typeEffectiveness / 2
+
+  if move.doesNoDamage(attacker, defender, field, typeEffectiveness, defAbilitySuppressed):
+    return noDamage
+
+  if pmmConsistentDamage in move.modifiers:
+    return move.calculateConsistentDamage(attacker, defender)
+
+  var basePower = 
+    move.calculateBasePower(attacker, defender, field, typeEffectiveness, defAbilitySuppressed)
+  var attack = attacker.calculateAttack(move, defender, field, defAbilitySuppressed)
+  var defense = defender.calculateDefense(attacker, move, field, defAbilitySuppressed)
+
+  var baseDamage =
+    calculateBaseDamage(attacker, defender, move, field, basePower, attack, defense)
+
+  let finalMod = calculateFinalMod(attacker, defender, move, field, state, typeEffectiveness, defAbilitySuppressed)
+
+  var stabMod =
+    if isSTAB:
+      if attacker.ability == "Adaptability": 0x2000 else: 0x1800
+    else: 0x1000
+
+  let applyBurn = burnApplies(move, attacker)
 
   result = noDamage
   for i in 0..15:
     result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, finalMod)
-
 
 var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)
 var attacker = makePokemon("Snorlax", ptNormal, stats = snorlaxStats)
@@ -316,7 +308,6 @@ var move = PokeMove(
     name: "Return",
     category: pmcPhysical,
     basePower: 102,
-    variablePower: false,
     pokeType: ptNormal,
     priority: 0,
     modifiers: {}

@@ -89,6 +89,14 @@ proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): 
   of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.maxHP)
   else: move.basePower
 
+proc transformMove*(move: PokeMove, attacker, defender: Pokemon, field: Field) =
+  if move == "Weather Ball": move.weatherBallTransformation(field.weather)
+  if move.isItemDependant() : move.changeTypeWithItem(attacker.item)
+  if move == "Nature Power": move.naturePowerTransformation(field.terrain)
+  if move == "Revelation Dance": move.pokeType = attacker.pokeType1
+  if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
+  move.basePower = if pmmVariablePower in move.modifiers: calculateBasePower(move, attacker, defender) else: move.basePower
+
 proc boostedKnockOff*(defender: Pokemon): bool =
   defender.hasItem() and
     not (defender.name == "Giratina-Origin" and defender.item == "Griseous Orb") and
