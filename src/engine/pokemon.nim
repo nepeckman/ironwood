@@ -27,7 +27,7 @@ type
     conditions*: set[GeneralConditionKind]
 
 proc makePokemon*(name: string, pokeType1 = ptNull, pokeType2 = ptNull, ability: Ability = nil,
-  level = 50, item: Item = nil, stats = (hp: 1, atk: 1, def: 1, spa: 1, spd: 1, spe: 1), weight = 1): Pokemon =
+  level = 50, item: Item = nil, stats = (hp: 1, atk: 1, def: 1, spa: 1, spd: 1, spe: 1), weight = 1, gender = pgkFemale): Pokemon =
   let uuid = genUUID()
   Pokemon(
     uuid: uuid,
@@ -36,15 +36,36 @@ proc makePokemon*(name: string, pokeType1 = ptNull, pokeType2 = ptNull, ability:
     pokeType2: pokeType2,
     ability: ability,
     level: level,
-    hasAttacked: false,
+    gender: gender,
+    hasAttacked: false, # TODO: move this to engine
     item: item,
     stats: stats,
     weight: weight,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
     status: sckHealthy,
     conditions: {},
-    hasEvolution: false,
+    hasEvolution: false, # TODO: move this to data lookup
     currentHP: stats.hp
+  )
+
+proc copy*(pokemon: Pokemon): Pokemon =
+  Pokemon(
+    uuid: pokemon.uuid,
+    name: pokemon.name,
+    pokeType1: pokemon.pokeType1,
+    pokeType2: pokemon.pokeType2,
+    ability: pokemon.ability,
+    level: pokemon.level,
+    gender: pokemon.gender,
+    hasAttacked: pokemon.hasAttacked,
+    item: pokemon.item,
+    stats: pokemon.stats,
+    weight: pokemon.weight,
+    boosts: pokemon.boosts,
+    status: pokemon.status,
+    conditions: pokemon.conditions,
+    hasEvolution: pokemon.hasEvolution,
+    currentHP: pokemon.currentHP
   )
 
 
@@ -75,6 +96,7 @@ proc spdefense*(mon: Pokemon): int =
 
 proc speed*(mon: Pokemon): int =
   getModifiedStat(mon.stats.spe, mon.boosts.spe)
+  #TODO: Add ability + item check
 
 proc weight*(mon: Pokemon): int = toInt(toFloat(mon.weight) * mon.getWeightFactor())
 

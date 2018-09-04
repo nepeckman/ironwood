@@ -14,3 +14,11 @@ proc makeTeam*(pokemonArray: array[6, Pokemon], side: TeamSideKind): Team =
   for mon in pokemonArray:
     members.incl(mon)
   Team(members: members, activePokemon: activePokemon, side: side)
+
+proc copy*(team: Team): Team =
+  var members: HashSet[Pokemon] = initSet[Pokemon]()
+  let activePokemon = copy(team.activePokemon)
+  members.incl(activePokemon)
+  for mon in team.members:
+    members.incl(copy(mon))
+  Team(members: members, activePokemon: activePokemon, side: team.side)

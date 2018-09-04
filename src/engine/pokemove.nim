@@ -1,5 +1,5 @@
 import strutils
-import poketype, field, item, ability
+import poketype, field, item, ability, effects
 
 type
 
@@ -15,6 +15,7 @@ type
     name*: string
     category*: PokeMoveCategory
     basePower*: int
+    effect: Effect
     pokeType*: PokeType
     priority*: int
     modifiers*: set[PokeMoveModifiers]
@@ -25,6 +26,7 @@ proc copy*(move: PokeMove): PokeMove =
     name: move.name,
     category: move.category,
     basePower: move.basePower,
+    effect: move.effect,
     pokeType: move.pokeType,
     priority: move.priority,
     modifiers: move.modifiers

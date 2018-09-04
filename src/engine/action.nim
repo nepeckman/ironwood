@@ -1,3 +1,4 @@
+import hashes
 import pokemon, pokemove
 
 type
@@ -6,7 +7,7 @@ type
 
   Action* = ref object
     pokemon*: Pokemon
-    case kind: ActionKind
+    case kind*: ActionKind
     of akMoveSelection:
       move*: PokeMove
       attackTarget*: Pokemon
@@ -17,3 +18,12 @@ proc newMoveAction*(actingPokemon: Pokemon, move: PokeMove, targetPokemon: Pokem
 
 proc newSwitchAction*(actingPokemon, targetPokemon: Pokemon): Action = 
   Action(kind: akSwitchSelection, pokemon: actingPokemon, switchTarget: targetPokemon)
+
+proc cmp*(action1, action2: Action): int =
+  if action1.kind == action2.kind:
+    cmp(action1.pokemon.speed, action2.pokemon.speed)
+  elif action1.kind == akSwitchSelection: 1
+  else: -1
+
+proc hash*(action: Action): Hash =
+  action.pokemon.hash

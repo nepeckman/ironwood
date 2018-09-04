@@ -259,7 +259,7 @@ proc getFinalDamage(baseAmount: int, i: int, effectiveness: float, isBurned: boo
     damageAmount = floor(damageAmount / 2)
   pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
 
-proc getDamageResult*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): DamageSpread =
+proc getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): DamageSpread =
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   let move = copy(m)
   let field = state.field
@@ -300,3 +300,7 @@ proc getDamageResult*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: 
   result = noDamage
   for i in 0..15:
     result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, finalMod)
+
+proc getAvgDamage*(attacker: Pokemon, defender: Pokemon, move: PokeMove, state: State): int =
+  let spread = getDamageSpread(attacker, defender, move, state)
+  toInt(sum(spread) / spread.len)

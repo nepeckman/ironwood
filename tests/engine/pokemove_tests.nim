@@ -1,4 +1,4 @@
-import ../../src/engine/[damage, pokemon, pokemove, team, state, field, poketype, action]
+import ../../src/engine/[damage, pokemon, pokemove, team, state, field, poketype, action, engine]
 import unittest
 
 suite "Regular moves":
@@ -19,5 +19,5 @@ suite "Regular moves":
     var awayTeam = makeTeam([defender, defender, defender, defender, defender, defender], tskAway)
     var gameState = State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
 
-    let damage = getDamageResult(attacker, defender, move, gameState)
+    let damage = getDamageSpread(attacker, defender, move, gameState)
     check(damage == [94, 96, 97, 99, 99, 100, 102, 103, 103, 105, 106, 108, 108, 109, 111, 112])

@@ -11,4 +11,9 @@ type
 proc getTeam*(state: State, pokemon: Pokemon): TeamSideKind =
   if pokemon in state.homeTeam.members: tskHome else: tskAway
 
-# TODO: add copy proc
+proc copy*(state: State): State =
+  State(
+    homeTeam: copy(state.homeTeam),
+    awayTeam: copy(state.awayTeam),
+    field: copy(state.field)
+  )
