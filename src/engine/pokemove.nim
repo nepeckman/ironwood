@@ -1,3 +1,4 @@
+#TODO: Make moves immutable data
 import strutils
 import poketype, field, item, ability, effects
 
