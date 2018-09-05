@@ -12,12 +12,6 @@ bin           = @["ironwood"]
 requires "nim >= 0.18.0"
 requires "uuids 0.1.9"
 
-task damage, "Compiles and runs damage program":
-  exec "nimble c -o:./build/damage -r src/engine/damage"
-
-task release, "Compiles release":
-  exec "nimble c -o:./build/release -d:release src/engine/damage"
-
 task testengine, "Runs tests against the game engine":
-  exec "nimble c -o:./build/tests/engine tests/engine/pokemove_tests.nim"
+  exec "nimble c -o:./build/tests/engine tests/engine/engine_test.nim"
   exec "./build/tests/engine"

@@ -1,4 +1,5 @@
 import hashes
+import uuids
 import pokemon, pokemove
 
 type
@@ -6,24 +7,18 @@ type
   ActionKind* = enum akMoveSelection, akSwitchSelection
 
   Action* = ref object
-    pokemon*: Pokemon
+    actingPokemonID*: UUID
     case kind*: ActionKind
     of akMoveSelection:
       move*: PokeMove
-      attackTarget*: Pokemon
-    of akSwitchSelection: switchTarget*: Pokemon
+      attackTargetID*: UUID
+    of akSwitchSelection: switchTargetID*: UUID
 
-proc newMoveAction*(actingPokemon: Pokemon, move: PokeMove, targetPokemon: Pokemon = nil): Action =
-  Action(kind: akMoveSelection, pokemon: actingPokemon, move: move, attackTarget: targetPokemon)
+proc newMoveAction*(actingPokemonID: UUID, move: PokeMove, targetPokemonID: UUID = initUUID(0, 0)): Action =
+  Action(kind: akMoveSelection, actingPokemonID: actingPokemonID, move: move, attackTargetID: targetPokemonID)
 
-proc newSwitchAction*(actingPokemon, targetPokemon: Pokemon): Action = 
-  Action(kind: akSwitchSelection, pokemon: actingPokemon, switchTarget: targetPokemon)
-
-proc cmp*(action1, action2: Action): int =
-  if action1.kind == action2.kind:
-    cmp(action1.pokemon.speed, action2.pokemon.speed)
-  elif action1.kind == akSwitchSelection: 1
-  else: -1
+proc newSwitchAction*(actingPokemonID, targetPokemonID: UUID): Action = 
+  Action(kind: akSwitchSelection, actingPokemonID: actingPokemonID, switchTargetID: targetPokemonID)
 
 proc hash*(action: Action): Hash =
-  action.pokemon.hash
+  action.actingPokemonID.hash
