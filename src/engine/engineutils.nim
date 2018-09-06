@@ -146,7 +146,7 @@ proc healthRatioToBasePower(healthRatio: float): int =
 proc variableBasePower(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
   case move.name
   of "Payback":
-    if defender.hasAttacked: 100 else: 50
+    if gckHasAttacked in defender.conditions: 100 else: 50
   of "Electro Ball": speedRatioToBasePower(floor(attacker.speed / defender.speed))
   of "Gyro Ball": min(150, 1 + toInt(floor(25 * defender.speed / attacker.speed)))
   of "Punishment": min(200, 60 + 20 * countBoosts(defender))

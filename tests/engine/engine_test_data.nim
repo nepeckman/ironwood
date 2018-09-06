@@ -1,10 +1,9 @@
 import ../../src/engine/gameObjects/[pokemon, team, field]
-import ../../src/engine/gameData/[pokemove, poketype]
+import ../../src/engine/gameData/[pokemove, poketype, pokemonData]
 import ../../src/engine/state
 
 proc sanityState*(): State =
-    var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)
-    var move = PokeMove(
+    var returnMove = PokeMove(
         name: "Return",
         category: pmcPhysical,
         basePower: 102,
@@ -12,8 +11,26 @@ proc sanityState*(): State =
         priority: 0,
         modifiers: {}
         )
-    var homePokemon = makePokemon("Snorlax", tskHome, ptNormal, stats = snorlaxStats, moves = @[move])
-    var awayPokemon = makePokemon("Snorlax", tskAway, ptNormal, stats = snorlaxStats, moves = @[move])
+    var snorlaxData = PokemonData(
+      name: "Snorlax",
+      pokeType1: ptNormal,
+      pokeType2: ptNull,
+      baseStats: (hp: 160, atk: 110, def: 65, spa: 65, spd: 110, spe: 30),
+      weight: 460,
+      dataFlags: {}
+    )
+    var snorlaxSet = PokemonSet(
+      moves: @[returnMove],
+      level: 50,
+      item: nil,
+      gender: pgkFemale,
+      ability: nil,
+      evs: (hp: 68, atk: 252, def: 188, spa: 0, spd: 0, spe: 0),
+      ivs: (hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31),
+      nature: pnAdamant
+    )
+    var homePokemon = makePokemon(snorlaxData, snorlaxSet, tskHome)
+    var awayPokemon = makePokemon(snorlaxData, snorlaxSet, tskAway)
     var homeTeam = makeTeam([homePokemon, nil, nil, nil, nil, nil], tskHome)
     var awayTeam = makeTeam([awayPokemon, nil, nil, nil, nil, nil], tskAway)
     State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())

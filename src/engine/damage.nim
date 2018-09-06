@@ -1,5 +1,5 @@
 import math, algorithm, sets
-import gameData/[fieldConditions, poketype, pokemove, condition, item, ability]
+import gameData/[fieldConditions, poketype, pokemove, pokemonData, condition, item, ability]
 import gameObjects/[team, pokemon, field]
 import engineutils
 
@@ -20,7 +20,7 @@ proc attackerAbilityBasePowerMod(attacker: Pokemon, move: PokeMove, defender: Po
   if (attacker.ability == "Technician" and move.basePower <= 60) or
     (attacker.ability == "Flare Boost" and attacker.status == sckBurned and move.category == pmcSpecial) or
     (attacker.ability == "Toxic Boost" and attacker.status in {sckPoisoned, sckBadlyPoisoned} and move.category == pmcPhysical): 0x1800
-  elif attacker.ability == "Analytic" and defender.hasAttacked: 0x14CD
+  elif attacker.ability == "Analytic" and gckHasAttacked in defender.conditions: 0x14CD
   elif attacker.ability == "Sand Force" and field.weather == fwkSand and move.pokeType in {ptRock, ptGround, ptSteel}: 0x14CD
   elif (attacker.ability == "Reckless" and pmmRecoil in move.modifiers) or
     (attacker.ability == "Iron Fist" and pmmPunch in move.modifiers): 0x1333
@@ -147,7 +147,7 @@ proc defenderAbilityDefenseMod(defender: Pokemon, field: Field, hitsPhysical: bo
 proc defenderItemDefenseMod(defender: Pokemon, hitsPhysical: bool): int =
   if (defender.item == "Metal Powder" and defender.name == "Ditto" and hitsPhysical) or
     (defender.item == "Deep Sea Scale" and defender.name == "Clamperl" and not hitsPhysical): 0x2000
-  elif (defender.item == "Eviolite" and defender.hasEvolution) or
+  elif (defender.item == "Eviolite" and pdfHasEvolution in defender.dataFlags) or
     (not hitsPhysical and defender.item == "Assault Vest"): 0x1800
   else: 0x1000
 
