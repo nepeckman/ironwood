@@ -1,5 +1,5 @@
 import strutils
-import poketype, field
+import poketype, fieldConditions
 
 type
 

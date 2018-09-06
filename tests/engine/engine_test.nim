@@ -1,6 +1,6 @@
 import unittest, sets
 import engine_test_data
-import ../../src/engine/[damage, pokemon, pokemove, team, state, field, poketype, action, engine]
+import ../../src/engine/[damage, pokemon, team, state, field, action, engine]
 
 suite "Sanity":
 

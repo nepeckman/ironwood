@@ -1,4 +1,5 @@
-import ../../src/engine/[damage, pokemon, pokemove, team, state, field, poketype, action, engine]
+import ../../src/engine/[pokemon, team, state, field]
+import ../../src/engine/gameData/[pokemove, poketype]
 
 proc sanityState*(): State =
     var snorlaxStats: PokeStats = (hp: 244, atk: 178, def: 109, spa: 85, spd: 130, spe: 45)

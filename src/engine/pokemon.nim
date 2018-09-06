@@ -1,5 +1,5 @@
 import math, hashes, uuids
-import item, poketype, pokemove, condition, effects, ability
+import gameData/[item, poketype, pokemove, condition, effects, ability]
 
 type
 

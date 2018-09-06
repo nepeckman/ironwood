@@ -1,6 +1,7 @@
 import hashes
 import uuids
-import pokemon, pokemove
+import gameData/pokemove
+import pokemon
 
 type
 
