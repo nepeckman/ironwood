@@ -261,10 +261,8 @@ proc getFinalDamage(baseAmount: int, i: int, effectiveness: float, isBurned: boo
 
 proc getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): DamageSpread =
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-  let move = copy(m)
   let field = state.field
-
-  move.transformMove(attacker, defender, field)
+  let move = m.damageStepMoveTransformation(attacker, defender, field)
 
   var isSTAB = attacker.hasType(move.pokeType)
   let defAbilitySuppressed = isDefenderAbilitySuppressed(defender, attacker, move)

@@ -67,7 +67,82 @@ proc hasImmunityViaAbility*(defender: Pokemon, move: PokeMove, typeEffectiveness
     (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
     (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0)
 
-proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
+proc changeTypeWithAbility(move: PokeMove, ability: Ability) =
+  if move.pokeType == ptNormal:
+    if ability == "Aerilate":
+      move.pokeType = ptFlying
+      move.modifiers.incl(pmmAerilated)
+    elif ability == "Pixilate":
+      move.pokeType = ptFairy
+      move.modifiers.incl(pmmPixilated)
+    elif ability == "Refrigerate":
+      move.pokeType = ptIce
+      move.modifiers.incl(pmmRefrigerated)
+    elif ability == "Galvanize":
+      move.pokeType = ptElectric
+      move.modifiers.incl(pmmGalvanized)
+    elif ability == "Liquid Voice" and pmmSound in move.modifiers:
+      move.pokeType = ptWater
+  elif ability == "Normalize":
+    move.pokeType = ptNormal
+
+proc changeTypeWithItem(move: PokeMove, item: Item) =
+  if item.kind in {ikDrive, ikPlate, ikMemory}:
+    move.pokeType = item.associatedType
+
+proc naturePowerTransformation(move: PokeMove, terrain: FieldTerrainKind) =
+  move.pokeType = case terrain
+    of ftkElectric: ptElectric
+    of ftkPsychic: ptPsychic
+    of ftkGrass: ptGrass
+    of ftkFairy: ptFairy
+    else: ptNormal
+  move.basePower = case terrain
+    of ftkElectric: 90
+    of ftkPsychic: 90
+    of ftkGrass: 90
+    of ftkFairy: 95
+    else: 80
+
+proc weatherBallTransformation(move: PokeMove, weather: FieldWeatherKind) =
+  move.pokeType = case weather
+    of fwkSun, fwkHarshSun: ptFire
+    of fwkRain, fwkHeavyRain: ptWater
+    of fwkSand: ptRock
+    of fwkHail: ptIce
+    else: ptNormal
+  move.basePower = if weather == fwkNone or weather == fwkStrongWinds: 50 else: 100
+
+proc speedRatioToBasePower(speedRatio: float): int =
+  if speedRatio >= 4: 150
+  elif speedRatio >= 3: 120
+  elif speedRatio >= 2: 80
+  else: 60
+
+proc weightToBasePower(weight: int): int =
+  if weight >= 200: 120
+  elif weight >= 100: 100
+  elif weight >= 50: 80
+  elif weight >= 25: 60
+  elif weight >= 10: 40
+  else: 20
+
+proc weightRatioToBasePower(weightRatio: float): int =
+  if weightRatio >= 5: 120
+  elif weightRatio >= 4: 100
+  elif weightRatio >= 3: 80
+  elif weightRatio >= 2: 60
+  else: 40
+
+proc healthRatioToBasePower(healthRatio: float): int =
+  if healthRatio <= 1: 200
+  elif healthRatio <= 4: 150
+  elif healthRatio <= 9: 100
+  elif healthRatio <= 16: 80
+  elif healthRatio <= 32: 40
+  else: 20
+
+proc variableBasePower(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
   case move.name
   of "Payback":
     if defender.hasAttacked: 100 else: 50
@@ -89,13 +164,21 @@ proc calculateBasePower*(move: PokeMove, attacker: Pokemon, defender: Pokemon): 
   of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.maxHP)
   else: move.basePower
 
-proc transformMove*(move: PokeMove, attacker, defender: Pokemon, field: Field) =
-  if move == "Weather Ball": move.weatherBallTransformation(field.weather)
-  if move.isItemDependant() : move.changeTypeWithItem(attacker.item)
-  if move == "Nature Power": move.naturePowerTransformation(field.terrain)
-  if move == "Revelation Dance": move.pokeType = attacker.pokeType1
-  if attacker.hasTypeChangingAbility(): move.changeTypeWithAbility(attacker.ability)
-  move.basePower = if pmmVariablePower in move.modifiers: calculateBasePower(move, attacker, defender) else: move.basePower
+proc isItemDependant(move: PokeMove): bool =
+  move.name in ["Judgement", "Techno Blast", "Multi-Attack", "Natural Gift"]
+
+proc damageStepMoveTransformation*(move: PokeMove, attacker, defender: Pokemon, field: Field): PokeMove =
+  result = copy(move)
+  if move == "Weather Ball": result.weatherBallTransformation(field.weather)
+  if move.isItemDependant() : result.changeTypeWithItem(attacker.item)
+  if move == "Nature Power": result.naturePowerTransformation(field.terrain)
+  if move == "Revelation Dance": result.pokeType = attacker.pokeType1
+  if attacker.hasTypeChangingAbility(): result.changeTypeWithAbility(attacker.ability)
+  result.basePower = if pmmVariablePower in move.modifiers: variableBasePower(move, attacker, defender) else: move.basePower
+
+proc isAuraBoosted*(move: PokeMove, field: Field): bool =
+  (fakDark in field.auras and move.pokeType == ptDark) or
+    (fakFairy in field.auras and move.pokeType == ptFairy)
 
 proc boostedKnockOff*(defender: Pokemon): bool =
   defender.hasItem() and
