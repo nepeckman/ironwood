@@ -1,6 +1,6 @@
 import math
 import gameData/[pokemove, poketype, item, ability, condition, fieldConditions]
-import pokemon, field
+import gameObjects/[pokemon, field]
 
 proc burnApplies*(move: PokeMove, attacker: Pokemon): bool =
   sckBurned == attacker.status and move.category == pmcPhysical and

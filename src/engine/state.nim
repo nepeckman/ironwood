@@ -1,6 +1,7 @@
 import sets
 import uuids
-import team, pokemon, field
+import gameObjects/[team, pokemon, field]
+import action
 
 type
 
@@ -9,13 +10,6 @@ type
     awayTeam*: Team
     field*: Field
 
-proc getTeam*(state: State, pokemon: Pokemon): TeamSideKind =
-  if pokemon in state.homeTeam.members: tskHome else: tskAway
-
-proc getPokemon*(state: State, uuid: UUID): Pokemon =
-  for pokemon in state.homeTeam.members + state.awayTeam.members:
-    if pokemon.uuid == uuid: return pokemon
-  return nil
   
 proc copy*(state: State): State =
   State(
@@ -23,3 +17,14 @@ proc copy*(state: State): State =
     awayTeam: copy(state.awayTeam),
     field: copy(state.field)
   )
+
+proc getPokemon*(state: State, uuid: UUID): Pokemon =
+  for pokemon in state.homeTeam.members + state.awayTeam.members:
+    if pokemon.uuid == uuid: return pokemon
+  return nil
+
+proc compareActions*(state: State, action1, action2: Action): int =
+  if action1.kind == action2.kind:
+    cmp(state.getPokemon(action1.actingPokemonID), state.getPokemon(action2.actingPokemonID))
+  elif action1.kind == akSwitchSelection: 1
+  else: -1

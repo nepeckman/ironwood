@@ -1,6 +1,7 @@
 import math, algorithm, sets
 import gameData/[fieldConditions, poketype, pokemove, condition, item, ability]
-import state, team, pokemon, field, engineutils
+import gameObjects/[team, pokemon, field]
+import engineutils
 
 type
   DamageSpread* = array[0..15, int]
@@ -237,9 +238,9 @@ proc calculateBaseDamage(attacker, defender: Pokemon, move: PokeMove, field: Fie
   return baseDamage
 
 proc calculateFinalMod(attacker, defender: Pokemon, move: PokeMove, field: Field,
-  state: State, typeEffectiveness: float, defAbilitySuppressed: bool): int =
+  typeEffectiveness: float, defAbilitySuppressed: bool): int =
   var finalMods: seq[int] = @[]
-  let defenderSideEffects = field.sideEffects(state.getTeam(defender))
+  let defenderSideEffects = field.sideEffects(defender.side)
   if (fseAuroraVeil in defenderSideEffects) or
     (fseLightScreen in defenderSideEffects and move.category == pmcSpecial) or
     (fseReflect in defenderSideEffects and move.category == pmcPhysical):
@@ -260,9 +261,8 @@ proc getFinalDamage(baseAmount: int, i: int, effectiveness: float, isBurned: boo
     damageAmount = floor(damageAmount / 2)
   pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
 
-proc getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: State): DamageSpread =
+proc getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: Field): DamageSpread =
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-  let field = state.field
   let move = m.damageStepMoveTransformation(attacker, defender, field)
 
   var isSTAB = attacker.hasType(move.pokeType)
@@ -287,7 +287,7 @@ proc getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: 
   var baseDamage =
     calculateBaseDamage(attacker, defender, move, field, basePower, attack, defense)
 
-  let finalMod = calculateFinalMod(attacker, defender, move, field, state, typeEffectiveness, defAbilitySuppressed)
+  let finalMod = calculateFinalMod(attacker, defender, move, field, typeEffectiveness, defAbilitySuppressed)
 
   var stabMod =
     if isSTAB:
@@ -300,6 +300,6 @@ proc getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, state: 
   for i in 0..15:
     result[i] = getFinalDamage(baseDamage, i, typeEffectiveness, applyBurn, stabMod, finalMod)
 
-proc getAvgDamage*(attacker: Pokemon, defender: Pokemon, move: PokeMove, state: State): int =
-  let spread = getDamageSpread(attacker, defender, move, state)
+proc getAvgDamage*(attacker: Pokemon, defender: Pokemon, move: PokeMove, field: Field): int =
+  let spread = getDamageSpread(attacker, defender, move, field)
   toInt(sum(spread) / spread.len)

@@ -1,7 +1,9 @@
 import math, hashes, uuids
-import gameData/[item, poketype, pokemove, condition, effects, ability]
+import ../gameData/[item, poketype, pokemove, condition, effects, ability]
 
 type
+
+  TeamSideKind* = enum tskHome, tskAway
 
   PokeStats* = tuple[hp: int, atk: int, def: int, spa: int, spd: int, spe: int]
 
@@ -18,6 +20,7 @@ type
     gender*: PokeGenderKind
     level*: int
     item*: Item
+    side*: TeamSideKind
     stats: PokeStats
     weight: int
     hasEvolution*: bool
@@ -27,7 +30,7 @@ type
     status*: StatusConditionKind
     conditions*: set[GeneralConditionKind]
 
-proc makePokemon*(name: string, pokeType1 = ptNull, pokeType2 = ptNull, ability: Ability = nil,
+proc makePokemon*(name: string, side: TeamSideKind, pokeType1 = ptNull, pokeType2 = ptNull, ability: Ability = nil,
   level = 50, item: Item = nil, stats = (hp: 1, atk: 1, def: 1, spa: 1, spd: 1, spe: 1), weight = 1, gender = pgkFemale, moves: seq[PokeMove] = @[]): Pokemon =
 
   let uuid = genUUID()
@@ -42,6 +45,7 @@ proc makePokemon*(name: string, pokeType1 = ptNull, pokeType2 = ptNull, ability:
     gender: gender,
     hasAttacked: false, # TODO: move this to engine
     item: item,
+    side: side,
     stats: stats,
     weight: weight,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
@@ -63,6 +67,7 @@ proc copy*(pokemon: Pokemon): Pokemon =
     gender: pokemon.gender,
     hasAttacked: pokemon.hasAttacked,
     item: pokemon.item,
+    side: pokemon.side,
     stats: pokemon.stats,
     weight: pokemon.weight,
     boosts: pokemon.boosts,

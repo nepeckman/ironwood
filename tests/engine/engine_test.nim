@@ -1,6 +1,7 @@
 import unittest, sets
 import engine_test_data
-import ../../src/engine/[damage, pokemon, team, state, field, action, engine]
+import ../../src/engine/gameObjects/[pokemon, team, field]
+import ../../src/engine/[damage, state, action, engine]
 
 suite "Sanity":
 
@@ -8,7 +9,7 @@ suite "Sanity":
     var gameState = sanityState()
     let attacker = gameState.homeTeam.activePokemon
     let defender = gameState.awayTeam.activePokemon
-    let damage = getDamageSpread(attacker, defender, attacker.moves[0], gameState)
+    let damage = getDamageSpread(attacker, defender, attacker.moves[0], gameState.field)
     check(damage == [94, 96, 97, 99, 99, 100, 102, 103, 103, 105, 106, 108, 108, 109, 111, 112])
 
   test "engine":

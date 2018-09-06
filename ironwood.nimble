@@ -13,5 +13,6 @@ requires "nim >= 0.18.0"
 requires "uuids 0.1.9"
 
 task testengine, "Runs tests against the game engine":
+  exec "mkdir -p ./build/tests"
   exec "nimble c -o:./build/tests/engine tests/engine/engine_test.nim"
   exec "./build/tests/engine"

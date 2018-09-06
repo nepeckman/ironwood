@@ -1,8 +1,8 @@
-import gameData/fieldConditions
+import ../gameData/fieldConditions
+import pokemon
 
 type
 
-  TeamSideKind* = enum tskHome, tskAway
 
   Field* = ref object
     format*: FieldFormatKind

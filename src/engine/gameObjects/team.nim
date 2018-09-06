@@ -1,5 +1,5 @@
 import sets
-import pokemon, field
+import pokemon
 
 type
 
