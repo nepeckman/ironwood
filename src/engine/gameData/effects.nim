@@ -30,3 +30,10 @@ proc target*(effect: Effect): EffectTargetKind =
 
 proc kind*(effect: Effect): EffectKind =
   if isNil(effect): ekNull else: effect.kind
+
+proc status*(effect: Effect): StatusConditionKind = effect.status
+proc condition*(effect: Effect): GeneralConditionKind = effect.condition
+proc boostChange*(effect: Effect): tuple[atk: int, def: int, spa: int, spd: int, spe: int] = effect.boostChange
+proc hpChange*(effect: Effect): int = effect.hpChange
+proc typeChange*(effect: Effect): PokeType = effect.typeChange
+proc isRandom*(effect: Effect): bool = effect.isRandom

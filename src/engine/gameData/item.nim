@@ -14,11 +14,11 @@ type
     consumable: bool
     name: string
     case kind: ItemKind
-    of ikResistBerry: resistedType*: PokeType
-    of ikGem, ikTypeBoost, ikZCrystal, ikDrive, ikMemory, ikPlate: associatedType*: PokeType
-    of ikTerrainSeed: associatedTerrain*: FieldTerrainKind
-    of ikPinchBerry: activationPercent*, restorePercent*: int
-    of ikMegaStone, ikPokemonExclusive: associatedPokemonName*: string
+    of ikGem, ikTypeBoost, ikZCrystal, ikResistBerry,
+      ikDrive, ikMemory, ikPlate: associatedType: PokeType
+    of ikTerrainSeed: associatedTerrain: FieldTerrainKind
+    of ikPinchBerry: activationPercent, restorePercent: int
+    of ikMegaStone, ikPokemonExclusive: associatedPokemonName: string
     of ikChoiceScarf, ikChoiceBand, ikChoiceSpecs, ikLifeOrb, ikLeftovers, ikShellBell, ikAirBalloon, ikFocusSash, ikEviolite,
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikMuscleBand,
@@ -32,6 +32,12 @@ proc name*(item: Item): string =
 
 proc consumable*(item: Item): bool =
   if isNil(item): false else: item.consumable
+
+proc associatedType*(item: Item): PokeType = item.associatedType
+proc associatedTerrain*(item: Item): FieldTerrainKind = item.associatedTerrain
+proc activationPercent*(item: Item): int = item.activationPercent
+proc restorePercent*(item: Item): int = item.restorePercent
+proc associatedPokemonName*(item: Item): string = item.associatedPokemonName
 
 proc `==`*(item: Item, s: string): bool =
   if isNil(item): "" == s else: item.name == s

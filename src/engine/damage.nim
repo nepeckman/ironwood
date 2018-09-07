@@ -184,7 +184,7 @@ proc attackerItemFinalMod(attacker: Pokemon, typeEffectiveness: float): int =
 
 proc defenderItemFinalMod(defender, attacker: Pokemon, move: PokeMove): int =
   if defender.item.kind == ikResistBerry and
-    move.pokeType == defender.item.resistedType and
+    move.pokeType == defender.item.associatedType and
     attacker.ability != "Unnerve": 0x800
   else: 0x1000
 
