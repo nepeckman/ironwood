@@ -1,5 +1,3 @@
-import ../../src/engine/gameObjects/gameObjects
-import ../../src/engine/gameData/gameData
 import ../../src/engine/engine
 
 proc sanityState*(): State =

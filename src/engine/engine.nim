@@ -1,9 +1,9 @@
 import 
-  sets, algorithm, future,
-  gameObjects/gameObjects,
+  algorithm, future,
+  gameObjects/gameObjects, gameData/gameData,
   state, action, damage
 
-proc turn*(s: State, actions: HashSet[Action]): State =
+proc turn*(s: State, actions: ActionSet): State =
   var state = copy(s)
   var orderedActions: seq[Action] = @[]
   for action in actions:
@@ -20,5 +20,20 @@ proc turn*(s: State, actions: HashSet[Action]): State =
       defender.currentHP = max(0, defender.currentHP - damage)
   return state
 
+proc newGame*() =
+  echo "not done yet"
+
+proc newActionSet*() =
+  echo "not done yet"
+
+proc homeActivePokemon*() =
+  echo "not done yet"
+
+proc awayActivePokemon*() =
+  echo "not done yet"
+
+proc possibleActions*() =
+  echo "not done yet"
+
 export
-  state
+  state, action, gameObjects, gameData
