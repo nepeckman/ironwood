@@ -171,6 +171,7 @@ proc isItemDependant(move: PokeMove): bool =
 
 proc damageStepMoveTransformation*(move: PokeMove, attacker, defender: Pokemon, field: Field): PokeMove =
   result = copy(move)
+  #TODO: return new moves by querying the movedex
   if move == "Weather Ball": result.weatherBallTransformation(field.weather)
   if move.isItemDependant() : result.changeTypeWithItem(attacker.item)
   if move == "Nature Power": result.naturePowerTransformation(field.terrain)

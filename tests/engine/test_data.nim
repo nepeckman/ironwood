@@ -1,14 +1,7 @@
 import ../../src/engine/engine
 
 proc sanityState*(): State =
-    var returnMove = PokeMove(
-        name: "Return",
-        category: pmcPhysical,
-        basePower: 102,
-        pokeType: ptNormal,
-        priority: 0,
-        modifiers: {}
-        )
+    var returnMove = getPokeMove("Return")
     var snorlaxData = getPokemonData("Snorlax")
     var snorlaxSet = PokemonSet(
       moves: @[returnMove],

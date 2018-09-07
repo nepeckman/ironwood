@@ -1,6 +1,6 @@
 import 
   algorithm, future,
-  gameObjects/gameObjects, gameData/gameData, dexes/pokedex,
+  gameObjects/gameObjects, gameData/gameData, dexes/[pokedex, movedex],
   state, action, damage
 
 proc turn*(s: State, actions: ActionSet): State =
@@ -36,4 +36,4 @@ proc possibleActions*() =
   echo "not done yet"
 
 export
-  state, action, gameObjects, gameData, pokedex #TODO: add movedex, export as one
+  state, action, gameObjects, gameData, pokedex, movedex #TODO: add movedex, export as one
