@@ -18,12 +18,12 @@ type
   PokemonDataFlags* = enum pdfHasEvolution, pdfIsAlternateForm
 
   PokemonData* = ref object
-    name*: string
-    pokeType1*: PokeType
-    pokeType2*: PokeType
-    baseStats*: PokeStats
-    weight*: float
-    dataFlags*: set[PokemonDataFlags]
+    name: string
+    pokeType1: PokeType
+    pokeType2: PokeType
+    baseStats: PokeStats
+    weight: float
+    dataFlags: set[PokemonDataFlags]
 
   PokemonSet* = ref object
     moves*: seq[PokeMove]
@@ -34,6 +34,24 @@ type
     evs*: PokeStats
     ivs*: PokeStats
     nature*: PokeNature
+
+proc name*(data: PokemonData): string = data.name
+proc pokeType1*(data: PokemonData): PokeType = data.pokeType1
+proc pokeType2*(data: PokemonData): PokeType = data.pokeType2
+proc baseStats*(data: PokemonData): PokeStats = data.baseStats
+proc weight*(data: PokemonData): float = data.weight
+proc dataFlags*(data: PokemonData): set[PokemonDataFlags] = data.dataFlags
+
+proc newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: PokeStats, 
+  weight: float, dataFlags: set[PokemonDataFlags]): PokemonData =
+  PokemonData(
+    name: name,
+    pokeType1: pokeType1,
+    pokeType2: pokeType2,
+    baseStats: baseStats,
+    weight: weight,
+    dataFlags: dataFlags
+  )
 
 proc calculateHP(baseHP: int, hpIV: int, hpEV: int, level: int): int =
   let numerator = (2 * baseHP + hpIV + toInt(floor(hpEV / 4))) * level

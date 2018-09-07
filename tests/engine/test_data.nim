@@ -9,14 +9,7 @@ proc sanityState*(): State =
         priority: 0,
         modifiers: {}
         )
-    var snorlaxData = PokemonData(
-      name: "Snorlax",
-      pokeType1: ptNormal,
-      pokeType2: ptNull,
-      baseStats: (hp: 160, atk: 110, def: 65, spa: 65, spd: 110, spe: 30),
-      weight: 460,
-      dataFlags: {}
-    )
+    var snorlaxData = getPokemonData("Snorlax")
     var snorlaxSet = PokemonSet(
       moves: @[returnMove],
       level: 50,
