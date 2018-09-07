@@ -7,7 +7,7 @@ proc burnApplies*(move: PokeMove, attacker: Pokemon): bool =
     attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
 
 proc skyDropFails*(move: PokeMove, defender: Pokemon): bool =
-  move == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200)
+  move == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200f)
 
 proc synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): bool =
   move == "Synchronoise" and
@@ -120,12 +120,12 @@ proc speedRatioToBasePower(speedRatio: float): int =
   elif speedRatio >= 2: 80
   else: 60
 
-proc weightToBasePower(weight: int): int =
-  if weight >= 200: 120
-  elif weight >= 100: 100
-  elif weight >= 50: 80
-  elif weight >= 25: 60
-  elif weight >= 10: 40
+proc weightToBasePower(weight: float): int =
+  if weight >= 200f: 120
+  elif weight >= 100f: 100
+  elif weight >= 50f: 80
+  elif weight >= 25f: 60
+  elif weight >= 10f: 40
   else: 20
 
 proc weightRatioToBasePower(weightRatio: float): int =

@@ -99,7 +99,7 @@ proc speed*(mon: Pokemon): int =
   getModifiedStat(mon.stats.spe, mon.boosts.spe)
   #TODO: Add ability + item check
 
-proc weight*(mon: Pokemon): int = toInt(toFloat(mon.data.weight) * mon.getWeightFactor())
+proc weight*(mon: Pokemon): float = mon.data.weight * mon.getWeightFactor()
 
 proc rawStats*(mon: Pokemon): PokeStats = mon.stats
 

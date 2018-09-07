@@ -6,7 +6,11 @@ type
   PokeStats* = tuple[hp: int, atk: int, def: int, spa: int, spd: int, spe: int]
 
   PokeNature* = enum
-    pnAdamant, pnJolly, pnTimid, pnModest
+    pnHardy, pnLonely, pnBrave, pnAdamant, pnNaughty,
+    pnBold, pnDocile, pnRelaxed, pnImpish, pnLax,
+    pnTimid, pnHasty, pnSerious, pnJolly, pnNaive,
+    pnModest, pnMild, pnQuiet, pnBashful, pnRash,
+    pnCalm, pnGentle, pnSassy, pnCareful, pnQuirky
 
   PokeGenderKind* = enum
     pgkMale, pgkFemale, pgkGenderless
@@ -18,7 +22,7 @@ type
     pokeType1*: PokeType
     pokeType2*: PokeType
     baseStats*: PokeStats
-    weight*: int #TODO: make weight a float
+    weight*: float
     dataFlags*: set[PokemonDataFlags]
 
   PokemonSet* = ref object
@@ -36,12 +40,31 @@ proc calculateHP(baseHP: int, hpIV: int, hpEV: int, level: int): int =
   toInt(floor(numerator / 100)) + level + 10
 
 proc natureBoost(stat: string, nature: PokeNature): float =
-  if stat == "atk" and nature == pnAdamant: 1.1f
-  else: 1.0f
+  if stat == "atk": 
+    if nature in {pnAdamant, pnLonely, pnBrave, pnNaughty}: 1.1f
+    elif nature in {pnModest, pnTimid, pnBold, pnCalm}: 0.9f
+    else: 1f
+  elif stat == "def":
+    if nature in {pnImpish, pnBold, pnRelaxed, pnLax}: 1.1f
+    elif nature in {pnLonely, pnMild, pnHasty, pnGentle}: 0.9f
+    else: 1f
+  elif stat == "spa":
+    if nature in {pnModest, pnMild, pnQuiet, pnRash}: 1.1f
+    elif nature in {pnJolly, pnAdamant, pnImpish, pnCareful}: 0.9f
+    else: 1f
+  elif stat == "spd":
+    if nature in {pnCalm, pnCareful, pnGentle, pnSassy}: 1.1f
+    elif nature in {pnNaughty, pnLax, pnNaive, pnRash}: 0.9f
+    else: 1f
+  elif stat == "spe":
+    if nature in {pnJolly, pnTimid, pnNaive, pnHasty}: 1.1f
+    elif nature in {pnQuiet, pnBrave, pnSassy, pnRelaxed}: 0.9f
+    else: 1f
+  else: 1f
 
 proc calculateStat(stat: string, base: int, iv: int, ev: int, level: int, nature: PokeNature): int =
   let numerator = (2 * base + iv + toInt(floor(ev / 4))) * level
-  toInt(floor( (floor(numerator / 100) + 5f) * natureBoost(stat, nature) ))#TODO: natures
+  toInt(floor( (floor(numerator / 100) + 5f) * natureBoost(stat, nature) ))
 
 proc calculateStats*(data: PokemonData, pokeSet: PokemonSet): PokeStats =
   let hp = calculateHP(data.baseStats.hp, pokeSet.ivs.hp, pokeSet.evs.hp, pokeSet.level)
