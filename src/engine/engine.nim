@@ -1,6 +1,7 @@
-import sets, algorithm, future
-import gameObjects/[team, field, pokemon]
-import state, action, damage
+import 
+  sets, algorithm, future,
+  gameObjects/gameObjects,
+  state, action, damage
 
 proc turn*(s: State, actions: HashSet[Action]): State =
   var state = copy(s)
@@ -20,4 +21,4 @@ proc turn*(s: State, actions: HashSet[Action]): State =
   return state
 
 export
-  state.State
+  state

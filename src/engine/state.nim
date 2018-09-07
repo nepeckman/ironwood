@@ -1,7 +1,8 @@
-import sets
-import uuids
-import gameObjects/[team, pokemon, field]
-import action
+import 
+  sets,
+  uuids,
+  gameObjects/gameObjects,
+  action
 
 type
 

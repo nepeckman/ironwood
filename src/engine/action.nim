@@ -1,6 +1,7 @@
-import hashes
-import uuids
-import gameData/pokemove
+import 
+  hashes,
+  uuids,
+  gameData/gameData
 
 type
 

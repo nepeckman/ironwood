@@ -1,7 +1,7 @@
 import unittest, sets
 import engine_test_data
-import ../../src/engine/gameObjects/[pokemon, team, field]
-import ../../src/engine/[damage, state, action, engine]
+import ../../src/engine/gameObjects/gameObjects
+import ../../src/engine/[damage, action, engine]
 
 suite "Sanity":
 

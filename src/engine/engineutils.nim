@@ -1,6 +1,7 @@
-import math
-import gameData/[pokemove, poketype, item, ability, condition, fieldConditions]
-import gameObjects/[pokemon, field]
+import 
+  math,
+  gameData/gameData,
+  gameObjects/gameObjects
 
 proc burnApplies*(move: PokeMove, attacker: Pokemon): bool =
   sckBurned == attacker.status and move.category == pmcPhysical and

@@ -1,6 +1,6 @@
-import ../../src/engine/gameObjects/[pokemon, team, field]
-import ../../src/engine/gameData/[pokemove, poketype, pokemonData]
-import ../../src/engine/state
+import ../../src/engine/gameObjects/gameObjects
+import ../../src/engine/gameData/gameData
+import ../../src/engine/engine
 
 proc sanityState*(): State =
     var returnMove = PokeMove(

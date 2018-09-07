@@ -1,7 +1,8 @@
-import math, algorithm, sets
-import gameData/[fieldConditions, poketype, pokemove, pokemonData, condition, item, ability]
-import gameObjects/[team, pokemon, field]
-import engineutils
+import 
+  math, algorithm, sets,
+  gameData/gameData,
+  gameObjects/gameObjects,
+  engineutils
 
 type
   DamageSpread* = array[0..15, int]
