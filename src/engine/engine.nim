@@ -1,7 +1,7 @@
 import 
   algorithm, future,
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
-  state, action, damage
+  state, action, damage, setParser
 
 proc turn*(s: State, actions: ActionSet): State =
   var state = copy(s)
