@@ -1,5 +1,6 @@
 import 
   algorithm, future,
+  uuids,
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
   state, action, damage, setParser
 
@@ -32,7 +33,7 @@ proc homeActivePokemon*() =
 proc awayActivePokemon*() =
   echo "not done yet"
 
-proc possibleActions*() =
+proc possibleActions*(pokemonID: UUID) =
   echo "not done yet"
 
 export

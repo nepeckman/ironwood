@@ -1,5 +1,5 @@
 import 
-  math,
+  math, sequtils, future,
   gameData/gameData,
   gameObjects/gameObjects
 
@@ -190,3 +190,12 @@ proc boostedKnockOff*(defender: Pokemon): bool =
     not (defender.name == "Genesect" and defender.item.kind == ikDrive) and
     not (defender.ability == "RKS System" and defender.item.kind == ikMemory) and
     not (defender.item.kind in {ikZCrystal, ikMegaStone})
+
+proc moveValidator(pokemon: Pokemon, move: PokeMove): bool =
+  (not (gckTaunted in pokemon.conditions or pokemon.item == "Assualt Vest") and move.category == pmcStatus)
+  # Choice lock, tormet lock. Both can be done by implementing last move used. Also would help mimic.
+  # Disabled lock
+  # Check move failure, don't provide moves that will always fail
+
+proc possibleMoves*(pokemon: Pokemon): seq[PokeMove] =
+  pokemon.moves.filter((move) => moveValidator(pokemon, move))
