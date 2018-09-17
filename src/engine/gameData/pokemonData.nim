@@ -1,4 +1,4 @@
-import math 
+import math, strutils
 import poketype, pokemove, item, ability
 
 type
@@ -52,6 +52,9 @@ proc newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: Po
     weight: weight,
     dataFlags: dataFlags
   )
+
+proc stringToNature*(nature: string): PokeNature =
+  parseEnum[PokeNature]("pn" & nature, pnBashful)
 
 proc calculateHP(baseHP: int, hpIV: int, hpEV: int, level: int): int =
   let numerator = (2 * baseHP + hpIV + toInt(floor(hpEV / 4))) * level

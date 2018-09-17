@@ -1,109 +1,70 @@
 import
-  strutils, parseutils,
+  strutils, sequtils, pegs, future,
   gameObjects/gameObjects, dexes/dexes, gameData/gameData
 
 type
 
   PokeTokens = object
-    name, item, ability, level, nature, evs, ivs: string
+    name, item, ability: string
+    level: int
+    nature: PokeNature
+    evs, ivs: PokeStats
     moves: seq[string]
 
-template iSkipWhitespace(idx, str: untyped): untyped =
-  inc(idx, skipWhitespace(str, idx))
-
-template iSkipUntil(idx, str, until: untyped): untyped =
-  inc(idx, skipUntil(str, until, idx))
-
-template iSkipWord(idx, str: untyped): untyped =
-  inc(idx, skipUntil(str, Whitespace, idx))
-
-template iNextWord(idx, str: untyped): untyped = 
-  iSkipWord(idx, str)
-  iSkipWhitespace(idx, str)
-
-template iParseUntil(idx, str, token, until: untyped): untyped =
-  inc(idx, parseUntil(str, token, until, idx))
-
-template iParseWord(idx, str, token: untyped): untyped =
-  inc(idx, parseUntil(str, token, Whitespace, idx))
-
-template iParseLine(idx, str, token: untyped): untyped =
-  inc(idx, parseUntil(str, token, '\n', idx))
-
-proc splitTeam*(teamString: string): seq[string] =
-  ## Takes a string containing a bunch of pokemon sets
-  ## And returns a sequence of strings, where each entry
-  ## is one set
-  var pokes: seq[string] = @[""]
-  var idx = 0
-  for poke in split(teamString, '\n'):
-    if isNilOrWhiteSpace(poke):
-      # If the line is empty, it denotes a new pokemon
-      pokes.add("") 
-      idx = idx + 1
-    else:
-      # Else this line is part of the current pokemon
-      pokes[idx] = pokes[idx] & poke & '\n'
-  return pokes
-
-proc tokenize(pokeString: string): PokeTokens =
-  result = PokeTokens(
-    name: "", item: "", ability: "", level: "", evs: "", ivs: "", nature: "", moves: @[]
-  )
-  var idx = 0
-  # Get name token
-  iParseWord(idx, pokeString, result.name)
-  iSkipWhitespace(idx, pokeString)
-  # Get item token
-  if pokeString[idx] == '@':
-    iNextWord(idx, pokeString)
-    iParseLine(idx, pokeString, result.item)
-    iSkipWhitespace(idx, pokeString)
-  # Get ability token
-  iNextWord(idx, pokeString)
-  iParseLine(idx, pokeString, result.ability)
-  iSkipWhitespace(idx, pokeString)
-  # Get level token
-  iNextWord(idx, pokeString)
-  iParseLine(idx, pokeString, result.level)
-  iSkipWhitespace(idx, pokeString)
-  # Get ev token
-  iNextWord(idx, pokeString)
-  iParseLine(idx, pokeString, result.evs)
-  iSkipWhitespace(idx, pokeString)
-  # Get nature token
-  iParseWord(idx, pokeString, result.nature)
-  iSkipWhitespace(idx, pokeString)
-  iNextWord(idx, pokeString)
-  # Get iv token
-  if pokeString[idx] == 'I':
-    iNextWord(idx, pokeString)
-    iParseLine(idx, pokeString, result.ivs)
-    iSkipWhitespace(idx, pokeString)
-  while idx < len(pokeString):
-    var move: string
-    iNextWord(idx, pokeString)
-    iParseLine(idx, pokeString, move)
-    iSkipWhitespace(idx, pokeString)
-    if not isNilOrEmpty(move):
-      result.moves.add(move)
-
-proc parseStatSpread(default = 0): PokeStats =
+proc parseStatSpread(statString: string, default = 0): PokeStats =
   result = (hp: default, atk: default, def: default, spa: default, spd: default, spe: default)
+  for stat in split(statString, '/'):
+    if stat =~ peg"\s* {\d*} \s* i'hp' \s*":
+      result = (hp: parseInt(matches[0]), atk: result.atk, def: result.def, spa: result.spa, spd: result.spd, spe: result.spe)
+    elif stat =~ peg"\s* {\d*} \s* i'atk' \s*":
+      result = (hp: result.hp, atk: parseInt(matches[0]), def: result.def, spa: result.spa, spd: result.spd, spe: result.spe)
+    elif stat =~ peg"\s* {\d*} \s* i'def' \s*":
+      result = (hp: result.hp, atk: result.atk, def: parseInt(matches[0]), spa: result.spa, spd: result.spd, spe: result.spe)
+    elif stat =~ peg"\s* {\d*} \s* i'spa' \s*":
+      result = (hp: result.hp, atk: result.atk, def: result.def, spa: parseInt(matches[0]), spd: result.spd, spe: result.spe)
+    elif stat =~ peg"\s* {\d*} \s* i'spd' \s*":
+      result = (hp: result.hp, atk: result.atk, def: result.def, spa: result.spa, spd: parseInt(matches[0]), spe: result.spe)
+    elif stat =~ peg"\s* {\d*} \s* i'spe' \s*":
+      result = (hp: result.hp, atk: result.atk, def: result.def, spa: result.spa, spd: result.spd, spe: parseInt(matches[0]))
   
+proc tokenize(teamString: string): seq[PokeTokens] =
+  result = @[]
+  for line in split(teamString, '\n'):
+    if line =~ peg"\s* {(\w / '-')+} \s* '@' \s* {(\w / '-' / \s)*}":
+      result.add(PokeTokens(
+        name: "", item: "", ability: "", level: 100, evs: (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0),
+        ivs: (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0), nature: pnBashful, moves: @[])
+      )
+      result[result.len - 1].name = matches[0]
+      result[result.len - 1].item = matches[1]
+    elif line =~ peg"\s* 'Ability:' \s* {(\w / '-' / \s)*}":
+      result[result.len - 1].ability = matches[0]
+    elif line =~ peg"\s* 'Level:' \s* {\d*} \s*":
+      result[result.len - 1].level = parseInt(matches[0])
+    elif line =~ peg"\s* 'EVs:' \s* {(\w / \s / '/')*}":
+      result[result.len - 1].evs = parseStatSpread(matches[0])
+    elif line =~ peg"\s* 'IVs:' \s* {(\w / \s / '/')*}":
+      result[result.len - 1].ivs = parseStatSpread(matches[0], 31)
+    elif line =~ peg"\s* '-' \s* {.*}":
+      result[result.len - 1].moves.add(matches[0])
+    elif line =~ peg"\s* {\w*} \s* 'Nature' \s*":
+      result[result.len - 1].nature = stringToNature(matches[0])
 
-proc parseTeam*(teamString: string) =
-  var teamSeq = splitTeam(teamString.strip)
-  for poke in teamSeq:
-    let data = tokenize(poke)
-    echo data.name
-    echo data.item
-    echo data.level
-    echo data.evs
-    echo data.nature
-    echo data.ivs
-    echo data.moves
-    echo "#####################"
+proc parseTeam(teamString: string, side: TeamSideKind): Team =
+  var pokeTokens = tokenize(teamString)
+  var pokemonSeq: seq[Pokemon] = @[]
+  for idx, token in pokeTokens:
+    let moves = token.moves.map((moveString) => getPokeMove(moveString.strip))
+    let item: Item = nil
+    let ability: Ability = nil
+    let gender = pgkFemale
+    let pokeSet = PokemonSet(
+      moves: moves, item: item, ability: ability, gender: gender,
+      level: token.level, evs: token.evs, ivs: token.ivs, nature: token.nature
+    )
+    let data = getPokemonData(token.name)
+    pokemonSeq.add(makePokemon(data, pokeSet, side))
+  makeTeam(pokemonSeq, side)
 
 
 const teamString = """
@@ -171,4 +132,5 @@ Jolly Nature
 - Superpower  
 """
 
-parseTeam(teamString)
+
+discard parseTeam(teamString, tskHome)

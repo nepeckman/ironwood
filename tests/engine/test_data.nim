@@ -15,6 +15,6 @@ proc sanityState*(): State =
     )
     var homePokemon = makePokemon(snorlaxData, snorlaxSet, tskHome)
     var awayPokemon = makePokemon(snorlaxData, snorlaxSet, tskAway)
-    var homeTeam = makeTeam([homePokemon, nil, nil, nil, nil, nil], tskHome)
-    var awayTeam = makeTeam([awayPokemon, nil, nil, nil, nil, nil], tskAway)
+    var homeTeam = makeTeam(@[homePokemon, nil, nil, nil, nil, nil], tskHome)
+    var awayTeam = makeTeam(@[awayPokemon, nil, nil, nil, nil, nil], tskAway)
     State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())

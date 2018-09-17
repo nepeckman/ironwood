@@ -8,10 +8,10 @@ type
     activePokemon*: Pokemon
     side*: TeamSideKind
 
-proc makeTeam*(pokemonArray: array[6, Pokemon], side: TeamSideKind): Team =
-  let activePokemon = pokemonArray[0]
+proc makeTeam*(pokemonSeq: seq[Pokemon], side: TeamSideKind): Team =
+  let activePokemon = pokemonSeq[0]
   var members: HashSet[Pokemon] = initSet[Pokemon]()
-  for mon in pokemonArray:
+  for mon in pokemonSeq:
     if not isNil(mon): members.incl(mon)
   Team(members: members, activePokemon: activePokemon, side: side)
 
