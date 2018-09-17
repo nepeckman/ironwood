@@ -33,7 +33,7 @@ proc tokenize(teamString: string): seq[PokeTokens] =
     if line =~ peg"\s* {(\w / '-')+} \s* '@' \s* {(\w / '-' / \s)*}":
       result.add(PokeTokens(
         name: "", item: "", ability: "", level: 100, evs: (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0),
-        ivs: (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0), nature: pnBashful, moves: @[])
+        ivs: (hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31), nature: pnBashful, moves: @[])
       )
       result[result.len - 1].name = matches[0]
       result[result.len - 1].item = matches[1]
@@ -50,7 +50,7 @@ proc tokenize(teamString: string): seq[PokeTokens] =
     elif line =~ peg"\s* {\w*} \s* 'Nature' \s*":
       result[result.len - 1].nature = stringToNature(matches[0])
 
-proc parseTeam(teamString: string, side: TeamSideKind): Team =
+proc parseTeam*(teamString: string, side: TeamSideKind): Team =
   var pokeTokens = tokenize(teamString)
   var pokemonSeq: seq[Pokemon] = @[]
   for idx, token in pokeTokens:
@@ -131,6 +131,3 @@ Jolly Nature
 - Rock Slide  
 - Superpower  
 """
-
-
-discard parseTeam(teamString, tskHome)

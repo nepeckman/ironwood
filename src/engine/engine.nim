@@ -36,4 +36,4 @@ proc possibleActions*() =
   echo "not done yet"
 
 export
-  state, action, gameObjects, gameData, dexes #TODO: add movedex, export as one
+  state, action, setParser, gameObjects, gameData, dexes
