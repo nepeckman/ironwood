@@ -2,7 +2,7 @@ import
   algorithm, future,
   uuids,
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
-  state, action, damage, setParser
+  state, action, damage, engineutils, setParser
 
 proc turn*(s: State, actions: ActionSet): State =
   var state = copy(s)
@@ -34,8 +34,11 @@ proc homeActivePokemon*() =
 proc awayActivePokemon*() =
   echo "not done yet"
 
-proc possibleActions*(pokemonID: UUID) =
-  echo "not done yet"
+proc possibleActions*(state: State, pokemon: Pokemon): seq[Action] =
+  result = @[]
+  for move in possibleMoves(pokemon):
+    for targets in possibleTargets(state, move):
+      result.add(newMoveAction(pokemon.uuid, move, targets))
 
 export
   state, action, setParser, gameObjects, gameData, dexes

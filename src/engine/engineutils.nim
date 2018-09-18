@@ -1,7 +1,8 @@
 import 
   math, sequtils, future,
   gameData/gameData,
-  gameObjects/gameObjects
+  gameObjects/gameObjects,
+  action, state
 
 proc burnApplies*(move: PokeMove, attacker: Pokemon): bool =
   sckBurned == attacker.status and move.category == pmcPhysical and
@@ -192,10 +193,21 @@ proc boostedKnockOff*(defender: Pokemon): bool =
     not (defender.item.kind in {ikZCrystal, ikMegaStone})
 
 proc moveValidator(pokemon: Pokemon, move: PokeMove): bool =
-  (not (gckTaunted in pokemon.conditions or pokemon.item == "Assualt Vest") and move.category == pmcStatus)
+  `not`((gckTaunted in pokemon.conditions or pokemon.item == "Assualt Vest") and move.category == pmcStatus)
   # Choice lock, tormet lock. Both can be done by implementing last move used. Also would help mimic.
   # Disabled lock
   # Check move failure, don't provide moves that will always fail
 
 proc possibleMoves*(pokemon: Pokemon): seq[PokeMove] =
   pokemon.moves.filter((move) => moveValidator(pokemon, move))
+
+proc possibleTargets*(state: State, move: PokeMove): seq[set[AttackTargetKind]] =
+  case move.target
+  of pmtUser: @[{atkSelf}]
+  of pmtAlly: @[{atkAlly}]
+  of pmtAllOpponents: 
+    if state.field.format == ffkSingles: @[{atkEnemyOne}] else: @[{atkEnemyOne, atkEnemyTwo}]
+  of pmtAllOthers:
+    if state.field.format == ffkSingles: @[{atkEnemyOne}] else: @[{atkAlly, atkEnemyOne, atkEnemyTwo}]
+  of pmtSelectedTarget:
+    if state.field.format == ffkSingles: @[{atkEnemyOne}] else: @[{atkAlly}, {atkEnemyOne}, {atkEnemyTwo}]

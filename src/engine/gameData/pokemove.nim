@@ -52,6 +52,7 @@ proc newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, 
 
 proc name*(move: PokeMove): string = move.name
 proc category*(move: PokeMove): PokeMoveCategory = move.category
+proc target*(move: PokeMove): PokeMoveTarget = move.target
 proc basePower*(move: PokeMove): int = move.basePower
 proc effect*(move: PokeMove): Effect = move.effect
 proc pokeType*(move: PokeMove): PokeType = move.pokeType
