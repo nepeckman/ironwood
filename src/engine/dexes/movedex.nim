@@ -15,4 +15,4 @@ proc getPokeMove*(name: string): PokeMove =
     else: pmcStatus
   let basePower = jsonData["bp"].getInt()
   let pokeType = jsonData["type"].getStr().toPokeType()
-  newMove(name, category, basePower, nil, pokeType, 0, {})
+  newMove(name, category, pmtSelectedTarget, basePower, nil, pokeType, 0, {})

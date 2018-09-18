@@ -11,9 +11,13 @@ type
   PokeMoveCategory* = enum
     pmcPhysical, pmcSpecial, pmcStatus
 
+  PokeMoveTarget* = enum
+    pmtUser, pmtAlly, pmtAllOpponents, pmtAllOthers, pmtSelectedTarget
+
   PokeMove* = ref object 
     name: string
     category*: PokeMoveCategory
+    target: PokeMoveTarget
     basePower*: int
     effect: Effect
     pokeType*: PokeType
@@ -25,6 +29,7 @@ proc copy*(move: PokeMove): PokeMove =
   PokeMove(
     name: move.name,
     category: move.category,
+    target: move.target,
     basePower: move.basePower,
     effect: move.effect,
     pokeType: move.pokeType,
@@ -32,11 +37,12 @@ proc copy*(move: PokeMove): PokeMove =
     modifiers: move.modifiers
   )
 
-proc newMove*(name: string, category: PokeMoveCategory, basePower: int,
+proc newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, basePower: int,
   effect: Effect, pokeType: Poketype, priority: int, modifiers: set[PokeMoveModifiers]): PokeMove =
   PokeMove(
     name: name,
     category: category,
+    target: target,
     basePower: basePower,
     effect: effect,
     pokeType: pokeType,

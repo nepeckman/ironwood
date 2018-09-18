@@ -124,3 +124,5 @@ proc hash*(pokemon: Pokemon): Hash =
   pokemon.uuid.hash
 
 proc `==`*(p1, p2: Pokemon): bool = p1.uuid == p2.uuid
+proc `==`*(p: Pokemon, uuid: UUID): bool = p.uuid == uuid
+proc `==`*(uuid: UUID, p: Pokemon): bool = p.uuid == uuid

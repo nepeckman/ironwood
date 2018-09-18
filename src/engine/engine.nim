@@ -14,11 +14,12 @@ proc turn*(s: State, actions: ActionSet): State =
     var pokemon = state.getPokemon(action.actingPokemonID)
     if action.kind == akSwitchSelection:
       var team = if pokemon.side == tskHome: state.homeTeam else: state.awayTeam
-      team.activePokemon = state.getPokemon(action.switchTargetID)
+      team.switchPokemon(action.actingPokemonID, action.switchTargetID)
     else:
-      let defender = state.getPokemon(action.attackTargetID)
-      let damage = getAvgDamage(pokemon, defender, action.move, state.field)
-      defender.currentHP = max(0, defender.currentHP - damage)
+      let targets = state.getTargetedPokemon(action)
+      for target in targets:
+        let damage = getAvgDamage(pokemon, target, action.move, state.field)
+        target.currentHP = max(0, target.currentHP - damage)
   return state
 
 proc newGame*() =
