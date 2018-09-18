@@ -55,6 +55,8 @@ proc copy*(pokemon: Pokemon): Pokemon =
   )
 
 proc name*(mon: Pokemon): string = mon.data.name
+proc uuid*(mon: Pokemon): UUID =
+  if isNil(mon): initUUID(0, 0) else: mon.uuid
 proc pokeType1*(mon: Pokemon): PokeType = mon.data.pokeType1
 proc pokeType2*(mon: Pokemon): PokeType = mon.data.pokeType2
 proc dataFlags*(mon: Pokemon): set[PokemonDataFlags] = mon.data.dataFlags
@@ -123,6 +125,6 @@ proc hasTypeChangingAbility*(pokemon: Pokemon): bool =
 proc hash*(pokemon: Pokemon): Hash =
   pokemon.uuid.hash
 
-proc `==`*(p1, p2: Pokemon): bool = p1.uuid == p2.uuid
-proc `==`*(p: Pokemon, uuid: UUID): bool = p.uuid == uuid
-proc `==`*(uuid: UUID, p: Pokemon): bool = p.uuid == uuid
+proc `==`*(p1, p2: Pokemon): bool = uuid(p1) == uuid(p2)
+proc `==`*(p: Pokemon, uuid: UUID): bool = uuid(p) == uuid
+proc `==`*(uuid: UUID, p: Pokemon): bool = uuid(p) == uuid

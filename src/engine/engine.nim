@@ -13,7 +13,7 @@ proc turn*(s: State, actions: ActionSet): State =
   for action in orderedActions:
     var pokemon = state.getPokemon(action.actingPokemonID)
     if action.kind == akSwitchSelection:
-      var team = if pokemon.side == tskHome: state.homeTeam else: state.awayTeam
+      var team = state.getTeam(pokemon)
       team.switchPokemon(action.actingPokemonID, action.switchTargetID)
     else:
       let targets = state.getTargetedPokemon(action)
@@ -22,17 +22,22 @@ proc turn*(s: State, actions: ActionSet): State =
         target.currentHP = max(0, target.currentHP - damage)
   return state
 
-proc newGame*() =
-  echo "not done yet"
+proc newGame*(homeTeamString, awayTeamString: string): State =
+  let homeTeam = parseTeam(homeTeamString, tskHome)
+  let awayTeam = parseTeam(awayTeamString, tskAway)
+  State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
 
-proc newActionSet*() =
-  echo "not done yet"
+proc homeActivePokemon*(state: State): seq[UUID] =
+  result = @[]
+  result.add(state.homeTeam[0].uuid)
+  if state.field.format == ffkDoubles:
+    result.add(state.homeTeam[1].uuid)
 
-proc homeActivePokemon*() =
-  echo "not done yet"
-
-proc awayActivePokemon*() =
-  echo "not done yet"
+proc awayActivePokemon*(state: State): seq[UUID] =
+  result = @[]
+  result.add(state.awayTeam[0].uuid)
+  if state.field.format == ffkDoubles:
+    result.add(state.awayTeam[1].uuid)
 
 proc possibleActions*(state: State, pokemon: Pokemon): seq[Action] =
   result = @[]

@@ -1,7 +1,7 @@
 import 
   sequtils, sets,
   uuids,
-  gameObjects/gameObjects,
+  gameObjects/gameObjects, gameData/gameData,
   action
 
 type
@@ -20,24 +20,56 @@ proc copy*(state: State): State =
   )
 
 proc getPokemon*(state: State, uuid: UUID): Pokemon =
-  for pokemon in concat(state.homeTeam.members, state.awayTeam.members):
-    if pokemon.uuid == uuid: return pokemon
+  for pokemon in state.homeTeam:
+    if pokemon == uuid: return pokemon
+  for pokemon in state.awayTeam:
+    if pokemon == uuid: return pokemon
   return nil
+
+proc getTeam*(state: State, pokemon: Pokemon): Team =
+  if pokemon.side == tskHome: state.homeTeam else: state.awayTeam
+
+proc getOpposingTeam*(state: State, pokemon: Pokemon): Team =
+  if pokemon.side == tskHome: state.awayTeam else: state.homeTeam
+
+proc isActive*(state: State, pokemon: Pokemon): bool =
+  let team = state.getTeam(pokemon)
+  if pokemon.currentHP == 0:
+    return false
+  elif team.position(pokemon) == 0 and state.field.format == ffkSingles:
+    return true
+  elif team.position(pokemon) < 2 and state.field.format == ffkDoubles:
+    return true
+  else:
+    return false
+
+proc getEnemy*(state: State, enemyTeam: Team, target: AttackTargetKind): Pokemon =
+  case target
+  of atkEnemyOne:
+    if state.isActive(enemyTeam[0]): enemyTeam[0]
+    elif state.isActive(enemyTeam[1]): enemyTeam[1]
+    else: nil
+  of atkEnemyTwo:
+    if state.isActive(enemyTeam[1]): enemyTeam[1]
+    elif state.isActive(enemyTeam[0]): enemyTeam[0]
+    else: nil
+  else: nil
+
+proc getAlly*(state: State, allyTeam: Team, actingPokemon: Pokemon): Pokemon =
+  if allyTeam[0] == actingPokemon and state.isActive(allyTeam[1]): allyTeam[1]
+  elif allyTeam[1] == actingPokemon and state.isActive(allyTeam[0]): allyTeam[0]
+  else: nil
 
 proc getTargetedPokemon*(state: State, action: Action): HashSet[Pokemon] =
   result = initSet[Pokemon]()
   let actingPokemon = state.getPokemon(action.actingPokemonID)
-  let allySide = actingPokemon.side
-  let allyTeam = if allySide == tskHome: state.homeTeam else: state.awayTeam
-  let enemyTeam = if allySide == tskHome: state.awayTeam else: state.homeTeam
+  let allyTeam = state.getTeam(actingPokemon)
+  let enemyTeam = state.getOpposingTeam(actingPokemon)
   for target in action.targets:
     let targetPokemon = case target
     of atkSelf: actingPokemon
-    of atkEnemyOne: enemyTeam.members[0]
-    of atkEnemyTwo: enemyTeam.members[1]
-    of atkAlly:
-      if allyTeam.members[0] == actingPokemon: allyTeam.members[1]
-      else: allyTeam.members[0]
+    of atkEnemyOne, atkEnemyTwo: state.getEnemy(enemyTeam, target)
+    of atkAlly: state.getAlly(allyTeam, actingPokemon)
     result.incl(targetPokemon)
 
 proc compareActions*(state: State, action1, action2: Action): int =

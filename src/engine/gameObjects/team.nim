@@ -5,7 +5,7 @@ import
 type
 
   Team* = ref object
-    members*: seq[Pokemon]
+    members: seq[Pokemon]
     side*: TeamSideKind
 
 proc makeTeam*(members: seq[Pokemon], side: TeamSideKind): Team =
@@ -23,3 +23,15 @@ proc switchPokemon*(team: Team, actingPokemonID, switchTargetID: UUID) =
   let tmp = team.members[actingIdx]
   team.members[actingIdx] = team.members[switchIdx]
   team.members[switchIdx] = tmp
+
+proc position*(team: Team, pokemon: Pokemon): int =
+  team.members.find(pokemon) #TODO throw error
+
+
+proc `[]`*(team: Team, idx: int): Pokemon =
+  if idx < team.members.len: team.members[idx]
+  else: nil
+
+iterator items*(team: Team): Pokemon =
+  for pokemon in team.members:
+    yield pokemon

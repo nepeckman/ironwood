@@ -10,6 +10,4 @@ Adamant Nature
 """
 
 proc sanityState*(): State =
-  let homeTeam = parseTeam(sanityTeam, tskHome)
-  let awayTeam = parseTeam(sanityTeam, tskAway)
-  State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
+  newGame(sanityTeam, sanityTeam)
