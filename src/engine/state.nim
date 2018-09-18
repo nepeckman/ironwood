@@ -11,6 +11,10 @@ type
     awayTeam*: Team
     field*: Field
 
+  PokemonState* = ref object
+    uuid*: UUID
+    percentHP: int
+
   
 proc copy*(state: State): State =
   State(
@@ -33,6 +37,8 @@ proc getOpposingTeam*(state: State, pokemon: Pokemon): Team =
   if pokemon.side == tskHome: state.awayTeam else: state.homeTeam
 
 proc isActive*(state: State, pokemon: Pokemon): bool =
+  if isNil(pokemon):
+    return false
   let team = state.getTeam(pokemon)
   if pokemon.currentHP == 0:
     return false
@@ -43,7 +49,13 @@ proc isActive*(state: State, pokemon: Pokemon): bool =
   else:
     return false
 
-proc getEnemy*(state: State, enemyTeam: Team, target: AttackTargetKind): Pokemon =
+proc getPokemonState(pokemon: Pokemon): PokemonState =
+  PokemonState(uuid: pokemon.uuid, percentHP: toInt(pokemon.currentHP / pokemon.maxHP))
+
+proc getPokemonState(state: State, pokemonID: UUID): PokemonState =
+  getPokemonState(state.getPokemon(pokemonID))
+  
+proc getEnemy(state: State, enemyTeam: Team, target: AttackTargetKind): Pokemon =
   case target
   of atkEnemyOne:
     if state.isActive(enemyTeam[0]): enemyTeam[0]
@@ -55,9 +67,9 @@ proc getEnemy*(state: State, enemyTeam: Team, target: AttackTargetKind): Pokemon
     else: nil
   else: nil
 
-proc getAlly*(state: State, allyTeam: Team, actingPokemon: Pokemon): Pokemon =
-  if allyTeam[0] == actingPokemon and state.isActive(allyTeam[1]): allyTeam[1]
-  elif allyTeam[1] == actingPokemon and state.isActive(allyTeam[0]): allyTeam[0]
+proc getAlly(state: State, allyTeam: Team, actingPokemon: Pokemon): Pokemon =
+  if state.isActive(allyTeam[1]) and allyTeam[0] == actingPokemon : allyTeam[1]
+  elif state.isActive(allyTeam[0]) and allyTeam[1] == actingPokemon: allyTeam[0]
   else: nil
 
 proc getTargetedPokemon*(state: State, action: Action): HashSet[Pokemon] =
@@ -70,7 +82,8 @@ proc getTargetedPokemon*(state: State, action: Action): HashSet[Pokemon] =
     of atkSelf: actingPokemon
     of atkEnemyOne, atkEnemyTwo: state.getEnemy(enemyTeam, target)
     of atkAlly: state.getAlly(allyTeam, actingPokemon)
-    result.incl(targetPokemon)
+    if not isNil(targetPokemon):
+      result.incl(targetPokemon)
 
 proc compareActions*(state: State, action1, action2: Action): int =
   if action1.kind == action2.kind:

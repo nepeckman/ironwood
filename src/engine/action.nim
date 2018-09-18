@@ -1,5 +1,5 @@
 import 
-  hashes, sets,
+  hashes,
   uuids,
   gameData/gameData
 
@@ -18,8 +18,6 @@ type
       targets*: set[AttackTargetKind]
     of akSwitchSelection: switchTargetID*: UUID
 
-  ActionSet* = HashSet[Action]
-
 proc newMoveAction*(actingPokemonID: UUID, move: PokeMove, targets: set[AttackTargetKind] = {}): Action =
   Action(kind: akMoveSelection, actingPokemonID: actingPokemonID, move: move, targets: targets)
 
@@ -28,5 +26,3 @@ proc newSwitchAction*(actingPokemonID, targetPokemonID: UUID): Action =
 
 proc hash*(action: Action): Hash =
   action.actingPokemonID.hash
-
-export sets

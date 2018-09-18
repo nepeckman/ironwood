@@ -12,7 +12,7 @@ type
     pokeTypes: set[PokeType]
     side*: TeamSideKind
     stats: PokeStats
-    currentHP*: int
+    currentHP: int
     currentItem*: Item
     currentAbility: Ability
     boosts*: PokeStats
@@ -57,6 +57,7 @@ proc copy*(pokemon: Pokemon): Pokemon =
 proc name*(mon: Pokemon): string = mon.data.name
 proc uuid*(mon: Pokemon): UUID =
   if isNil(mon): initUUID(0, 0) else: mon.uuid
+proc currentHP*(mon: Pokemon): int = mon.currentHP
 proc pokeType1*(mon: Pokemon): PokeType = mon.data.pokeType1
 proc pokeType2*(mon: Pokemon): PokeType = mon.data.pokeType2
 proc dataFlags*(mon: Pokemon): set[PokemonDataFlags] = mon.data.dataFlags
@@ -71,6 +72,9 @@ proc resetAbility*(mon: Pokemon) =
   mon.currentAbility = mon.pokeSet.ability
 proc resetItem*(mon: Pokemon) =
   mon.currentItem = mon.pokeSet.item
+
+proc takeDamage*(mon: Pokemon, damage: int) =
+  mon.currentHP = max(0, mon.currentHP - damage)
 
 proc getModifiedStat(stat: int, boost: int): int =
   if boost > 0: toInt(floor(stat * (2 + boost) / 2))
