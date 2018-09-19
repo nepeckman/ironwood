@@ -10,7 +10,7 @@ proc turn*(s: State, actions: seq[Action]): State =
   shallowCopy(orderedActions, actions)
   orderedActions.sort((a1, a2) => state.compareActions(a1, a2), SortOrder.Descending)
   for action in orderedActions:
-    var pokemon = state.getPokemon(action.actingPokemonID)
+    var pokemon = state.getPokemonObj(action.actingPokemonID)
     if action.kind == akSwitchSelection:
       var team = state.getTeam(pokemon)
       team.switchPokemon(action.actingPokemonID, action.switchTargetID)
@@ -41,7 +41,7 @@ proc awayActivePokemon*(state: State): seq[UUID] =
 
 proc possibleActions*(state: State, pokemonID: UUID): seq[Action] =
   result = @[]
-  let pokemon = state.getPokemon(pokemonID)
+  let pokemon = state.getPokemonObj(pokemonID)
   for move in possibleMoves(pokemon):
     for targets in possibleTargets(state, move):
       result.add(newMoveAction(pokemon.uuid, move, targets))

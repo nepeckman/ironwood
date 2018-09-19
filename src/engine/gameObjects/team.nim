@@ -31,6 +31,9 @@ proc `[]`*(team: Team, idx: int): Pokemon =
   if idx < team.members.len: team.members[idx]
   else: nil
 
+proc get*(team: Team, idx: int): UUID =
+  team[idx].uuid
+
 iterator items*(team: Team): Pokemon =
   for pokemon in team.members:
     yield pokemon

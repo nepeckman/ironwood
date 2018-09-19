@@ -13,7 +13,8 @@ type
 
   PokemonState* = ref object
     uuid*: UUID
-    percentHP: int
+    percentHP*: int
+    currentHP*: int
 
   
 proc copy*(state: State): State =
@@ -23,13 +24,30 @@ proc copy*(state: State): State =
     field: copy(state.field)
   )
 
-proc getPokemon*(state: State, uuid: UUID): Pokemon =
+proc getPokemonObj*(state: State, uuid: UUID): Pokemon =
   for pokemon in state.homeTeam:
     if pokemon == uuid: return pokemon
   for pokemon in state.awayTeam:
     if pokemon == uuid: return pokemon
   return nil
 
+proc getPokemon*(state: State, side: TeamSideKind, position: int): UUID =
+  let team = if side == tskHome: state.homeTeam else: state.awayTeam
+  team.get(position)
+
+proc getPokemonState(pokemon: Pokemon): PokemonState =
+  PokemonState(
+    uuid: pokemon.uuid, 
+    percentHP: toInt(pokemon.currentHP / pokemon.maxHP),
+    currentHP: pokemon.currentHP)
+
+proc getPokemonState*(state: State, pokemonID: UUID): PokemonState =
+  getPokemonState(state.getPokemonObj(pokemonID))
+
+proc getPokemonState*(state: State, side: TeamSideKind, position: int): PokemonState =
+  let id = state.getPokemon(side, position)
+  state.getPokemonState(id)
+  
 proc getTeam*(state: State, pokemon: Pokemon): Team =
   if pokemon.side == tskHome: state.homeTeam else: state.awayTeam
 
@@ -49,11 +67,6 @@ proc isActive*(state: State, pokemon: Pokemon): bool =
   else:
     return false
 
-proc getPokemonState(pokemon: Pokemon): PokemonState =
-  PokemonState(uuid: pokemon.uuid, percentHP: toInt(pokemon.currentHP / pokemon.maxHP))
-
-proc getPokemonState(state: State, pokemonID: UUID): PokemonState =
-  getPokemonState(state.getPokemon(pokemonID))
   
 proc getEnemy(state: State, enemyTeam: Team, target: AttackTargetKind): Pokemon =
   case target
@@ -74,7 +87,7 @@ proc getAlly(state: State, allyTeam: Team, actingPokemon: Pokemon): Pokemon =
 
 proc getTargetedPokemon*(state: State, action: Action): HashSet[Pokemon] =
   result = initSet[Pokemon]()
-  let actingPokemon = state.getPokemon(action.actingPokemonID)
+  let actingPokemon = state.getPokemonObj(action.actingPokemonID)
   let allyTeam = state.getTeam(actingPokemon)
   let enemyTeam = state.getOpposingTeam(actingPokemon)
   for target in action.targets:
@@ -87,6 +100,6 @@ proc getTargetedPokemon*(state: State, action: Action): HashSet[Pokemon] =
 
 proc compareActions*(state: State, action1, action2: Action): int =
   if action1.kind == action2.kind:
-    cmp(state.getPokemon(action1.actingPokemonID), state.getPokemon(action2.actingPokemonID))
+    cmp(state.getPokemonObj(action1.actingPokemonID), state.getPokemonObj(action2.actingPokemonID))
   elif action1.kind == akSwitchSelection: 1
   else: -1

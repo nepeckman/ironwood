@@ -11,7 +11,7 @@ suite "Sanity":
     var actions = @[possibleActions[0]]
     var nextState = gameState.turn(actions)
 
-    check(gameState.homeTeam[0].currentHP == 244)
-    check(gameState.awayTeam[0].currentHP == 244)
-    check(nextState.homeTeam[0].currentHP == 244)
-    check(nextState.awayTeam[0].currentHP == 141)
+    check(gameState.getPokemonState(tskHome, 0).currentHP == 244)
+    check(gameState.getPokemonState(tskAway, 0).currentHP == 244)
+    check(nextState.getPokemonState(tskHome, 0).currentHP == 244)
+    check(nextState.getPokemonState(tskAway, 0).currentHP == 141)
