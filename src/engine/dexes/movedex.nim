@@ -2,7 +2,7 @@ import
   json, os,
   ../gameData/[pokemove, poketype]
 
-const movedexString = staticRead("rawdata/movedex.json")
+const movedexString = staticRead("rawdata/movedex.min.json")
 
 let movedex = parseJson(movedexString)
 

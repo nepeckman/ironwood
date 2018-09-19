@@ -2,7 +2,7 @@ import
   json, os,
   ../gameData/[pokemonData, poketype]
 
-const pokedexString = staticRead("rawdata/pokedex.json")
+const pokedexString = staticRead("rawdata/pokedex.min.json")
 
 let pokedex = parseJson(pokedexString)
 
