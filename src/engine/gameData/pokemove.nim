@@ -45,7 +45,7 @@ proc newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, 
     target: target,
     basePower: basePower,
     effect: effect,
-    pokeType: pokeType,
+pokeType: pokeType,
     priority: priority,
     modifiers: modifiers
   )
@@ -71,3 +71,11 @@ proc toPokeMoveCategory*(category: string): PokeMoveCategory =
   of "physical": pmcPhysical
   of "specal": pmcSpecial
   else: pmcStatus
+
+proc toPokeMoveTarget*(target: string): PokeMoveTarget =
+  case target
+  of "Self": pmtUser
+  of "Ally": pmtAlly
+  of "AllOthers": pmtAllOthers
+  of "AllOpponents": pmtAllOpponents
+  else: pmtSelectedTarget

@@ -37,3 +37,14 @@ proc boostChange*(effect: Effect): tuple[atk: int, def: int, spa: int, spd: int,
 proc hpChange*(effect: Effect): int = effect.hpChange
 proc typeChange*(effect: Effect): PokeType = effect.typeChange
 proc isRandom*(effect: Effect): bool = effect.isRandom
+
+proc toEffectTarget*(str: string): EffectTargetKind =
+  case str
+  of "Field": etkField
+  of "Self": etkSelf
+  else: etkPokemon
+
+proc newBoostEffect*(target: EffectTargetKind, 
+                     boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int],
+                     activation = eakAfterAttack): Effect =
+  Effect(target: target, activation: activation, kind: ekBoost, boostChange: boostChange)

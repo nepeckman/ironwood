@@ -24,6 +24,9 @@ proc copy*(state: State): State =
     field: copy(state.field)
   )
 
+proc getTeam*(state: State, side: TeamSideKind): Team =
+  if side == tskHome: state.homeTeam else: state.awayTeam
+
 proc getPokemonObj*(state: State, uuid: UUID): Pokemon =
   for pokemon in state.homeTeam:
     if pokemon == uuid: return pokemon
@@ -31,9 +34,11 @@ proc getPokemonObj*(state: State, uuid: UUID): Pokemon =
     if pokemon == uuid: return pokemon
   return nil
 
+proc getPokemonObj*(state: State, side: TeamSideKind, position: int): Pokemon =
+  state.getTeam(side)[position]
+
 proc getPokemon*(state: State, side: TeamSideKind, position: int): UUID =
-  let team = if side == tskHome: state.homeTeam else: state.awayTeam
-  team.get(position)
+  state.getTeam(side).get(position)
 
 proc getPokemonState(pokemon: Pokemon): PokemonState =
   PokemonState(

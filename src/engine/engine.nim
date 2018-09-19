@@ -2,7 +2,7 @@ import
   algorithm, future, sequtils, sets,
   uuids,
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
-  state, action, damage, engineutils, setParser
+  state, action, damage, effectEngine, engineutils, setParser
 
 proc turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)
@@ -19,6 +19,8 @@ proc turn*(s: State, actions: seq[Action]): State =
       for target in targets:
         let damage = getAvgDamage(pokemon, target, action.move, state.field)
         target.takeDamage(damage)
+        if action.move.effect.activation == eakAfterAttack:
+          applyEffect(pokemon, target, action.move.effect)
   return state
 
 proc newGame*(homeTeamString, awayTeamString: string): State =
@@ -50,6 +52,22 @@ proc possibleActions*(state: State, pokemonIDs: seq[UUID]): seq[Action] =
   result = @[]
   for id in pokemonIDs:
     result = result.concat(state.possibleActions(id))
+
+proc possibleActions*(state: State, side: TeamSideKind): seq[Action] =
+  let activeMons =
+    if side == tskHome: state.homeActivePokemon() else: state.awayActivePokemon()
+  state.possibleActions(activeMons)
+
+proc getActionByMove*(actions: seq[Action], move: string): Action = 
+  for action in actions:
+    if action.move == move:
+      return action
+  var error = new(SystemError)
+  error.msg = "No action for move: " & move
+  raise error
+
+proc getActionByMove*(state: State, side: TeamSideKind, move: string): Action =
+  getActionByMove(state.possibleActions(side), move)
 
 export
   state, action, setParser, gameObjects, gameData, dexes

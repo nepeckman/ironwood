@@ -428,7 +428,12 @@
   "Swords Dance": {
     "bp": 0,
     "type": "Normal",
-    "category": "Status"
+    "category": "Status",
+    "boostChange": {
+      "atk": 2
+    },
+    "targets": "Self",
+    "effectTargets": "Self"
   },
   "Tackle": {
     "bp": 40,

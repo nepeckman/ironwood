@@ -76,6 +76,16 @@ proc resetItem*(mon: Pokemon) =
 proc takeDamage*(mon: Pokemon, damage: int) =
   mon.currentHP = max(0, mon.currentHP - damage)
 
+proc addBoosts(b1, b2: int): int = min(6, (max(-6, b1 + b2)))
+proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd: int, spe: int]) =
+  mon.boosts = (
+    hp: mon.boosts.hp,
+    atk: addBoosts(mon.boosts.atk, boosts.atk),
+    def: addBoosts(mon.boosts.def, boosts.def),
+    spa: addBoosts(mon.boosts.spa, boosts.spa),
+    spd: addBoosts(mon.boosts.spd, boosts.spd),
+    spe: addBoosts(mon.boosts.spe, boosts.spe))
+
 proc getModifiedStat(stat: int, boost: int): int =
   if boost > 0: toInt(floor(stat * (2 + boost) / 2))
   elif boost < 0: toInt(floor(stat * 2 / (2 - boost)))

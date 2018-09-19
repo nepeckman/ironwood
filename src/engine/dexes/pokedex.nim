@@ -8,8 +8,8 @@ let pokedex = parseJson(pokedexString)
 
 proc getPokemonData*(name: string): PokemonData =
   #TODO: handle missing pokemon
-  let jsonData = pokedex[name]
-  let statsJson = jsonData["bs"]
+  let pokeData = pokedex[name]
+  let statsJson = pokeData["bs"]
   let stats: PokeStats = (
     hp: statsJson["hp"].getInt(),
     atk: statsJson["at"].getInt(),
@@ -19,11 +19,11 @@ proc getPokemonData*(name: string): PokemonData =
     spe: statsJson["sp"].getInt()
   )
   let pokeType1 = 
-    if jsonData.hasKey("t1"): toPokeType(jsonData["t1"].getStr())
+    if pokeData.hasKey("t1"): toPokeType(pokeData["t1"].getStr())
     else: ptNull
   let pokeType2 =
-    if jsonData.hasKey("t2"): toPokeType(jsonData["t2"].getStr())
+    if pokeData.hasKey("t2"): toPokeType(pokeData["t2"].getStr())
     else: ptNull
-  let weight = jsonData["w"].getFloat()
+  let weight = pokeData["w"].getFloat()
 
   newPokemonData(name, pokeType1, pokeType2, stats, weight, {})
