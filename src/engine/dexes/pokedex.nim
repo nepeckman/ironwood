@@ -1,8 +1,9 @@
 import
   json, os,
-  ../gameData/[pokemonData, poketype]
+  ../gameData/[pokemonData, poketype],
+  rawDataImporter
 
-const pokedexString = staticRead("rawdata/pokedex.min.json")
+const pokedexString = staticRead("rawdata/pokedex" & fileSuffix)
 
 let pokedex = parseJson(pokedexString)
 

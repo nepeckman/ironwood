@@ -12,3 +12,9 @@ Smeargle @
 - Headbutt
 - Swords Dance
 """
+
+const intimidate* = """
+Smeargle @
+Ability: Intimidate
+- Headbutt
+"""

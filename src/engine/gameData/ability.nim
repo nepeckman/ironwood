@@ -21,3 +21,6 @@ proc `==`*(s: string, a: Ability): bool =
 
 proc `contains`*(arr: openArray[string], ability: Ability): bool =
   if isNil(ability): false else: find(arr, ability.name) >= 0
+
+proc newAbility*(name: string, effect: Effect): Ability = 
+  Ability(name: name, effect: effect)

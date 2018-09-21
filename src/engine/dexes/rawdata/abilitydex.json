@@ -1,0 +1,9 @@
+{
+    "Intimidate": {
+        "activation": "OnSwitchIn",
+        "boostChange": {
+            "atk": -1
+        }
+    },
+    "Gluttony": {}
+}

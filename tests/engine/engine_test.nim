@@ -23,3 +23,11 @@ suite "Moves":
     action = @[state.getActionByMove(tskHome, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(tskAway, 0).currentHP == 133)
+
+suite "Abilities":
+
+  test "Intimidate":
+    var state = newGame(intimidate, intimidate)
+    var action = @[state.getActionByMove(tskHome, "Headbutt")]
+    state = turn(state, action)
+    check(state.getPokemonState(tskAway, 0).currentHP == 212)

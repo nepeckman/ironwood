@@ -44,6 +44,16 @@ proc toEffectTarget*(str: string): EffectTargetKind =
   of "Self": etkSelf
   else: etkPokemon
 
+proc toEffectActivation*(str: string): EffectActivationKind =
+  case str
+  of "TurnStart": eakTurnStart
+  of "TurnEnd": eakTurnEnd
+  of "BeforeAttack": eakBeforeAttack
+  of "AfterAttack": eakAfterAttack
+  of "OnSwitchIn": eakOnSwitchIn
+  of "OnSwitchOut": eakOnSwitchOut
+  else: eakPassive
+
 proc newBoostEffect*(target: EffectTargetKind, 
                      boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int],
                      activation = eakAfterAttack): Effect =

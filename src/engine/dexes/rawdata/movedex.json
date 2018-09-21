@@ -433,7 +433,8 @@
       "atk": 2
     },
     "targets": "Self",
-    "effectTargets": "Self"
+    "effectTargets": "Self",
+    "activation": "AfterAttack"
   },
   "Tackle": {
     "bp": 40,

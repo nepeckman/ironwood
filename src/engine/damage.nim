@@ -2,7 +2,7 @@ import
   math, algorithm, sets,
   gameData/gameData,
   gameObjects/gameObjects,
-  engineutils
+  damageutils
 
 type
   DamageSpread* = array[0..15, int]

@@ -105,6 +105,6 @@ proc getTargetedPokemon*(state: State, action: Action): HashSet[Pokemon] =
 
 proc compareActions*(state: State, action1, action2: Action): int =
   if action1.kind == action2.kind:
-    cmp(state.getPokemonObj(action1.actingPokemonID), state.getPokemonObj(action2.actingPokemonID))
+    cmp(state.getPokemonObj(action1.actingPokemonID).speed, state.getPokemonObj(action2.actingPokemonID).speed)
   elif action1.kind == akSwitchSelection: 1
   else: -1
