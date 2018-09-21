@@ -9,6 +9,10 @@ let abilitydex = parseJson(abilitydexString)
 
 proc getAbility*(name: string): Ability =
   if isNilOrWhitespace(name): return nil
-  let abilityData = abilitydex[name]
+  var abilityData: JsonNode
+  try:
+    abilityData = abilitydex[name]
+  except KeyError:
+    return newAbility(name, nil)
   let effect = parseEffect(abilityData)
   newAbility(name, effect)

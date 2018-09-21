@@ -24,6 +24,9 @@ type
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikMuscleBand,
       ikWiseGlasses, ikExpertBelt, ikNone: discard
 
+proc newItem*(name: string, consumable = false, kind = ikNone): Item =
+  Item(name: name, consumable: consumable, kind: kind)
+
 proc kind*(item: Item): ItemKind =
   if isNil(item): ikNone else: item.kind
 
