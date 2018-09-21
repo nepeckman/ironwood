@@ -21,3 +21,9 @@ Spinda @
 Ability: Intimidate
 - Headbutt
 """
+
+const adaptability* = """
+Dragalge @
+Ability: Adaptability
+- Dragon Pulse
+"""

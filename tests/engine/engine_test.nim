@@ -26,6 +26,12 @@ suite "Moves":
 
 suite "Abilities":
 
+  test "Adaptability":
+    var state = newGame(adaptability, adaptability)
+    var action = @[state.getActionByMove(tskHome, "Dragon Pulse")]
+    state = turn(state, action)
+    check(state.getPokemonState(tskAway, 0).currentHP == 50)
+
   test "Intimidate":
     var state = newGame(intimidate, intimidate)
     var action = @[state.getActionByMove(tskHome, "Headbutt")]
