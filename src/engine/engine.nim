@@ -14,6 +14,9 @@ proc turn*(s: State, actions: seq[Action]): State =
     if action.kind == akSwitchSelection:
       var team = state.getTeam(pokemon)
       team.switchPokemon(action.actingPokemonID, action.switchTargetID)
+      let switchIn = state.getPokemonObj(action.switchTargetID)
+      if switchIn.ability.effect.activation == eakOnSwitchIn:
+        state.applyAbilityEffect(switchIn)
     else:
       let targets = state.getTargetedPokemon(action)
       for target in targets:

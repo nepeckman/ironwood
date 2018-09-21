@@ -17,4 +17,7 @@ const intimidate* = """
 Smeargle @
 Ability: Intimidate
 - Headbutt
+Spinda @
+Ability: Intimidate
+- Headbutt
 """

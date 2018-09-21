@@ -54,9 +54,13 @@ proc awayActivePokemon*(state: State): seq[UUID] =
 proc possibleActions*(state: State, pokemonID: UUID): seq[Action] =
   result = @[]
   let pokemon = state.getPokemonObj(pokemonID)
+  let team = state.getTeam(pokemon)
   for move in possibleMoves(pokemon):
     for targets in possibleTargets(state, move):
       result.add(newMoveAction(pokemon.uuid, move, targets))
+  for teammate in team:
+    if not state.isActive(teammate) and not teammate.fainted:
+      result.add(newSwitchAction(pokemon.uuid, teammate.uuid))
 
 proc possibleActions*(state: State, pokemonIDs: seq[UUID]): seq[Action] =
   result = @[]
@@ -70,7 +74,7 @@ proc possibleActions*(state: State, side: TeamSideKind): seq[Action] =
 
 proc getActionByMove*(actions: seq[Action], move: string): Action = 
   for action in actions:
-    if action.move == move:
+    if action.kind == akMoveSelection and action.move == move:
       return action
   var error = new(SystemError)
   error.msg = "No action for move: " & move
@@ -78,3 +82,13 @@ proc getActionByMove*(actions: seq[Action], move: string): Action =
 
 proc getActionByMove*(state: State, side: TeamSideKind, move: string): Action =
   getActionByMove(state.possibleActions(side), move)
+
+proc getActionBySwitch*(state: State, side: TeamSideKind, pokemon: string): Action =
+  for action in state.possibleActions(side):
+    if action.kind == akSwitchSelection and 
+       state.getPokemonObj(action.switchTargetID).name == pokemon:
+      return action
+  var error = new(SystemError)
+  error.msg = "No action for switch: " & pokemon
+  raise error
+

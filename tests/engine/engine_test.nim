@@ -31,3 +31,7 @@ suite "Abilities":
     var action = @[state.getActionByMove(tskHome, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(tskAway, 0).currentHP == 212)
+    
+    action = @[state.getActionBySwitch(tskAway, "Spinda"), state.getActionByMove(tskHome, "Headbutt")]
+    state = turn(state, action)
+    check(state.getPokemonState(tskAway, 0).currentHP == 240)

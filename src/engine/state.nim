@@ -72,7 +72,6 @@ proc isActive*(state: State, pokemon: Pokemon): bool =
   else:
     return false
 
-  
 proc getEnemy(state: State, enemyTeam: Team, target: AttackTargetKind): Pokemon =
   case target
   of atkEnemyOne:
