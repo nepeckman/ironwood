@@ -55,7 +55,7 @@ proc parseTeam*(teamString: string, side: TeamSideKind): Team =
   var pokemonSeq: seq[Pokemon] = @[]
   for idx, token in pokeTokens:
     let moves = token.moves.map((moveString) => getPokeMove(moveString.strip))
-    let item: Item = nil
+    let item: Item = getItem(token.item)
     let ability: Ability = getAbility(token.ability)
     let gender = pgkFemale
     let pokeSet = PokemonSet(

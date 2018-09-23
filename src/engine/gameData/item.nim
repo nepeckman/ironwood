@@ -5,10 +5,9 @@ type
 
   ItemKind* = enum
     ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal, ikTerrainSeed,
-    ikPinchBerry , ikChoiceScarf, ikChoiceBand, ikChoiceSpecs, ikLifeOrb,
-    ikLeftovers, ikShellBell, ikPokemonExclusive, ikAirBalloon, ikFocusSash,
+    ikPinchBerry , ikLifeOrb, ikLeftovers, ikShellBell, ikPokemonExclusive, ikFocusSash,
     ikEviolite, ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb, ikRockyHelmet,
-    ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikMuscleBand, ikWiseGlasses, ikExpertBelt, ikNone
+    ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique
 
   Item* = ref object
     consumable: bool
@@ -19,16 +18,15 @@ type
     of ikTerrainSeed: associatedTerrain: FieldTerrainKind
     of ikPinchBerry: activationPercent, restorePercent: int
     of ikMegaStone, ikPokemonExclusive: associatedPokemonName: string
-    of ikChoiceScarf, ikChoiceBand, ikChoiceSpecs, ikLifeOrb, ikLeftovers, ikShellBell, ikAirBalloon, ikFocusSash, ikEviolite,
+    of ikLifeOrb, ikLeftovers, ikShellBell, ikFocusSash, ikEviolite,
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
-      ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikMuscleBand,
-      ikWiseGlasses, ikExpertBelt, ikNone: discard
+      ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique: discard
 
-proc newItem*(name: string, consumable = false, kind = ikNone): Item =
+proc newItem*(name: string, consumable = false, kind = ikUnique): Item =
   Item(name: name, consumable: consumable, kind: kind)
 
 proc kind*(item: Item): ItemKind =
-  if isNil(item): ikNone else: item.kind
+  if isNil(item): ikUnique else: item.kind
 
 proc name*(item: Item): string =
   if isNil(item): "" else: item.name

@@ -27,3 +27,8 @@ Dragalge @
 Ability: Adaptability
 - Dragon Pulse
 """
+
+const choiceBand* = """
+Spinda @ Choice Band
+- Headbutt
+"""

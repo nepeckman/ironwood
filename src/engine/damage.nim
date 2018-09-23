@@ -12,7 +12,7 @@ proc chainMods(mods: seq[int]): int =
   result = 0x1000
   for m in mods:
     if m != 0x1000:
-      result = ((result * m) + 0x800) shl 12
+      result = ((result * m) + 0x800) shr 12
 
 proc pokeRound(num: float): int =
   if num - floor(num) > 0.5: toInt(ceil(num)) else: toInt(floor(num))
@@ -47,8 +47,8 @@ proc defenderAbilityBasePowerMod(defender: Pokemon, move: PokeMove, attacker: Po
 
 proc attackerItemBasePowerMod(attacker: Pokemon, move: PokeMove): int =
   if attacker.item.kind in {ikPlate, ikTypeBoost}: 0x1333
-  elif (attacker.item.kind == ikMuscleBand and move.category == pmcPhysical) or
-    (attacker.item.kind == ikWiseGlasses and move.category == pmcSpecial): 0x1199
+  elif (attacker.item == "Muscle Band" and move.category == pmcPhysical) or
+    (attacker.item == "Wise Glasses" and move.category == pmcSpecial): 0x1199
   elif attacker.item.kind == ikPokemonExclusive:
     if (attacker.item == "Adamant Orb" and attacker.name == "Dialga") or
       (attacker.item == "Lustrous Orb" and attacker.name == "Palkia") or
@@ -195,7 +195,7 @@ proc doesNoDamage(move: PokeMove, attacker, defender: Pokemon, field: Field,
     defenderProtected(defender, move) or moveFails(move, defender, attacker) or
     (not defAbilitySuppressed and hasImmunityViaAbility(defender, move, typeEffectiveness)) or
     (move.priority > 0 and field.terrain == ftkPsychic and defender.isGrounded(field)) or
-    (defender.item.kind == ikAirBalloon and move.pokeType == ptGround and
+    (defender.item == "Air Balloon" and move.pokeType == ptGround and
     move != "Thousand Arrows" and not field.gravityActive) or
     (field.weather == fwkHarshSun and move.pokeType == ptWater) or
     (field.weather == fwkHeavyRain and move.pokeType == ptFire)

@@ -11,7 +11,7 @@ proc getItem*(name: string): Item =
   if isNilOrWhitespace(name): return nil
   var itemData: JsonNode
   try:
-    itemData = idemdex[name]
+    itemData = itemdex[name]
   except KeyError:
     return newItem(name)
-  item(name)
+  newItem(name)

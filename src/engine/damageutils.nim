@@ -26,7 +26,7 @@ proc moveFails*(move: PokeMove, defender, attacker: Pokemon): bool =
 
 proc isGrounded*(pokemon: Pokemon, field: Field): bool =
   field.gravityActive or
-    not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item.kind == ikAirBalloon)
+    not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item == "Air Balloon")
 
 proc getTypeEffectiveness*(attackerType: PokeType, defenderType: PokeType, move: PokeMove,
   isGhostRevealed = false, isFlierGrounded = false): float =

@@ -50,3 +50,13 @@ suite "Abilities":
     action = @[state.getActionBySwitch(smearA, "Spinda"), state.getActionByMove(smearH, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 240)
+
+suite "Items":
+
+  test "Choice Band":
+    var state = newGame(choiceBand, choiceBand)
+    let spindH = state.getPokemon(tskHome, 0)
+    let spindA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(spindH, "Headbutt")]
+    state = turn(state, action)
+    check(state.getPokemonState(spindA).currentHP == 137)
