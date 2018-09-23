@@ -32,3 +32,8 @@ const choiceBand* = """
 Spinda @ Choice Band
 - Headbutt
 """
+
+const choiceSpecs* = """
+Spinda @ Choice Specs
+- Hyper Voice
+"""

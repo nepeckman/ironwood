@@ -69,7 +69,7 @@ proc `contains`*(arr: openArray[string], move: PokeMove): bool = find(arr, move.
 proc toPokeMoveCategory*(category: string): PokeMoveCategory =
   case category.toLowerAscii
   of "physical": pmcPhysical
-  of "specal": pmcSpecial
+  of "special": pmcSpecial
   else: pmcStatus
 
 proc toPokeMoveTarget*(target: string): PokeMoveTarget =

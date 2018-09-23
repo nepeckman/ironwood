@@ -60,3 +60,11 @@ suite "Items":
     var action = @[state.getActionByMove(spindH, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 137)
+
+  test "Choice Specs":
+    var state = newGame(choiceSpecs, choiceSpecs)
+    let spindH = state.getPokemon(tskHome, 0)
+    let spindA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(spindH, "Hyper Voice")]
+    state = turn(state, action)
+    check(state.getPokemonState(spindA).currentHP == 102)
