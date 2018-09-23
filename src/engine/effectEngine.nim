@@ -3,11 +3,12 @@ import
   state, engineutils
 
 
-proc applyMoveEffect*(actingPokemon, attackTarget: Pokemon, effect: Effect) =
-  let target = 
-    if effect.target == etkSelf: actingPokemon else: attackTarget
+proc applyMoveEffect*(state: State, actingPokemon, attackTarget: Pokemon, effect: Effect) =
+  let target = if effect.target == etkSelf: actingPokemon else: attackTarget
   if effect.kind == ekBoost:
     target.applyBoosts(effect.boostChange)
+  elif effect.kind == ekWeather:
+    state.field.changeWeather(actingPokemon, effect.weather)
 
 proc applyAbilityEffect*(state: State, actingPokemon: Pokemon) =
   let effect = actingPokemon.ability.effect
@@ -16,3 +17,5 @@ proc applyAbilityEffect*(state: State, actingPokemon: Pokemon) =
     if effect.kind == ekBoost:
       for target in targets:
         target.applyBoosts(effect.boostChange)
+    elif effect.kind == ekWeather:
+      state.field.changeWeather(actingPokemon, effect.weather)

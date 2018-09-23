@@ -37,3 +37,9 @@ const choiceSpecs* = """
 Spinda @ Choice Specs
 - Hyper Voice
 """
+
+const sunnyDay* = """
+Blaziken @
+- Sunny Day
+- Flamethrower
+"""

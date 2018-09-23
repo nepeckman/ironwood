@@ -910,7 +910,9 @@
   },
   "Sunny Day": {
     "bp": 0,
-    "type": "Fire"
+    "type": "Fire",
+    "weatherChange": "Sun",
+    "activation": "AfterAttack"
   },
   "Swagger": {
     "bp": 0,

@@ -4,6 +4,9 @@ import
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
   state, action, damage, effectEngine, engineutils, setParser
 
+proc turnTeardown(state: State) =
+  state.field.decrementCounters
+
 proc turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)
   var orderedActions: seq[Action]
@@ -23,7 +26,8 @@ proc turn*(s: State, actions: seq[Action]): State =
         let damage = getAvgDamage(pokemon, target, action.move, state.field)
         target.takeDamage(damage)
         if action.move.effect.activation == eakAfterAttack:
-          applyMoveEffect(pokemon, target, action.move.effect)
+          state.applyMoveEffect(pokemon, target, action.move.effect)
+  state.turnTeardown()
   return state
 
 proc newGame*(homeTeamString, awayTeamString: string): State =

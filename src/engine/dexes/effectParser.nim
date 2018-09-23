@@ -1,6 +1,6 @@
 import
   json,
-  ../gameData/effects
+  ../gameData/gameData
 
 proc parseBoostChange(boostData: JsonNode):
                         tuple[atk: int, def: int, spa: int, spd: int, spe: int] =
@@ -19,14 +19,15 @@ proc parseBoostChange(boostData: JsonNode):
 
 proc parseEffect*(data: JsonNode): Effect =
   let target =
-    if data.hasKey("effectTargets"):
-      toEffectTarget(data["effectTargets"].getStr())
+    if data.hasKey("effectTargets"): toEffectTarget(data["effectTargets"].getStr())
     else: etkPokemon
   let activation =
-    if data.hasKey("activation"):
-      toEffectActivation(data["activation"].getStr())
+    if data.hasKey("activation"): toEffectActivation(data["activation"].getStr())
     else: eakPassive
+
   if data.hasKey("boostChange"):
     let boosts = parseBoostChange(data["boostChange"])
     newBoostEffect(target, boosts, activation)
+  elif data.hasKey("weatherChange"):
+    newWeatherEffect(toWeather(data["weatherChange"].getStr()), activation)
   else: nil

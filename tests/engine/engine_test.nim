@@ -28,6 +28,23 @@ suite "Moves":
     state = turn(state, action)
     check(state.getPokemonState(smeargleA).currentHP == 133)
 
+  test "Sunny Day":
+    var state = newGame(sunnyDay, sunnyDay)
+    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(blazeH, "Sunny Day")]
+    state = turn(state, action)
+    check(state.field.weather == fwkSun)
+
+    action = @[state.getActionByMove(blazeH, "Flamethrower")]
+    state = turn(state, action)
+    check(state.getPokemonState(blazeA).currentHP == 186)
+    
+    state = turn(state, @[])
+    state = turn(state, @[])
+    state = turn(state, @[])
+    check(state.field.weather == fwkNone)
+
 suite "Abilities":
 
   test "Adaptability":

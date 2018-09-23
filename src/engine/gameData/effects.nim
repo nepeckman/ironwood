@@ -1,4 +1,4 @@
-import condition, poketype
+import condition, poketype, fieldConditions
 type
 
   EffectActivationKind* = enum
@@ -8,7 +8,8 @@ type
     etkField, etkSelf, etkPokemon, etkNone
 
   EffectKind* = enum
-    ekStatus, ekCondition, ekBoost, ekHP, ekTypeChange, ekForceSwitch, ekNull
+    ekStatus, ekCondition, ekBoost, ekHP, ekTypeChange, ekForceSwitch, 
+    ekWeather, ekTerrain, ekNull
 
   Effect* = ref object of RootObj
     activation: EffectActivationKind
@@ -20,6 +21,8 @@ type
     of ekHP: hpChange: int
     of ekTypeChange: typeChange: PokeType
     of ekForceSwitch: isRandom: bool
+    of ekWeather: weather: FieldWeatherKind
+    of ekTerrain: terrain: FieldTerrainKind
     of ekNull: discard
 
 proc activation*(effect: Effect): EffectActivationKind =
@@ -37,6 +40,7 @@ proc boostChange*(effect: Effect): tuple[atk: int, def: int, spa: int, spd: int,
 proc hpChange*(effect: Effect): int = effect.hpChange
 proc typeChange*(effect: Effect): PokeType = effect.typeChange
 proc isRandom*(effect: Effect): bool = effect.isRandom
+proc weather*(effect: Effect): FieldWeatherKind = effect.weather
 
 proc toEffectTarget*(str: string): EffectTargetKind =
   case str
@@ -58,3 +62,6 @@ proc newBoostEffect*(target: EffectTargetKind,
                      boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int],
                      activation = eakAfterAttack): Effect =
   Effect(target: target, activation: activation, kind: ekBoost, boostChange: boostChange)
+
+proc newWeatherEffect*(weather: FieldWeatherKind, activation = eakAfterAttack): Effect =
+  Effect(target: etkField, activation: activation, kind: ekWeather, weather: weather)

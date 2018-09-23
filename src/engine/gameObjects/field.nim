@@ -1,3 +1,4 @@
+import tables
 import ../gameData/fieldConditions
 import pokemon
 
@@ -12,8 +13,11 @@ type
     auras*: set[FieldAuraKind]
     gravityActive*: bool
     trickRoomActive*: bool
-    homeSideEffects: set[FieldSideEffects]
-    awaySideEffects: set[FieldSideEffects]
+    homeSideEffects: set[FieldSideEffect]
+    awaySideEffects: set[FieldSideEffect]
+    sideEffectCounters: Table[FieldSideEffect, int]
+    weatherCounter: int
+    terrainCounter: int
 
 proc makeField*(): Field =
   Field(
@@ -25,7 +29,10 @@ proc makeField*(): Field =
     gravityActive: false,
     trickRoomActive: false,
     homeSideEffects: {},
-    awaySideEffects: {}
+    awaySideEffects: {},
+    sideEffectCounters: initTable[FieldSideEffect, int](),
+    weatherCounter: 0,
+    terrainCounter: 0
   )
 
 proc copy*(field: Field): Field =
@@ -38,11 +45,24 @@ proc copy*(field: Field): Field =
     gravityActive: field.gravityActive,
     trickRoomActive: field.trickRoomActive,
     homeSideEffects: field.homeSideEffects,
-    awaySideEffects: field.awaySideEffects
+    awaySideEffects: field.awaySideEffects,
+    sideEffectCounters: field.sideEffectCounters,
+    weatherCounter: field.weatherCounter,
+    terrainCounter: field.terrainCounter
   )
 
 proc weather*(field: Field): FieldWeatherKind =
   if field.weatherSuppressed: fwkNone else: field.weather
 
-proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffects] =
+proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
   if side == tskHome: field.homeSideEffects else: field.awaySideEffects
+
+proc changeWeather*(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =
+  field.weather = weather
+  field.weatherCounter = 5
+
+proc decrementCounters*(field: Field) =
+  if field.weatherCounter > 0:
+    field.weatherCounter = field.weatherCounter - 1
+  if field.weatherCounter == 0:
+    field.weather = fwkNone
