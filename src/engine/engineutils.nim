@@ -72,7 +72,7 @@ proc possibleActions*(state: State, side: TeamSideKind): seq[Action] =
     if side == tskHome: state.homeActivePokemon() else: state.awayActivePokemon()
   state.possibleActions(activeMons)
 
-proc getActionByMove*(actions: seq[Action], move: string): Action = 
+proc getActionByMove(actions: seq[Action], move: string): Action = 
   for action in actions:
     if action.kind == akMoveSelection and action.move == move:
       return action
@@ -80,11 +80,11 @@ proc getActionByMove*(actions: seq[Action], move: string): Action =
   error.msg = "No action for move: " & move
   raise error
 
-proc getActionByMove*(state: State, side: TeamSideKind, move: string): Action =
-  getActionByMove(state.possibleActions(side), move)
+proc getActionByMove*(state: State, pokemonID: UUID, move: string): Action =
+  getActionByMove(state.possibleActions(pokemonID), move)
 
-proc getActionBySwitch*(state: State, side: TeamSideKind, pokemon: string): Action =
-  for action in state.possibleActions(side):
+proc getActionBySwitch(state: State, actions: seq[Action], pokemon: string): Action =
+  for action in actions:
     if action.kind == akSwitchSelection and 
        state.getPokemonObj(action.switchTargetID).name == pokemon:
       return action
@@ -92,3 +92,5 @@ proc getActionBySwitch*(state: State, side: TeamSideKind, pokemon: string): Acti
   error.msg = "No action for switch: " & pokemon
   raise error
 
+proc getActionBySwitch*(state: State, pokemonID: UUID, pokemon: string): Action =
+  getActionBySwitch(state, state.possibleActions(pokemonID), pokemon)

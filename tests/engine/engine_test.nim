@@ -6,38 +6,47 @@ suite "Sanity":
 
   test "engine":
     var gameState = newGame(sanityTeam, sanityTeam)
-    var action = @[gameState.getActionByMove(tskHome, "Return")]
+    let snorlaxH = gameState.getPokemon(tskHome, 0)
+    let snorlaxA = gameState.getPokemon(tskAway, 0)
+    var action = @[gameState.getActionByMove(snorlaxH, "Return")]
     var nextState = gameState.turn(action)
 
-    check(gameState.getPokemonState(tskHome, 0).currentHP == 244)
-    check(gameState.getPokemonState(tskAway, 0).currentHP == 244)
-    check(nextState.getPokemonState(tskHome, 0).currentHP == 244)
-    check(nextState.getPokemonState(tskAway, 0).currentHP == 141)
+    check(gameState.getPokemonState(snorlaxH).currentHP == 244)
+    check(gameState.getPokemonState(snorlaxA).currentHP == 244)
+    check(nextState.getPokemonState(snorlaxH).currentHP == 244)
+    check(nextState.getPokemonState(snorlaxA).currentHP == 141)
 
 suite "Moves":
 
   test "Swords Dance":
     var state = newGame(swordsDance, swordsDance)
-    var action = @[state.getActionByMove(tskHome, "Swords Dance")]
+    let smeargleH = state.getPokemon(tskHome, 0)
+    let smeargleA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(smeargleH, "Swords Dance")]
     state = turn(state, action)
-    action = @[state.getActionByMove(tskHome, "Headbutt")]
+    action = @[state.getActionByMove(smeargleH, "Headbutt")]
     state = turn(state, action)
-    check(state.getPokemonState(tskAway, 0).currentHP == 133)
+    check(state.getPokemonState(smeargleA).currentHP == 133)
 
 suite "Abilities":
 
   test "Adaptability":
     var state = newGame(adaptability, adaptability)
-    var action = @[state.getActionByMove(tskHome, "Dragon Pulse")]
+    let dragH = state.getPokemon(tskHome, 0)
+    let dragA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(dragH, "Dragon Pulse")]
     state = turn(state, action)
-    check(state.getPokemonState(tskAway, 0).currentHP == 50)
+    check(state.getPokemonState(dragA).currentHP == 50)
 
   test "Intimidate":
     var state = newGame(intimidate, intimidate)
-    var action = @[state.getActionByMove(tskHome, "Headbutt")]
+    let smearH = state.getPokemon(tskHome, 0)
+    let smearA = state.getPokemon(tskAway, 0)
+    let spindA = state.getPokemon(tskAway, 1)
+    var action = @[state.getActionByMove(smearH, "Headbutt")]
     state = turn(state, action)
-    check(state.getPokemonState(tskAway, 0).currentHP == 212)
+    check(state.getPokemonState(smearA).currentHP == 212)
     
-    action = @[state.getActionBySwitch(tskAway, "Spinda"), state.getActionByMove(tskHome, "Headbutt")]
+    action = @[state.getActionBySwitch(smearA, "Spinda"), state.getActionByMove(smearH, "Headbutt")]
     state = turn(state, action)
-    check(state.getPokemonState(tskAway, 0).currentHP == 240)
+    check(state.getPokemonState(spindA).currentHP == 240)
