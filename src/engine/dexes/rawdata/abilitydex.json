@@ -32,5 +32,21 @@
     "Delta Stream": {
         "activation": "OnSwitchIn",
         "weatherChange": "StrongWinds"
+    },
+    "Psychic Surge": {
+        "activation": "OnSwitchIn",
+        "terrainChange": "Psychic"
+    },
+    "Electric Surge": {
+        "activation": "OnSwitchIn",
+        "terrainChange": "Electric"
+    },
+    "Misty Surge": {
+        "activation": "OnSwitchIn",
+        "terrainChange": "Fairy"
+    },
+    "Grassy Surge": {
+        "activation": "OnSwitchIn",
+        "terrainChange": "Grass"
     }
 }

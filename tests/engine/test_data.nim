@@ -18,6 +18,12 @@ Smeargle @
 - Swords Dance
 """
 
+const technician* = """
+Scizor @
+Ability: Technician
+- Bullet Punch
+"""
+
 const intimidate* = """
 Smeargle @
 Ability: Intimidate
@@ -112,4 +118,28 @@ Ability: Primordial Sea
 const deltaStream* = """
 Rayquaza-Mega @
 Ability: Delta Stream
+"""
+
+const psychicSurge* = """
+Tapu Lele @
+Ability: Psychic Surge
+- Psychic
+"""
+
+const electricSurge* = """
+Tapu Koko @
+Ability: Electric Surge
+- Volt Switch
+"""
+
+const mistySurge* = """
+Tapu Fini @
+Ability: Misty Surge
+- Dragon Pulse
+"""
+
+const grassySurge* = """
+Tapu Bulu @
+Ability: Grassy Surge
+- Giga Drain
 """

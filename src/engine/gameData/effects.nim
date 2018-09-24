@@ -41,6 +41,7 @@ proc hpChange*(effect: Effect): int = effect.hpChange
 proc typeChange*(effect: Effect): PokeType = effect.typeChange
 proc isRandom*(effect: Effect): bool = effect.isRandom
 proc weather*(effect: Effect): FieldWeatherKind = effect.weather
+proc terrain*(effect: Effect): FieldTerrainKind = effect.terrain
 
 proc toEffectTarget*(str: string): EffectTargetKind =
   case str
@@ -65,3 +66,6 @@ proc newBoostEffect*(target: EffectTargetKind,
 
 proc newWeatherEffect*(weather: FieldWeatherKind, activation = eakAfterAttack): Effect =
   Effect(target: etkField, activation: activation, kind: ekWeather, weather: weather)
+
+proc newTerrainEffect*(terrain: FieldTerrainKind, activation = eakAfterAttack): Effect =
+  Effect(target: etkField, activation: activation, kind: ekTerrain, terrain: terrain)

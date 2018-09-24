@@ -28,6 +28,14 @@ proc toWeather*(weather: string): FieldWeatherKind =
   of "StrongWinds": fwkStrongWinds
   else: fwkNone
 
+proc toTerrain*(terrain: string): FieldTerrainKind =
+  case terrain
+  of "Psychic": ftkPsychic
+  of "Electric": ftkElectric
+  of "Fairy": ftkFairy
+  of "Grass": ftkGrass
+  else: ftkNone
+
 proc normalWeather*(weather: FieldWeatherKind): bool =
   weather in {fwkSun, fwkRain, fwkSand, fwkHail}
 

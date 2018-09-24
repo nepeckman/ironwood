@@ -54,6 +54,8 @@ proc copy*(field: Field): Field =
 proc weather*(field: Field): FieldWeatherKind =
   if field.weatherSuppressed: fwkNone else: field.weather
 
+proc terrain*(field: Field): FieldTerrainKind = field.terrain
+
 proc rawWeather*(field: Field): FieldWeatherKind = field.weather
 
 proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
@@ -76,6 +78,11 @@ proc changeWeather*(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =
   elif weather.strongWeather:
     field.weather = weather
     field.weatherCounter = -1
+
+proc changeTerrain*(field: Field, terrain: FieldTerrainKind) =
+  if terrain != field.terrain:
+    field.terrain = terrain
+    field.terrainCounter = 5
 
 proc decrementCounters*(field: Field) =
   if field.weatherCounter > 0:

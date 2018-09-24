@@ -30,13 +30,13 @@ proc parseStatSpread(statString: string, default = 0): PokeStats =
 proc tokenize(teamString: string): seq[PokeTokens] =
   result = @[]
   for line in split(teamString, '\n'):
-    if line =~ peg"\s* {(\w / '-')+} \s* '@' \s* {(\w / '-' / \s)*}":
+    if line =~ peg"\s* {(\w / '-' / \s)+} \s* '@' \s* {(\w / '-' / \s)*}":
       result.add(PokeTokens(
         name: "", item: "", ability: "", level: 100, evs: (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0),
         ivs: (hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31), nature: pnBashful, moves: @[])
       )
-      result[result.len - 1].name = matches[0]
-      result[result.len - 1].item = matches[1]
+      result[result.len - 1].name = matches[0].strip
+      result[result.len - 1].item = matches[1].strip
     elif line =~ peg"\s* 'Ability:' \s* {(\w / '-' / \s)*}":
       result[result.len - 1].ability = matches[0]
     elif line =~ peg"\s* 'Level:' \s* {\d*} \s*":

@@ -276,6 +276,22 @@ suite "Abilities":
     var state = newGame(deltaStream, utility)
     check(state.field.weather == fwkStrongWinds)
 
+  test "Psychic Surge":
+    var state = newGame(psychicSurge, utility)
+    check(state.field.terrain == ftkPsychic)
+  
+  test "Electric Surge":
+    var state = newGame(electricSurge, utility)
+    check(state.field.terrain == ftkElectric)
+
+  test "Misty Surge":
+    var state = newGame(mistySurge, utility)
+    check(state.field.terrain == ftkFairy)
+
+  test "Grassy Surge":
+    var state = newGame(grassySurge, utility)
+    check(state.field.terrain == ftkGrass)
+
 suite "Items":
 
   test "Choice Band":

@@ -9,6 +9,8 @@ proc applyMoveEffect*(state: State, actingPokemon, attackTarget: Pokemon, effect
     target.applyBoosts(effect.boostChange)
   elif effect.kind == ekWeather:
     state.field.changeWeather(actingPokemon, effect.weather)
+  elif effect.kind == ekTerrain:
+    state.field.changeTerrain(effect.terrain)
 
 proc applyAbilityEffect*(state: State, actingPokemon: Pokemon) =
   let effect = actingPokemon.ability.effect
@@ -20,4 +22,6 @@ proc applyAbilityEffect*(state: State, actingPokemon: Pokemon) =
   elif effect.target == etkField:
     if effect.kind == ekWeather:
       state.field.changeWeather(actingPokemon, effect.weather)
+    elif effect.kind == ekTerrain:
+      state.field.changeTerrain(effect.terrain)
 
