@@ -24,3 +24,6 @@ proc `contains`*(arr: openArray[string], ability: Ability): bool =
 
 proc newAbility*(name: string, effect: Effect): Ability = 
   Ability(name: name, effect: effect)
+
+proc suppressesWeather*(ability: Ability): bool =
+  ability in ["Cloud Nine", "Air Lock"]

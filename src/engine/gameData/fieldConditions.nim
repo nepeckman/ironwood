@@ -23,4 +23,13 @@ proc toWeather*(weather: string): FieldWeatherKind =
   of "Rain": fwkRain
   of "Sand": fwkSand
   of "Hail": fwkHail
+  of "HeavyRain": fwkHeavyRain
+  of "HarshSun": fwkHarshSun
+  of "StrongWinds": fwkStrongWinds
   else: fwkNone
+
+proc normalWeather*(weather: FieldWeatherKind): bool =
+  weather in {fwkSun, fwkRain, fwkSand, fwkHail}
+
+proc strongWeather*(weather: FieldWeatherKind): bool =
+  weather in {fwkHarshSun, fwkHeavyRain, fwkStrongWinds}

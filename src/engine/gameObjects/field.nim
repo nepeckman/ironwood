@@ -8,7 +8,7 @@ type
   Field* = ref object
     format*: FieldFormatKind
     weather: FieldWeatherKind
-    weatherSuppressed*: bool
+    weatherSuppressed: bool
     terrain*: FieldTerrainKind
     auras*: set[FieldAuraKind]
     gravityActive*: bool
@@ -57,10 +57,21 @@ proc weather*(field: Field): FieldWeatherKind =
 proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
   if side == tskHome: field.homeSideEffects else: field.awaySideEffects
 
+proc `weather=`*(field: Field, weather: FieldWeatherKind) =
+  field.weather = weather
+
+proc setWeatherSuppression*(field: Field, suppressed: bool) =
+  field.weatherSuppressed = suppressed
+
 proc changeWeather*(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =
-  if field.weather != weather:
+  if weather.normalWeather and
+     not field.weather.strongWeather and
+     field.weather != weather:
     field.weather = weather
     field.weatherCounter = 5
+  elif weather.strongWeather:
+    field.weather = weather
+    field.weatherCounter = -1
 
 proc decrementCounters*(field: Field) =
   if field.weatherCounter > 0:

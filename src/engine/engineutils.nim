@@ -38,6 +38,9 @@ proc homeActivePokemonObj*(state: State): seq[Pokemon] =
 proc awayActivePokemonObj*(state: State): seq[Pokemon] =
   state.activePokemonObj(state.awayTeam)
 
+proc allActivePokemonObj*(state: State): seq[Pokemon] =
+  concat(state.homeActivePokemonObj, state.awayActivePokemonObj)
+
 proc activePokemon*(state: State, team: Team): seq[UUID] =
   result = @[]
   if state.isActive(team[0]):
@@ -50,6 +53,9 @@ proc homeActivePokemon*(state: State): seq[UUID] =
 
 proc awayActivePokemon*(state: State): seq[UUID] =
   state.activePokemon(state.awayTeam)
+
+proc allActivePokemon*(state: State): seq[UUID] =
+  concat(state.homeActivePokemon, state.awayActivePokemon)
 
 proc possibleActions*(state: State, pokemonID: UUID): seq[Action] =
   result = @[]
@@ -94,3 +100,19 @@ proc getActionBySwitch(state: State, actions: seq[Action], pokemon: string): Act
 
 proc getActionBySwitch*(state: State, pokemonID: UUID, pokemon: string): Action =
   getActionBySwitch(state, state.possibleActions(pokemonID), pokemon)
+
+proc assessWeather*(state: State) =
+  let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
+  var constantWeatherMaintained, weatherSuppressed = false
+  for ability in activeAbilities:
+    if ability.effect.kind == ekWeather and
+       ability.effect.weather.strongWeather and
+       ability.effect.weather == state.field.weather:
+      constantWeatherMaintained = true
+  if not constantWeatherMaintained:
+    state.field.weather = fwkNone
+
+  for ability in activeAbilities:
+    if ability.suppressesWeather:
+      weatherSuppressed = true
+  state.field.setWeatherSuppression(weatherSuppressed)
