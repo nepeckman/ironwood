@@ -16,6 +16,78 @@ suite "Sanity":
     check(nextState.getPokemonState(snorlaxH).currentHP == 244)
     check(nextState.getPokemonState(snorlaxA).currentHP == 141)
 
+suite "Weather":
+
+  test "Should end in 5 turns":
+    var state = newGame(sunnyDay, sunnyDay)
+    let blazeH = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(blazeH, "Sunny Day")]
+    state = turn(state, action)
+    check(state.field.weather == fwkSun)
+    state = turn(state, @[])
+    check(state.field.weather == fwkSun)
+    state = turn(state, @[])
+    check(state.field.weather == fwkSun )
+    state = turn(state, @[])
+    check(state.field.weather == fwkSun)
+    state = turn(state, @[])
+    check(state.field.weather == fwkNone)
+
+  test "Cannot reset same weather":
+    var state = newGame(sunnyDay, sunnyDay)
+    let blazeH = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(blazeH, "Sunny Day")]
+    state = turn(state, action)
+    check(state.field.weather == fwkSun)
+    state = turn(state, action)
+    check(state.field.weather == fwkSun)
+    state = turn(state, @[])
+    check(state.field.weather == fwkSun )
+    state = turn(state, @[])
+    check(state.field.weather == fwkSun)
+    state = turn(state, @[])
+    check(state.field.weather == fwkNone)
+
+  test "Sun - Boost Fire moves":
+    var state = newGame(sunnyDay, sunnyDay)
+    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(blazeH, "Sunny Day")]
+    state = turn(state, action)
+    action = @[state.getActionByMove(blazeH, "Flamethrower")]
+    state = turn(state, action)
+    check(state.getPokemonState(blazeA).currentHP == 186)
+
+  test "Sun - Weaken Water moves":
+    var state = newGame(sunnyDay, sunnyDay)
+    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(blazeH, "Sunny Day")]
+    state = turn(state, action)
+    action = @[state.getActionByMove(blazeH, "Water Pulse")]
+    state = turn(state, action)
+    check(state.getPokemonState(blazeA).currentHP == 233)
+
+  test "Rain - Boost Water moves":
+    var state = newGame(rainDance, rainDance)
+    let ludiH = state.getPokemon(tskHome, 0)
+    let ludiA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(ludiH, "Rain Dance")]
+    state = turn(state, action)
+    action = @[state.getActionByMove(ludiH, "Hydro Pump")]
+    state = turn(state, action)
+    check(state.getPokemonState(ludiA).currentHP == 257)
+
+  test "Rain - Weaken Sun moves":
+    var state = newGame(rainDance, rainDance)
+    let ludiH = state.getPokemon(tskHome, 0)
+    let ludiA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(ludiH, "Rain Dance")]
+    state = turn(state, action)
+    action = @[state.getActionByMove(ludiH, "Fire Punch")]
+    state = turn(state, action)
+    check(state.getPokemonState(ludiA).currentHP == 272)
+
 suite "Moves":
 
   test "Swords Dance":
@@ -31,19 +103,17 @@ suite "Moves":
   test "Sunny Day":
     var state = newGame(sunnyDay, sunnyDay)
     let blazeH = state.getPokemon(tskHome, 0)
-    let blazeA = state.getPokemon(tskAway, 0)
     var action = @[state.getActionByMove(blazeH, "Sunny Day")]
     state = turn(state, action)
     check(state.field.weather == fwkSun)
 
-    action = @[state.getActionByMove(blazeH, "Flamethrower")]
+  test "Rain Dance":
+    var state = newGame(rainDance, rainDance)
+    let ludiH = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(ludiH, "Rain Dance")]
     state = turn(state, action)
-    check(state.getPokemonState(blazeA).currentHP == 186)
-    
-    state = turn(state, @[])
-    state = turn(state, @[])
-    state = turn(state, @[])
-    check(state.field.weather == fwkNone)
+    check(state.field.weather == fwkRain)
+
 
 suite "Abilities":
 

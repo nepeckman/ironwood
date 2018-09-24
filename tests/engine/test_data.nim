@@ -42,4 +42,12 @@ const sunnyDay* = """
 Blaziken @
 - Sunny Day
 - Flamethrower
+- Water Pulse
+"""
+
+const rainDance* = """
+Ludicolo @
+- Rain Dance
+- Hydro Pump
+- Fire Punch
 """

@@ -58,8 +58,9 @@ proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
   if side == tskHome: field.homeSideEffects else: field.awaySideEffects
 
 proc changeWeather*(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =
-  field.weather = weather
-  field.weatherCounter = 5
+  if field.weather != weather:
+    field.weather = weather
+    field.weatherCounter = 5
 
 proc decrementCounters*(field: Field) =
   if field.weatherCounter > 0:

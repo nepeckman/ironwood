@@ -914,6 +914,12 @@
     "weatherChange": "Sun",
     "activation": "AfterAttack"
   },
+  "Rain Dance": {
+    "bp": 0,
+    "type": "Water",
+    "weatherChange": "Rain",
+    "activation": "AfterAttack"
+  },
   "Swagger": {
     "bp": 0,
     "type": "Normal"
