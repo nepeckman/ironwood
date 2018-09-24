@@ -159,6 +159,30 @@ suite "Weather":
     check(state.getPokemonState(abom).currentHP == 321)
     check(state.getPokemonState(ky).currentHP == 320)
 
+  test "Harsh Sun - nullify Water moves":
+    var state = newGame(desolateLand, rainDance)
+    let groudon = state.getPokemon(tskHome, 0)
+    let ludi = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(ludi, "Hydro Pump")]
+    state = turn(state, action)
+    check(state.getPokemonState(groudon).currentHP == 341)
+
+  test "Heavy Rain - nullify Fire moves":
+    var state = newGame(primordialSea, sunnyDay)
+    let ky = state.getPokemon(tskHome, 0)
+    let blaze = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(blaze, "Flamethrower")]
+    state = turn(state, action)
+    check(state.getPokemonState(ky).currentHP == 341)
+
+  test "Strong Winds - remove Flying weaknesses":
+    var state = newGame(deltaStream, utility)
+    let ray = state.getPokemon(tskHome, 0)
+    let smeargle = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(smeargle, "Stone Edge")]
+    state = turn(state, action)
+    check(state.getPokemonState(ray).currentHP == 325)
+
 
 suite "Moves":
 
@@ -239,6 +263,18 @@ suite "Abilities":
   test "Snow Warning":
     var state = newGame(snowWarning, snowWarning)
     check(state.field.weather == fwkHail)
+
+  test "Desolate Land":
+    var state = newGame(desolateLand, utility)
+    check(state.field.weather == fwkHarshSun)
+
+  test "Primordial Sea":
+    var state = newGame(primordialSea, utility)
+    check(state.field.weather == fwkHeavyRain)
+
+  test "Delta Stream":
+    var state = newGame(deltaStream, utility)
+    check(state.field.weather == fwkStrongWinds)
 
 suite "Items":
 

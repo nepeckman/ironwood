@@ -7,6 +7,11 @@ Adamant Nature
 - Return
 """
 
+const utility* = """
+Smeargle @
+- Stone Edge
+"""
+
 const swordsDance* = """
 Smeargle @
 - Headbutt
@@ -96,11 +101,13 @@ Ability: Snow Warning
 const desolateLand* = """
 Groudon-Primal @
 Ability: Desolate Land
+- Fire Punch
 """
 
 const primordialSea* = """
 Kyogre-Primal @
 Ability: Primordial Sea
+- Scald
 """
 const deltaStream* = """
 Rayquaza-Mega @
