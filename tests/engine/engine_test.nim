@@ -33,6 +33,17 @@ suite "Weather":
     state = turn(state, @[])
     check(state.field.weather == fwkNone)
 
+  test "Slower weather wins":
+    var state = newGame(sunnyDay, rainDance)
+    let blaze = state.getPokemon(tskHome, 0)
+    let ludi = state.getPokemon(tskAway, 0)
+    var action = @[
+      state.getActionByMove(blaze, "Sunny Day"),
+      state.getActionByMove(ludi, "Rain Dance")
+    ]
+    state = turn(state, action)
+    check(state.field.weather == fwkRain)
+
   test "Cannot reset same weather":
     var state = newGame(sunnyDay, sunnyDay)
     let blazeH = state.getPokemon(tskHome, 0)
@@ -87,6 +98,24 @@ suite "Weather":
     action = @[state.getActionByMove(ludiH, "Fire Punch")]
     state = turn(state, action)
     check(state.getPokemonState(ludiA).currentHP == 272)
+
+  test "Sand - Damage relevant types":
+    var state = newGame(sandstorm1, sandstorm1)
+    let dun = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(dun, "Sandstorm")]
+    state = turn(state, action)
+    check(state.getPokemonState(dun).currentHP == 320)
+
+  test "Sand - Boost Rock types SpD":
+    var state = newGame(sandstorm2, sandstorm2)
+    let ttarH = state.getPokemon(tskHome, 0)
+    let ttarA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(ttarH, "Sandstorm")]
+    state = turn(state, action)
+    action = @[state.getActionByMove(ttarH, "Dark Pulse")]
+    state = turn(state, action)
+    check(state.getPokemonState(ttarA).currentHP == 311)
+
 
 suite "Moves":
 

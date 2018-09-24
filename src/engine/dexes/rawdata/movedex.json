@@ -920,6 +920,18 @@
     "weatherChange": "Rain",
     "activation": "AfterAttack"
   },
+  "Sandstorm": {
+    "bp": 0,
+    "type": "Rock",
+    "weatherChange": "Sand",
+    "activation": "AfterAttack"
+  },
+  "Hail": {
+    "bp": 0,
+    "type": "Ice",
+    "weatherChange": "Hail",
+    "activation": "AfterAttack"
+  },
   "Swagger": {
     "bp": 0,
     "type": "Normal"

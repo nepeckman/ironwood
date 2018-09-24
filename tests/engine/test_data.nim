@@ -51,3 +51,14 @@ Ludicolo @
 - Hydro Pump
 - Fire Punch
 """
+
+const sandstorm1* = """
+Dunsparce @
+- Sandstorm
+"""
+
+const sandstorm2* = """
+Tyranitar @
+- Sandstorm
+- Dark Pulse
+"""

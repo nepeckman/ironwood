@@ -1,11 +1,24 @@
 import 
-  algorithm, future, sequtils, sets,
+  algorithm, future, sequtils, sets, math,
   uuids,
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
   state, action, damage, effectEngine, engineutils, setParser
 
+proc weatherDamage(pokemon: Pokemon) =
+  let damage = toInt(floor(pokemon.maxHP / 16))
+  pokemon.takeDamage(damage)
+
 proc turnTeardown(state: State) =
-  state.field.decrementCounters
+  state.field.decrementCounters()
+  if state.field.weather == fwkSand:
+    let activePokemon = concat(state.homeActivePokemonObj, state.awayActivePokemonObj)
+    var damagedPokemon = activePokemon.filter((pokemon) => not (pokemon.hasType(ptRock) or
+                                                                pokemon.hasType(ptSteel) or 
+                                                                pokemon.hasType(ptGround)))
+
+    damagedPokemon.sort((p1, p2) => cmp(p1.speed, p2.speed), SortOrder.Descending)
+    for pokemon in damagedPokemon:
+      weatherDamage(pokemon)
 
 proc turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)

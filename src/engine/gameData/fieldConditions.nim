@@ -21,4 +21,6 @@ proc toWeather*(weather: string): FieldWeatherKind =
   case weather
   of "Sun": fwkSun
   of "Rain": fwkRain
+  of "Sand": fwkSand
+  of "Hail": fwkHail
   else: fwkNone
