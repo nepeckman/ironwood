@@ -92,3 +92,17 @@ const snowWarning* = """
 Abomasnow @
 Ability: Snow Warning
 """
+
+const desolateLand* = """
+Groudon-Primal @
+Ability: Desolate Land
+"""
+
+const primordialSea* = """
+Kyogre-Primal @
+Ability: Primordial Sea
+"""
+const deltaStream* = """
+Rayquaza-Mega @
+Ability: Delta Stream
+"""

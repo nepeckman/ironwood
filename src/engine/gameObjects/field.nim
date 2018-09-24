@@ -54,13 +54,17 @@ proc copy*(field: Field): Field =
 proc weather*(field: Field): FieldWeatherKind =
   if field.weatherSuppressed: fwkNone else: field.weather
 
+proc rawWeather*(field: Field): FieldWeatherKind = field.weather
+
 proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
   if side == tskHome: field.homeSideEffects else: field.awaySideEffects
 
 proc `weather=`*(field: Field, weather: FieldWeatherKind) =
   field.weather = weather
 
-proc setWeatherSuppression*(field: Field, suppressed: bool) =
+proc weatherSuppressed*(field: Field): bool = field.weatherSuppressed 
+
+proc `weatherSuppressed=`*(field: Field, suppressed: bool) =
   field.weatherSuppressed = suppressed
 
 proc changeWeather*(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =

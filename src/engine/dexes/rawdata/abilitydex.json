@@ -20,5 +20,17 @@
     "Sand Stream": {
         "activation": "OnSwitchIn",
         "weatherChange": "Sand"
+    },
+    "Desolate Land": {
+        "activation": "OnSwitchIn",
+        "weatherChange": "HarshSun"
+    },
+    "Primordial Sea": {
+        "activation": "OnSwitchIn",
+        "weatherChange": "HeavyRain"
+    },
+    "Delta Stream": {
+        "activation": "OnSwitchIn",
+        "weatherChange": "StrongWinds"
     }
 }

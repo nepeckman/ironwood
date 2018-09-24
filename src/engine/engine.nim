@@ -20,6 +20,7 @@ proc turnTeardown(state: State) =
     state.fieldEffect(weatherDamage, (pokemon) => not (pokemon.hasType(ptRock) or pokemon.hasType(ptGround) or pokemon.hasType(ptSteel)))
   elif state.field.weather == fwkHail:
     state.fieldEffect(weatherDamage, (pokemon) => not pokemon.hasType(ptIce))
+  state.assessWeather()
 
 proc turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)
@@ -41,6 +42,9 @@ proc turn*(s: State, actions: seq[Action]): State =
         target.takeDamage(damage)
         if action.move.effect.activation == eakAfterAttack:
           state.applyMoveEffect(pokemon, target, action.move.effect)
+
+    state.assessWeather()
+
   state.turnTeardown()
   return state
 
@@ -53,6 +57,7 @@ proc newGame*(homeTeamString, awayTeamString: string): State =
   for pokemon in activePokemon:
     if pokemon.ability.effect.activation == eakOnSwitchIn:
       state.applyAbilityEffect(pokemon)
+  state.assessWeather()
   return state
 
 export

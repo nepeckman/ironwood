@@ -89,30 +89,33 @@ proc getActionByMove(actions: seq[Action], move: string): Action =
 proc getActionByMove*(state: State, pokemonID: UUID, move: string): Action =
   getActionByMove(state.possibleActions(pokemonID), move)
 
-proc getActionBySwitch(state: State, actions: seq[Action], pokemon: string): Action =
+proc getActionBySwitch(state: State, actions: seq[Action], switchTargetID: UUID): Action =
   for action in actions:
     if action.kind == akSwitchSelection and 
-       state.getPokemonObj(action.switchTargetID).name == pokemon:
+       action.switchTargetID == switchTargetID:
       return action
   var error = new(SystemError)
-  error.msg = "No action for switch: " & pokemon
+  error.msg = "No action for switch: " & $switchTargetID
   raise error
 
-proc getActionBySwitch*(state: State, pokemonID: UUID, pokemon: string): Action =
-  getActionBySwitch(state, state.possibleActions(pokemonID), pokemon)
+proc getActionBySwitch*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
+  getActionBySwitch(state, state.possibleActions(pokemonID), switchTargetID)
 
 proc assessWeather*(state: State) =
   let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
   var constantWeatherMaintained, weatherSuppressed = false
-  for ability in activeAbilities:
-    if ability.effect.kind == ekWeather and
-       ability.effect.weather.strongWeather and
-       ability.effect.weather == state.field.weather:
-      constantWeatherMaintained = true
-  if not constantWeatherMaintained:
-    state.field.weather = fwkNone
 
-  for ability in activeAbilities:
-    if ability.suppressesWeather:
-      weatherSuppressed = true
-  state.field.setWeatherSuppression(weatherSuppressed)
+  if state.field.rawWeather.strongWeather:
+    for ability in activeAbilities:
+      if ability.effect.kind == ekWeather and
+         ability.effect.weather.strongWeather and
+         ability.effect.weather == state.field.weather:
+        constantWeatherMaintained = true
+    if not constantWeatherMaintained:
+      state.field.weather = fwkNone
+
+  if state.field.weatherSuppressed:
+    for ability in activeAbilities:
+      if ability.suppressesWeather:
+        weatherSuppressed = true
+    state.field.weatherSuppressed = weatherSuppressed

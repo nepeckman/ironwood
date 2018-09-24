@@ -59,6 +59,40 @@ suite "Weather":
     state = turn(state, @[])
     check(state.field.weather == fwkNone)
 
+  test "Strong weather prevents normal weather":
+    var state = newGame(desolateLand, sunnyDay)
+    let blaze = state.getPokemon(tskAway, 0)
+    check(state.field.weather == fwkHarshSun)
+    var action = @[state.getActionByMove(blaze, "Sunny Day")]
+    state = turn(state, action)
+    check(state.field.weather == fwkHarshSun)
+    
+    state = newGame(desolateLand, drought)
+    check(state.field.weather == fwkHarshSun)
+
+  test "Strong weather never ends":
+    var state = newGame(deltaStream, deltaStream)
+    check(state.field.weather == fwkStrongWinds)
+    state = turn(state, @[])
+    check(state.field.weather == fwkStrongWinds)
+    state = turn(state, @[])
+    check(state.field.weather == fwkStrongWinds)
+    state = turn(state, @[])
+    check(state.field.weather == fwkStrongWinds)
+    state = turn(state, @[])
+    check(state.field.weather == fwkStrongWinds)
+    state = turn(state, @[])
+    check(state.field.weather == fwkStrongWinds)
+
+  test "Strong weather ends on switch out":
+    var state = newGame(deltaStream, primordialSea & rainDance)
+    let ky = state.getPokemon(tskAway, 0)
+    let ludi = state.getPokemon(tskAway, 1)
+    check(state.field.weather == fwkHeavyRain)
+    var action = @[state.getActionBySwitch(ky, ludi)]
+    state = turn(state, action)
+    check(state.field.weather == fwkNone)
+
   test "Sun - Boost Fire moves":
     var state = newGame(sunnyDay, sunnyDay)
     let blazeH = state.getPokemon(tskHome, 0)
@@ -186,7 +220,7 @@ suite "Abilities":
     state = turn(state, action)
     check(state.getPokemonState(smearA).currentHP == 212)
     
-    action = @[state.getActionBySwitch(smearA, "Spinda"), state.getActionByMove(smearH, "Headbutt")]
+    action = @[state.getActionBySwitch(smearA, spindA), state.getActionByMove(smearH, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 240)
 
