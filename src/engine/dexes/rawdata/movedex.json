@@ -932,6 +932,30 @@
     "weatherChange": "Hail",
     "activation": "AfterAttack"
   },
+  "Psychic Terrain": {
+    "bp": 0,
+    "type": "Psychic",
+    "terrainChange": "Psychic",
+    "activation": "AfterAttack"
+  },
+  "Electric Terrain": {
+    "bp": 0,
+    "type": "Electric",
+    "terrainChange": "Electric",
+    "activation": "AfterAttack"
+  },
+  "Misty Terrain": {
+    "bp": 0,
+    "type": "Fairy",
+    "terrainChange": "Fairy",
+    "activation": "AfterAttack"
+  },
+  "Grassy Terrain": {
+    "bp": 0,
+    "type": "Grass",
+    "terrainChange": "Grass",
+    "activation": "AfterAttack"
+  },
   "Swagger": {
     "bp": 0,
     "type": "Normal"

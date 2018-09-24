@@ -183,6 +183,21 @@ suite "Weather":
     state = turn(state, action)
     check(state.getPokemonState(ray).currentHP == 325)
 
+suite "Terrain":
+
+  test "Should end in 5 turns":
+    var state = newGame(psychicSurge, utility)
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, @[])
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, @[])
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, @[])
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, @[])
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, @[])
+    check(state.field.terrain == ftkNone)
 
 suite "Moves":
 
@@ -224,6 +239,33 @@ suite "Moves":
     state = turn(state, action)
     check(state.field.weather == fwkHail)
 
+  test "Psychic Terrain":
+    var state = newGame(psychicTerrain, utility)
+    let mew = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(mew, "Psychic Terrain")]
+    state = turn(state, action)
+    check(state.field.terrain == ftkPsychic)
+
+  test "Electric Terrain":
+    var state = newGame(electricTerrain, utility)
+    let raikou = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(raikou, "Electric Terrain")]
+    state = turn(state, action)
+    check(state.field.terrain == ftkElectric)
+
+  test "Misty Terrain":
+    var state = newGame(mistyTerrain, utility)
+    let mew = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(mew, "Misty Terrain")]
+    state = turn(state, action)
+    check(state.field.terrain == ftkFairy)
+
+  test "Grassy Terrain":
+    var state = newGame(grassyTerrain, utility)
+    let celebi = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(celebi, "Grassy Terrain")]
+    state = turn(state, action)
+    check(state.field.terrain == ftkGrass)
 
 suite "Abilities":
 

@@ -143,3 +143,22 @@ Tapu Bulu @
 Ability: Grassy Surge
 - Giga Drain
 """
+const psychicTerrain* = """
+Mew @
+- Psychic Terrain
+"""
+
+const electricTerrain* = """
+Raikou @
+- Electric Terrain
+"""
+
+const mistyTerrain* = """
+Mew @
+- Misty Terrain
+"""
+
+const grassyTerrain* = """
+Celebi @
+- Grassy Terrain
+"""

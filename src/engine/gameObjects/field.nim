@@ -89,3 +89,8 @@ proc decrementCounters*(field: Field) =
     field.weatherCounter = field.weatherCounter - 1
   if field.weatherCounter == 0:
     field.weather = fwkNone
+
+  if field.terrainCounter > 0:
+    field.terrainCounter = field.terrainCounter - 1
+  if field.terrainCounter == 0:
+    field.terrain = ftkNone
