@@ -8,17 +8,19 @@ proc weatherDamage(pokemon: Pokemon) =
   let damage = toInt(floor(pokemon.maxHP / 16))
   pokemon.takeDamage(damage)
 
+proc fieldEffect(state: State, effectFn: (Pokemon) -> void, f: (Pokemon) -> bool) =
+    let activePokemon = concat(state.homeActivePokemonObj, state.awayActivePokemonObj)
+    var effectedPokemon = activePokemon.filter(f)
+    effectedPokemon.sort((p1, p2) => cmp(p1.speed, p2.speed), SortOrder.Descending)
+    for pokemon in effectedPokemon:
+      effectFn(pokemon)
+
 proc turnTeardown(state: State) =
   state.field.decrementCounters()
   if state.field.weather == fwkSand:
-    let activePokemon = concat(state.homeActivePokemonObj, state.awayActivePokemonObj)
-    var damagedPokemon = activePokemon.filter((pokemon) => not (pokemon.hasType(ptRock) or
-                                                                pokemon.hasType(ptSteel) or 
-                                                                pokemon.hasType(ptGround)))
-
-    damagedPokemon.sort((p1, p2) => cmp(p1.speed, p2.speed), SortOrder.Descending)
-    for pokemon in damagedPokemon:
-      weatherDamage(pokemon)
+    state.fieldEffect(weatherDamage, (pokemon) => not (pokemon.hasType(ptRock) or pokemon.hasType(ptGround) or pokemon.hasType(ptSteel)))
+  elif state.field.weather == fwkHail:
+    state.fieldEffect(weatherDamage, (pokemon) => not pokemon.hasType(ptIce))
 
 proc turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)

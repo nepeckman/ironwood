@@ -62,3 +62,13 @@ Tyranitar @
 - Sandstorm
 - Dark Pulse
 """
+
+const hail1* = """
+Abomasnow @
+- Hail
+"""
+
+const hail2* = """
+Kyogre @
+- Water Pulse
+"""

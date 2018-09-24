@@ -116,6 +116,15 @@ suite "Weather":
     state = turn(state, action)
     check(state.getPokemonState(ttarA).currentHP == 311)
 
+  test "Hail - Damage relevant types":
+    var state = newGame(hail1, hail2)
+    let abom = state.getPokemon(tskHome, 0)
+    let ky = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(abom, "Hail")]
+    state = turn(state, action)
+    check(state.getPokemonState(abom).currentHP == 321)
+    check(state.getPokemonState(ky).currentHP == 320)
+
 
 suite "Moves":
 
@@ -142,6 +151,20 @@ suite "Moves":
     var action = @[state.getActionByMove(ludiH, "Rain Dance")]
     state = turn(state, action)
     check(state.field.weather == fwkRain)
+
+  test "Sandstorm":
+    var state = newGame(sandstorm1, sandstorm1)
+    let dun = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(dun, "Sandstorm")]
+    state = turn(state, action)
+    check(state.field.weather == fwkSand)
+
+  test "Hail":
+    var state = newGame(hail1, hail1)
+    let abom = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(abom, "Hail")]
+    state = turn(state, action)
+    check(state.field.weather == fwkHail)
 
 
 suite "Abilities":
