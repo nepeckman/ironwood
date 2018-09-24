@@ -72,3 +72,23 @@ const hail2* = """
 Kyogre @
 - Water Pulse
 """
+
+const drought* = """
+Torkoal @
+Ability: Drought
+"""
+
+const drizzle* = """
+Politoed @
+Ability: Drizzle
+"""
+
+const sandstream* = """
+Tyranitar @
+Ability: Sand Stream
+"""
+
+const snowWarning* = """
+Abomasnow @
+Ability: Snow Warning
+"""

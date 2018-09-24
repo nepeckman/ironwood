@@ -17,5 +17,7 @@ proc applyAbilityEffect*(state: State, actingPokemon: Pokemon) =
     if effect.kind == ekBoost:
       for target in targets:
         target.applyBoosts(effect.boostChange)
-    elif effect.kind == ekWeather:
+  elif effect.target == etkField:
+    if effect.kind == ekWeather:
       state.field.changeWeather(actingPokemon, effect.weather)
+

@@ -190,6 +190,22 @@ suite "Abilities":
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 240)
 
+  test "Drought":
+    var state = newGame(drought, drought)
+    check(state.field.weather == fwkSun)
+
+  test "Drizzle":
+    var state = newGame(drizzle, drizzle)
+    check(state.field.weather == fwkRain)
+
+  test "Sand Stream":
+    var state = newGame(sandstream, sandstream)
+    check(state.field.weather == fwkSand)
+
+  test "Snow Warning":
+    var state = newGame(snowWarning, snowWarning)
+    check(state.field.weather == fwkHail)
+
 suite "Items":
 
   test "Choice Band":

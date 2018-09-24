@@ -4,5 +4,21 @@
         "boostChange": {
             "atk": -1
         }
+    },
+    "Drought": {
+        "activation": "OnSwitchIn",
+        "weatherChange": "Sun"
+    },
+    "Drizzle": {
+        "activation": "OnSwitchIn",
+        "weatherChange": "Rain"
+    },
+    "Snow Warning": {
+        "activation": "OnSwitchIn",
+        "weatherChange": "Hail"
+    },
+    "Sand Stream": {
+        "activation": "OnSwitchIn",
+        "weatherChange": "Sand"
     }
 }
