@@ -199,6 +199,64 @@ suite "Terrain":
     state = turn(state, @[])
     check(state.field.terrain == ftkNone)
 
+  test "Cannot reset same terrain":
+    var state = newGame(psychicTerrain, utility)
+    let mew = state.getPokemon(tskHome, 0)
+    var action = @[state.getActionByMove(mew, "Psychic Terrain")]
+    state = turn(state, action)
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, action)
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, action)
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, action)
+    check(state.field.terrain == ftkPsychic)
+    state = turn(state, action)
+    check(state.field.terrain == ftkNone)
+
+  test "Psychic - Boost Psychic moves":
+    var state = newGame(psychicSurge, technician)
+    let lele = state.getPokemon(tskHome, 0)
+    let scizor = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(lele, "Psychic")]
+    state = turn(state, action)
+    check(state.getPokemonState(scizor).currentHP == 161)
+
+  test "Electric - Boost Electric moves":
+    var state = newGame(electricSurge, technician)
+    let koko = state.getPokemon(tskHome, 0)
+    let scizor = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(koko, "Volt Switch")]
+    state = turn(state, action)
+    check(state.getPokemonState(scizor).currentHP == 139)
+
+  test "Misty - Weaken Dragon moves":
+    var state = newGame(mistySurge, adaptability)
+    let fini = state.getPokemon(tskHome, 0)
+    let drag = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(fini, "Dragon Pulse")]
+    state = turn(state, action)
+    check(state.getPokemonState(drag).currentHP == 218)
+
+  test "Grassy - Boost Grass moves":
+    var state = newGame(grassySurge, technician)
+    let bulu = state.getPokemon(tskHome, 0)
+    let scizor = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(bulu, "Giga Drain")]
+    state = turn(state, action)
+    check(state.getPokemonState(scizor).currentHP == 246)
+  
+  test "Grassy - Weaken EQ / Bulldoze":
+    var state = newGame(grassySurge, earthquake)
+    let bulu = state.getPokemon(tskHome, 0)
+    let chomp = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(chomp, "Earthquake")]
+    state = turn(state, action)
+    check(state.getPokemonState(bulu).currentHP == 249)
+    action = @[state.getActionByMove(chomp, "Bulldoze")]
+    state = turn(state, action)
+    check(state.getPokemonState(bulu).currentHP == 230)
+
 suite "Moves":
 
   test "Swords Dance":

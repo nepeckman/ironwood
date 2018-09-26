@@ -24,6 +24,12 @@ Ability: Technician
 - Bullet Punch
 """
 
+const earthquake* = """
+Garchomp @
+- Earthquake
+- Bulldoze
+"""
+
 const intimidate* = """
 Smeargle @
 Ability: Intimidate
