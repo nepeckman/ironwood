@@ -1,5 +1,5 @@
 import 
-  algorithm, future, sequtils, sets, math,
+  algorithm, sugar, sequtils, sets, math,
   uuids,
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
   state, action, damage, effectEngine, engineutils, setParser

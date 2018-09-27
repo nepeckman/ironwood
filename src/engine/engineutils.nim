@@ -1,5 +1,5 @@
 import
-  math, sequtils, future,
+  math, sequtils, sugar,
   uuids,
   gameData/gameData,
   gameObjects/gameObjects,
@@ -82,7 +82,7 @@ proc getActionByMove(actions: seq[Action], move: string): Action =
   for action in actions:
     if action.kind == akMoveSelection and action.move == move:
       return action
-  var error = new(SystemError)
+  var error = new(CatchableError)
   error.msg = "No action for move: " & move
   raise error
 
@@ -94,7 +94,7 @@ proc getActionBySwitch(state: State, actions: seq[Action], switchTargetID: UUID)
     if action.kind == akSwitchSelection and 
        action.switchTargetID == switchTargetID:
       return action
-  var error = new(SystemError)
+  var error = new(CatchableError)
   error.msg = "No action for switch: " & $switchTargetID
   raise error
 

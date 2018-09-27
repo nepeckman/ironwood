@@ -10,7 +10,7 @@ bin           = @["ironwood"]
 # Dependencies
 
 requires "nim >= 0.18.0"
-requires "uuids 0.1.9"
+requires "uuids 0.1.10"
 
 task testengine, "Runs tests against the game engine":
   exec "mkdir -p ./build/tests"

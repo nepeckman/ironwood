@@ -1,5 +1,5 @@
 import
-  strutils, sequtils, pegs, future,
+  strutils, sequtils, pegs, sugar,
   gameObjects/gameObjects, dexes/dexes, gameData/gameData
 
 type

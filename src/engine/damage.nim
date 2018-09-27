@@ -220,7 +220,7 @@ proc calculateBaseDamage(attacker, defender: Pokemon, move: PokeMove, field: Fie
   var baseDamage = getBaseDamage(attacker.level, basePower, attack, defense)
 
   if field.format != ffkSingles and pmmSpread in move.modifiers:
-    baseDamage = pokeRound(baseDamage  * 0xC00 / 0x1000)
+    baseDamage = pokeRound(baseDamage * 0xC00 / 0x1000)
   if (field.weather in {fwkSun, fwkHarshSun} and move.pokeType == ptFire) or
     (field.weather in {fwkRain, fwkHeavyRain} and move.pokeType == ptWater):
     baseDamage = pokeRound(baseDamage * 0x1800 / 0x1000)
