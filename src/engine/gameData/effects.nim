@@ -25,31 +25,31 @@ type
     of ekTerrain: terrain: FieldTerrainKind
     of ekNull: discard
 
-proc activation*(effect: Effect): EffectActivationKind =
+func activation*(effect: Effect): EffectActivationKind =
   if isNil(effect): eakPassive else: effect.activation
 
-proc target*(effect: Effect): EffectTargetKind =
+func target*(effect: Effect): EffectTargetKind =
   if isNil(effect): etkNone else: effect.target
 
-proc kind*(effect: Effect): EffectKind =
+func kind*(effect: Effect): EffectKind =
   if isNil(effect): ekNull else: effect.kind
 
-proc status*(effect: Effect): StatusConditionKind = effect.status
-proc condition*(effect: Effect): GeneralConditionKind = effect.condition
-proc boostChange*(effect: Effect): tuple[atk: int, def: int, spa: int, spd: int, spe: int] = effect.boostChange
-proc hpChange*(effect: Effect): int = effect.hpChange
-proc typeChange*(effect: Effect): PokeType = effect.typeChange
-proc isRandom*(effect: Effect): bool = effect.isRandom
-proc weather*(effect: Effect): FieldWeatherKind = effect.weather
-proc terrain*(effect: Effect): FieldTerrainKind = effect.terrain
+func status*(effect: Effect): StatusConditionKind = effect.status
+func condition*(effect: Effect): GeneralConditionKind = effect.condition
+func boostChange*(effect: Effect): tuple[atk: int, def: int, spa: int, spd: int, spe: int] = effect.boostChange
+func hpChange*(effect: Effect): int = effect.hpChange
+func typeChange*(effect: Effect): PokeType = effect.typeChange
+func isRandom*(effect: Effect): bool = effect.isRandom
+func weather*(effect: Effect): FieldWeatherKind = effect.weather
+func terrain*(effect: Effect): FieldTerrainKind = effect.terrain
 
-proc toEffectTarget*(str: string): EffectTargetKind =
+func toEffectTarget*(str: string): EffectTargetKind =
   case str
   of "Field": etkField
   of "Self": etkSelf
   else: etkPokemon
 
-proc toEffectActivation*(str: string): EffectActivationKind =
+func toEffectActivation*(str: string): EffectActivationKind =
   case str
   of "TurnStart": eakTurnStart
   of "TurnEnd": eakTurnEnd
@@ -59,13 +59,13 @@ proc toEffectActivation*(str: string): EffectActivationKind =
   of "OnSwitchOut": eakOnSwitchOut
   else: eakPassive
 
-proc newBoostEffect*(target: EffectTargetKind, 
+func newBoostEffect*(target: EffectTargetKind, 
                      boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int],
                      activation = eakAfterAttack): Effect =
   Effect(target: target, activation: activation, kind: ekBoost, boostChange: boostChange)
 
-proc newWeatherEffect*(weather: FieldWeatherKind, activation = eakAfterAttack): Effect =
+func newWeatherEffect*(weather: FieldWeatherKind, activation = eakAfterAttack): Effect =
   Effect(target: etkField, activation: activation, kind: ekWeather, weather: weather)
 
-proc newTerrainEffect*(terrain: FieldTerrainKind, activation = eakAfterAttack): Effect =
+func newTerrainEffect*(terrain: FieldTerrainKind, activation = eakAfterAttack): Effect =
   Effect(target: etkField, activation: activation, kind: ekTerrain, terrain: terrain)

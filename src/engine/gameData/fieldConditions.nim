@@ -17,7 +17,7 @@ type
   FieldFormatKind* = enum
     ffkSingles, ffkDoubles, ffkTriples, ffkRotation
 
-proc toWeather*(weather: string): FieldWeatherKind =
+func toWeather*(weather: string): FieldWeatherKind =
   case weather
   of "Sun": fwkSun
   of "Rain": fwkRain
@@ -28,7 +28,7 @@ proc toWeather*(weather: string): FieldWeatherKind =
   of "StrongWinds": fwkStrongWinds
   else: fwkNone
 
-proc toTerrain*(terrain: string): FieldTerrainKind =
+func toTerrain*(terrain: string): FieldTerrainKind =
   case terrain
   of "Psychic": ftkPsychic
   of "Electric": ftkElectric
@@ -36,8 +36,8 @@ proc toTerrain*(terrain: string): FieldTerrainKind =
   of "Grass": ftkGrass
   else: ftkNone
 
-proc normalWeather*(weather: FieldWeatherKind): bool =
+func normalWeather*(weather: FieldWeatherKind): bool =
   weather in {fwkSun, fwkRain, fwkSand, fwkHail}
 
-proc strongWeather*(weather: FieldWeatherKind): bool =
+func strongWeather*(weather: FieldWeatherKind): bool =
   weather in {fwkHarshSun, fwkHeavyRain, fwkStrongWinds}

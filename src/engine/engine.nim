@@ -22,7 +22,7 @@ proc turnTeardown(state: State) =
     state.fieldEffect(weatherDamage, (pokemon) => not pokemon.hasType(ptIce))
   state.assessWeather()
 
-proc turn*(s: State, actions: seq[Action]): State =
+func turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)
   var orderedActions: seq[Action]
   shallowCopy(orderedActions, actions)

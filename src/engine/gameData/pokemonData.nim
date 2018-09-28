@@ -35,14 +35,14 @@ type
     ivs*: PokeStats
     nature*: PokeNature
 
-proc name*(data: PokemonData): string = data.name
-proc pokeType1*(data: PokemonData): PokeType = data.pokeType1
-proc pokeType2*(data: PokemonData): PokeType = data.pokeType2
-proc baseStats*(data: PokemonData): PokeStats = data.baseStats
-proc weight*(data: PokemonData): float = data.weight
-proc dataFlags*(data: PokemonData): set[PokemonDataFlags] = data.dataFlags
+func name*(data: PokemonData): string = data.name
+func pokeType1*(data: PokemonData): PokeType = data.pokeType1
+func pokeType2*(data: PokemonData): PokeType = data.pokeType2
+func baseStats*(data: PokemonData): PokeStats = data.baseStats
+func weight*(data: PokemonData): float = data.weight
+func dataFlags*(data: PokemonData): set[PokemonDataFlags] = data.dataFlags
 
-proc newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: PokeStats, 
+func newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: PokeStats, 
   weight: float, dataFlags: set[PokemonDataFlags]): PokemonData =
   PokemonData(
     name: name,
@@ -53,14 +53,14 @@ proc newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: Po
     dataFlags: dataFlags
   )
 
-proc stringToNature*(nature: string): PokeNature =
+func stringToNature*(nature: string): PokeNature =
   parseEnum[PokeNature]("pn" & nature, pnBashful)
 
-proc calculateHP(baseHP: int, hpIV: int, hpEV: int, level: int): int =
+func calculateHP(baseHP: int, hpIV: int, hpEV: int, level: int): int =
   let numerator = (2 * baseHP + hpIV + toInt(floor(hpEV / 4))) * level
   toInt(floor(numerator / 100)) + level + 10
 
-proc natureBoost(stat: string, nature: PokeNature): float =
+func natureBoost(stat: string, nature: PokeNature): float =
   if stat == "atk": 
     if nature in {pnAdamant, pnLonely, pnBrave, pnNaughty}: 1.1f
     elif nature in {pnModest, pnTimid, pnBold, pnCalm}: 0.9f
@@ -83,11 +83,11 @@ proc natureBoost(stat: string, nature: PokeNature): float =
     else: 1f
   else: 1f
 
-proc calculateStat(stat: string, base: int, iv: int, ev: int, level: int, nature: PokeNature): int =
+func calculateStat(stat: string, base: int, iv: int, ev: int, level: int, nature: PokeNature): int =
   let numerator = (2 * base + iv + toInt(floor(ev / 4))) * level
   toInt(floor( (floor(numerator / 100) + 5f) * natureBoost(stat, nature) ))
 
-proc calculateStats*(data: PokemonData, pokeSet: PokemonSet): PokeStats =
+func calculateStats*(data: PokemonData, pokeSet: PokemonSet): PokeStats =
   let hp = calculateHP(data.baseStats.hp, pokeSet.ivs.hp, pokeSet.evs.hp, pokeSet.level)
   let atk = calculateStat("atk", data.baseStats.atk, pokeSet.ivs.atk, pokeSet.evs.atk, pokeSet.level, pokeSet.nature)
   let def = calculateStat("def", data.baseStats.def, pokeSet.ivs.def, pokeSet.evs.def, pokeSet.level, pokeSet.nature)

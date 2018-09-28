@@ -3,32 +3,32 @@ import
   gameData/gameData,
   gameObjects/gameObjects
 
-proc burnApplies*(move: PokeMove, attacker: Pokemon): bool =
+func burnApplies*(move: PokeMove, attacker: Pokemon): bool =
   sckBurned == attacker.status and move.category == pmcPhysical and
     attacker.ability != "Guts" and not (pmmIgnoresBurn in move.modifiers)
 
-proc skyDropFails*(move: PokeMove, defender: Pokemon): bool =
+func skyDropFails*(move: PokeMove, defender: Pokemon): bool =
   move == "Sky Drop" and (defender.hasType(ptFlying) or defender.weight >= 200f)
 
-proc synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): bool =
+func synchronoiseFails*(move: PokeMove, defender: Pokemon, attacker: Pokemon): bool =
   move == "Synchronoise" and
     not defender.hasType(attacker.pokeType1) and
     not defender.hasType(attacker.pokeType2)
 
-proc dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
+func dreamEaterFails*(move: PokeMove, defender: Pokemon): bool =
   move == "Dream Eater" and
     not (sckAsleep == defender.status) and
     defender.ability != "Comatose"
 
-proc moveFails*(move: PokeMove, defender, attacker: Pokemon): bool =
+func moveFails*(move: PokeMove, defender, attacker: Pokemon): bool =
   skyDropFails(move, defender) or synchronoiseFails(move, defender, attacker) or
     dreamEaterFails(move, defender)
 
-proc isGrounded*(pokemon: Pokemon, field: Field): bool =
+func isGrounded*(pokemon: Pokemon, field: Field): bool =
   field.gravityActive or
     not (pokemon.hasType(ptFlying) or pokemon.ability == "Levitate" or pokemon.item == "Air Balloon")
 
-proc getTypeEffectiveness*(attackerType: PokeType, defenderType: PokeType, move: PokeMove,
+func getTypeEffectiveness*(attackerType: PokeType, defenderType: PokeType, move: PokeMove,
   isGhostRevealed = false, isFlierGrounded = false): float =
   if isGhostRevealed and defenderType == ptGhost and attackerType in {ptNormal, ptFighting}:
     return 1
@@ -43,22 +43,22 @@ proc getTypeEffectiveness*(attackerType: PokeType, defenderType: PokeType, move:
   else:
     return getTypeMatchup(attackerType, defenderType)
 
-proc getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon, field: Field): float =
+func getMoveEffectiveness*(move: PokeMove, defender, attacker: Pokemon, field: Field): float =
   let isGhostRevealed = attacker.ability == "Scrappy" or gckRevealed in defender.conditions
   let isFlierGrounded = field.gravityActive or gckGrounded in defender.conditions
   getTypeEffectiveness(move.pokeType, defender.pokeType1, move, isGhostRevealed, isFlierGrounded) *
     getTypeEffectiveness(move.pokeType, defender.pokeType2, move, isGhostRevealed, isFlierGrounded)
 
-proc isDefenderAbilitySuppressed*(defender, attacker: Pokemon, move: PokeMove): bool =
+func isDefenderAbilitySuppressed*(defender, attacker: Pokemon, move: PokeMove): bool =
   defender.ability notin ["Full Metal Body", "Prism Armor", "Shadow Shield"] and
     (attacker.ability in ["Mold Breaker", "Teravolt", "Turboblaze"] or move in ["Menacing Moonraze Maelstrom", "Moongeist Beam", "Photon Geyser", "Searing Sunraze Smash", "Sunsteel Strike"])
 
-proc defenderProtected*(defender: Pokemon, move: PokeMove): bool =
+func defenderProtected*(defender: Pokemon, move: PokeMove): bool =
   (gckProtected in defender.conditions and not (pmmBypassesProtect in move.modifiers)) or
     (gckWideGuarded in defender.conditions and pmmSpread in move.modifiers) or
     (gckQuickGuarded in defender.conditions and not (pmmBypassesProtect in move.modifiers) and move.priority > 0)
 
-proc hasImmunityViaAbility*(defender: Pokemon, move: PokeMove, typeEffectiveness: float): bool =
+func hasImmunityViaAbility*(defender: Pokemon, move: PokeMove, typeEffectiveness: float): bool =
   (defender.ability == "Wonder Guard" and typeEffectiveness <= 1) or
     (defender.ability == "Sap Sipper" and move.pokeType == ptGrass) or
     (defender.ability == "Flash Fire" and move.pokeType == ptFire) or
@@ -69,7 +69,7 @@ proc hasImmunityViaAbility*(defender: Pokemon, move: PokeMove, typeEffectiveness
     (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
     (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0)
 
-proc changeTypeWithAbility(move: PokeMove, ability: Ability) =
+func changeTypeWithAbility(move: PokeMove, ability: Ability) =
   if move.pokeType == ptNormal:
     if ability == "Aerilate":
       move.pokeType = ptFlying
@@ -88,11 +88,11 @@ proc changeTypeWithAbility(move: PokeMove, ability: Ability) =
   elif ability == "Normalize":
     move.pokeType = ptNormal
 
-proc changeTypeWithItem(move: PokeMove, item: Item) =
+func changeTypeWithItem(move: PokeMove, item: Item) =
   if item.kind in {ikDrive, ikPlate, ikMemory}:
     move.pokeType = item.associatedType
 
-proc naturePowerTransformation(move: PokeMove, terrain: FieldTerrainKind) =
+func naturePowerTransformation(move: PokeMove, terrain: FieldTerrainKind) =
   move.pokeType = case terrain
     of ftkElectric: ptElectric
     of ftkPsychic: ptPsychic
@@ -106,7 +106,7 @@ proc naturePowerTransformation(move: PokeMove, terrain: FieldTerrainKind) =
     of ftkFairy: 95
     else: 80
 
-proc weatherBallTransformation(move: PokeMove, weather: FieldWeatherKind) =
+func weatherBallTransformation(move: PokeMove, weather: FieldWeatherKind) =
   move.pokeType = case weather
     of fwkSun, fwkHarshSun: ptFire
     of fwkRain, fwkHeavyRain: ptWater
@@ -115,13 +115,13 @@ proc weatherBallTransformation(move: PokeMove, weather: FieldWeatherKind) =
     else: ptNormal
   move.basePower = if weather == fwkNone or weather == fwkStrongWinds: 50 else: 100
 
-proc speedRatioToBasePower(speedRatio: float): int =
+func speedRatioToBasePower(speedRatio: float): int =
   if speedRatio >= 4: 150
   elif speedRatio >= 3: 120
   elif speedRatio >= 2: 80
   else: 60
 
-proc weightToBasePower(weight: float): int =
+func weightToBasePower(weight: float): int =
   if weight >= 200f: 120
   elif weight >= 100f: 100
   elif weight >= 50f: 80
@@ -129,14 +129,14 @@ proc weightToBasePower(weight: float): int =
   elif weight >= 10f: 40
   else: 20
 
-proc weightRatioToBasePower(weightRatio: float): int =
+func weightRatioToBasePower(weightRatio: float): int =
   if weightRatio >= 5: 120
   elif weightRatio >= 4: 100
   elif weightRatio >= 3: 80
   elif weightRatio >= 2: 60
   else: 40
 
-proc healthRatioToBasePower(healthRatio: float): int =
+func healthRatioToBasePower(healthRatio: float): int =
   if healthRatio <= 1: 200
   elif healthRatio <= 4: 150
   elif healthRatio <= 9: 100
@@ -144,7 +144,7 @@ proc healthRatioToBasePower(healthRatio: float): int =
   elif healthRatio <= 32: 40
   else: 20
 
-proc variableBasePower(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
+func variableBasePower(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
   case move.name
   of "Payback":
     if gckHasAttacked in defender.conditions: 100 else: 50
@@ -166,10 +166,10 @@ proc variableBasePower(move: PokeMove, attacker: Pokemon, defender: Pokemon): in
   of "Wring Out": 1 + toInt(120 * defender.currentHP / defender.maxHP)
   else: move.basePower
 
-proc isItemDependant(move: PokeMove): bool =
+func isItemDependant(move: PokeMove): bool =
   move.name in ["Judgement", "Techno Blast", "Multi-Attack", "Natural Gift"]
 
-proc damageStepMoveTransformation*(move: PokeMove, attacker, defender: Pokemon, field: Field): PokeMove =
+func damageStepMoveTransformation*(move: PokeMove, attacker, defender: Pokemon, field: Field): PokeMove =
   result = copy(move)
   #TODO: return new moves by querying the movedex
   if move == "Weather Ball": result.weatherBallTransformation(field.weather)
@@ -179,11 +179,11 @@ proc damageStepMoveTransformation*(move: PokeMove, attacker, defender: Pokemon, 
   if attacker.hasTypeChangingAbility(): result.changeTypeWithAbility(attacker.ability)
   result.basePower = if pmmVariablePower in move.modifiers: variableBasePower(move, attacker, defender) else: move.basePower
 
-proc isAuraBoosted*(move: PokeMove, field: Field): bool =
+func isAuraBoosted*(move: PokeMove, field: Field): bool =
   (fakDark in field.auras and move.pokeType == ptDark) or
     (fakFairy in field.auras and move.pokeType == ptFairy)
 
-proc boostedKnockOff*(defender: Pokemon): bool =
+func boostedKnockOff*(defender: Pokemon): bool =
   defender.hasItem() and
     not (defender.name == "Giratina-Origin" and defender.item == "Griseous Orb") and
     not (defender.name == "Arceus" and defender.item.kind == ikPlate) and

@@ -7,7 +7,7 @@ type
     ptNormal, ptFighting, ptRock, ptGround, ptSteel, ptGhost, ptPoison, ptBug, ptFlying,
     ptNull
 
-var PokeTypeEffectiveness = {
+const PokeTypeEffectiveness = {
   ptWater: {ptWater: 0.5, ptFire: 2d, ptGrass: 0.5, ptDragon: 0.5, ptRock: 2d, ptGround: 2d}.toTable,
   ptFire: {ptWater: 0.5, ptFire: 0.5, ptGrass: 2d, ptIce: 2d, ptDragon: 0.5, ptRock: 0.5, ptSteel: 2d, ptBug: 2d}.toTable,
   ptElectric: {ptWater: 2d, ptElectric: 0.5, ptGrass: 0.5, ptDragon: 0.5, ptGround: 0d, ptFlying: 2d}.toTable,
@@ -29,10 +29,10 @@ var PokeTypeEffectiveness = {
   ptNull: initTable[PokeType, float]()
   }.toTable
 
-proc getTypeMatchup*(attackerType, defenderType: PokeType): float =
+func getTypeMatchup*(attackerType, defenderType: PokeType): float =
   if defenderType in PokeTypeEffectiveness[attackerType]: PokeTypeEffectiveness[attackerType][defenderType] else: 1
 
-proc toPokeType*(typeString: string): PokeType =
+func toPokeType*(typeString: string): PokeType =
   case toLowerAscii(typestring)
   of "water": ptWater
   of "fire": ptFire

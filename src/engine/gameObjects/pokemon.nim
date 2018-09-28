@@ -38,7 +38,7 @@ proc makePokemon*(data: PokemonData, pokeSet: PokemonSet, side: TeamSideKind): P
     conditions: {},
   )
 
-proc copy*(pokemon: Pokemon): Pokemon =
+func copy*(pokemon: Pokemon): Pokemon =
   Pokemon(
     uuid: pokemon.uuid,
     data: pokemon.data,
@@ -54,19 +54,19 @@ proc copy*(pokemon: Pokemon): Pokemon =
     conditions: pokemon.conditions
   )
 
-proc name*(mon: Pokemon): string = mon.data.name
-proc uuid*(mon: Pokemon): UUID =
+func name*(mon: Pokemon): string = mon.data.name
+func uuid*(mon: Pokemon): UUID =
   if isNil(mon): initUUID(0, 0) else: mon.uuid
-proc currentHP*(mon: Pokemon): int = mon.currentHP
-proc pokeType1*(mon: Pokemon): PokeType = mon.data.pokeType1
-proc pokeType2*(mon: Pokemon): PokeType = mon.data.pokeType2
-proc dataFlags*(mon: Pokemon): set[PokemonDataFlags] = mon.data.dataFlags
-proc moves*(mon: Pokemon): seq[PokeMove] = mon.pokeSet.moves
-proc level*(mon: Pokemon): int = mon.pokeSet.level
-proc gender*(mon: Pokemon): PokeGenderKind = mon.pokeSet.gender
+func currentHP*(mon: Pokemon): int = mon.currentHP
+func pokeType1*(mon: Pokemon): PokeType = mon.data.pokeType1
+func pokeType2*(mon: Pokemon): PokeType = mon.data.pokeType2
+func dataFlags*(mon: Pokemon): set[PokemonDataFlags] = mon.data.dataFlags
+func moves*(mon: Pokemon): seq[PokeMove] = mon.pokeSet.moves
+func level*(mon: Pokemon): int = mon.pokeSet.level
+func gender*(mon: Pokemon): PokeGenderKind = mon.pokeSet.gender
 
-proc item*(mon: Pokemon): Item = mon.currentItem
-proc ability*(mon: Pokemon): Ability = mon.currentAbility
+func item*(mon: Pokemon): Item = mon.currentItem
+func ability*(mon: Pokemon): Ability = mon.currentAbility
 
 proc resetAbility*(mon: Pokemon) =
   mon.currentAbility = mon.pokeSet.ability
@@ -86,59 +86,59 @@ proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd:
     spd: addBoosts(mon.boosts.spd, boosts.spd),
     spe: addBoosts(mon.boosts.spe, boosts.spe))
 
-proc getModifiedStat(stat: int, boost: int): int =
+func getModifiedStat(stat: int, boost: int): int =
   if boost > 0: toInt(floor(stat * (2 + boost) / 2))
   elif boost < 0: toInt(floor(stat * 2 / (2 - boost)))
   else: stat
 
-proc getWeightFactor*(pokemon: Pokemon): float =
+func getWeightFactor*(pokemon: Pokemon): float =
   if pokemon.ability == "Heavy Metal": 2f
   elif pokemon.ability == "Light Metal": 0.5
   else: 1f
 
-proc maxHP*(mon: Pokemon): int =
+func maxHP*(mon: Pokemon): int =
   mon.stats.hp
 
-proc attack*(mon: Pokemon): int =
+func attack*(mon: Pokemon): int =
   getModifiedStat(mon.stats.atk, mon.boosts.atk)
 
-proc defense*(mon: Pokemon): int =
+func defense*(mon: Pokemon): int =
   getModifiedStat(mon.stats.def, mon.boosts.def)
 
-proc spattack*(mon: Pokemon): int =
+func spattack*(mon: Pokemon): int =
   getModifiedStat(mon.stats.spa, mon.boosts.spa)
 
-proc spdefense*(mon: Pokemon): int =
+func spdefense*(mon: Pokemon): int =
   getModifiedStat(mon.stats.spd, mon.boosts.spd)
 
-proc speed*(mon: Pokemon): int =
+func speed*(mon: Pokemon): int =
   getModifiedStat(mon.stats.spe, mon.boosts.spe)
   #TODO: Add ability + item check
 
-proc weight*(mon: Pokemon): float = mon.data.weight * mon.getWeightFactor()
+func weight*(mon: Pokemon): float = mon.data.weight * mon.getWeightFactor()
 
-proc rawStats*(mon: Pokemon): PokeStats = mon.stats
+func rawStats*(mon: Pokemon): PokeStats = mon.stats
 
-proc countBoosts*(mon: Pokemon): int =
+func countBoosts*(mon: Pokemon): int =
   result = 0
   for boost in mon.boosts.fields:
     result = if boost > 0: boost + result else: result
 
-proc hasType*(pokemon: Pokemon, pokeType: PokeType): bool =
+func hasType*(pokemon: Pokemon, pokeType: PokeType): bool =
   if pokeType == ptNull:
     return false
   pokeType == pokemon.pokeType1 or pokeType == pokemon.pokeType2
 
-proc hasItem*(mon: Pokemon): bool = isNil(mon.item)
+func hasItem*(mon: Pokemon): bool = isNil(mon.item)
 
-proc fainted*(mon: Pokemon): bool = mon.currentHP <= 0
+func fainted*(mon: Pokemon): bool = mon.currentHP <= 0
 
-proc hasTypeChangingAbility*(pokemon: Pokemon): bool =
+func hasTypeChangingAbility*(pokemon: Pokemon): bool =
   pokemon.ability in ["Aerliate", "Pixilate", "Refrigerate", "Galvanize", "Liquid Voice", "Normalize"]
 
-proc hash*(pokemon: Pokemon): Hash =
+func hash*(pokemon: Pokemon): Hash =
   pokemon.uuid.hash
 
-proc `==`*(p1, p2: Pokemon): bool = uuid(p1) == uuid(p2)
-proc `==`*(p: Pokemon, uuid: UUID): bool = uuid(p) == uuid
-proc `==`*(uuid: UUID, p: Pokemon): bool = uuid(p) == uuid
+func `==`*(p1, p2: Pokemon): bool = uuid(p1) == uuid(p2)
+func `==`*(p: Pokemon, uuid: UUID): bool = uuid(p) == uuid
+func `==`*(uuid: UUID, p: Pokemon): bool = uuid(p) == uuid

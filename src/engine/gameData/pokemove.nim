@@ -25,7 +25,7 @@ type
     modifiers*: set[PokeMoveModifiers]
 
 
-proc copy*(move: PokeMove): PokeMove =
+func copy*(move: PokeMove): PokeMove =
   PokeMove(
     name: move.name,
     category: move.category,
@@ -37,7 +37,7 @@ proc copy*(move: PokeMove): PokeMove =
     modifiers: move.modifiers
   )
 
-proc newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, basePower: int,
+func newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, basePower: int,
   effect: Effect, pokeType: Poketype, priority: int, modifiers: set[PokeMoveModifiers]): PokeMove =
   PokeMove(
     name: name,
@@ -50,29 +50,29 @@ pokeType: pokeType,
     modifiers: modifiers
   )
 
-proc name*(move: PokeMove): string = move.name
-proc category*(move: PokeMove): PokeMoveCategory = move.category
-proc target*(move: PokeMove): PokeMoveTarget = move.target
-proc basePower*(move: PokeMove): int = move.basePower
-proc effect*(move: PokeMove): Effect = move.effect
-proc pokeType*(move: PokeMove): PokeType = move.pokeType
-proc priority*(move: PokeMove): int = move.priority
-proc modifiers*(move: PokeMove): set[PokeMoveModifiers] = move.modifiers
+func name*(move: PokeMove): string = move.name
+func category*(move: PokeMove): PokeMoveCategory = move.category
+func target*(move: PokeMove): PokeMoveTarget = move.target
+func basePower*(move: PokeMove): int = move.basePower
+func effect*(move: PokeMove): Effect = move.effect
+func pokeType*(move: PokeMove): PokeType = move.pokeType
+func priority*(move: PokeMove): int = move.priority
+func modifiers*(move: PokeMove): set[PokeMoveModifiers] = move.modifiers
 #TODO: For all flags and modifier sets: provide methods to check them, don't export enums
 
-proc `==`*(move: PokeMove, s: string): bool = move.name == s
+func `==`*(move: PokeMove, s: string): bool = move.name == s
 
-proc `==`*(s: string, move: PokeMove): bool = move.name == s
+func `==`*(s: string, move: PokeMove): bool = move.name == s
 
-proc `contains`*(arr: openArray[string], move: PokeMove): bool = find(arr, move.name) >= 0
+func `contains`*(arr: openArray[string], move: PokeMove): bool = find(arr, move.name) >= 0
 
-proc toPokeMoveCategory*(category: string): PokeMoveCategory =
+func toPokeMoveCategory*(category: string): PokeMoveCategory =
   case category.toLowerAscii
   of "physical": pmcPhysical
   of "special": pmcSpecial
   else: pmcStatus
 
-proc toPokeMoveTarget*(target: string): PokeMoveTarget =
+func toPokeMoveTarget*(target: string): PokeMoveTarget =
   case target
   of "Self": pmtUser
   of "Ally": pmtAlly

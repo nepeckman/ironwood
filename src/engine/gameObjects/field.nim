@@ -19,7 +19,7 @@ type
     weatherCounter: int
     terrainCounter: int
 
-proc makeField*(): Field =
+func makeField*(): Field =
   Field(
     format: ffkSingles,
     weather: fwkNone,
@@ -35,7 +35,7 @@ proc makeField*(): Field =
     terrainCounter: 0
   )
 
-proc copy*(field: Field): Field =
+func copy*(field: Field): Field =
   Field(
     format: field.format,
     weather: field.weather,
@@ -51,20 +51,20 @@ proc copy*(field: Field): Field =
     terrainCounter: field.terrainCounter
   )
 
-proc weather*(field: Field): FieldWeatherKind =
+func weather*(field: Field): FieldWeatherKind =
   if field.weatherSuppressed: fwkNone else: field.weather
 
-proc terrain*(field: Field): FieldTerrainKind = field.terrain
+func terrain*(field: Field): FieldTerrainKind = field.terrain
 
-proc rawWeather*(field: Field): FieldWeatherKind = field.weather
+func rawWeather*(field: Field): FieldWeatherKind = field.weather
 
-proc sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
+func sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
   if side == tskHome: field.homeSideEffects else: field.awaySideEffects
 
 proc `weather=`*(field: Field, weather: FieldWeatherKind) =
   field.weather = weather
 
-proc weatherSuppressed*(field: Field): bool = field.weatherSuppressed 
+func weatherSuppressed*(field: Field): bool = field.weatherSuppressed 
 
 proc `weatherSuppressed=`*(field: Field, suppressed: bool) =
   field.weatherSuppressed = suppressed

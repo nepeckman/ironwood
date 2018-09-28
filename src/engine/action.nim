@@ -18,11 +18,11 @@ type
       targets*: set[AttackTargetKind]
     of akSwitchSelection: switchTargetID*: UUID
 
-proc newMoveAction*(actingPokemonID: UUID, move: PokeMove, targets: set[AttackTargetKind] = {}): Action =
+func newMoveAction*(actingPokemonID: UUID, move: PokeMove, targets: set[AttackTargetKind] = {}): Action =
   Action(kind: akMoveSelection, actingPokemonID: actingPokemonID, move: move, targets: targets)
 
-proc newSwitchAction*(actingPokemonID, targetPokemonID: UUID): Action = 
+func newSwitchAction*(actingPokemonID, targetPokemonID: UUID): Action = 
   Action(kind: akSwitchSelection, actingPokemonID: actingPokemonID, switchTargetID: targetPokemonID)
 
-proc hash*(action: Action): Hash =
+func hash*(action: Action): Hash =
   action.actingPokemonID.hash

@@ -8,10 +8,10 @@ type
     members: seq[Pokemon]
     side*: TeamSideKind
 
-proc makeTeam*(members: seq[Pokemon], side: TeamSideKind): Team =
+func makeTeam*(members: seq[Pokemon], side: TeamSideKind): Team =
   Team(members: members, side: side)
 
-proc copy*(team: Team): Team =
+func copy*(team: Team): Team =
   var members: seq[Pokemon] = @[]
   for mon in team.members:
     members.add(copy(mon))
@@ -24,14 +24,14 @@ proc switchPokemon*(team: Team, actingPokemonID, switchTargetID: UUID) =
   team.members[actingIdx] = team.members[switchIdx]
   team.members[switchIdx] = tmp
 
-proc position*(team: Team, pokemon: Pokemon): int =
+func position*(team: Team, pokemon: Pokemon): int =
   team.members.find(pokemon) #TODO throw error
 
-proc `[]`*(team: Team, idx: int): Pokemon =
+func `[]`*(team: Team, idx: int): Pokemon =
   if idx < team.members.len: team.members[idx]
   else: nil
 
-proc get*(team: Team, idx: int): UUID =
+func get*(team: Team, idx: int): UUID =
   team[idx].uuid
 
 iterator items*(team: Team): Pokemon =
