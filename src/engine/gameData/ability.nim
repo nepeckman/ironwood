@@ -1,5 +1,5 @@
 import strutils
-import effects
+import effects, fieldConditions
 
 type
 
@@ -27,3 +27,16 @@ func newAbility*(name: string, effect: Effect): Ability =
 
 func suppressesWeather*(ability: Ability): bool =
   ability in ["Cloud Nine", "Air Lock"]
+
+func weatherSpeedAbility*(ability: Ability): bool =
+  ability in ["Chlorophyll", "Sand Rush", "Slush Rush", "Swift Swim"]
+
+func terrainSpeedAbility*(ability: Ability): bool =
+  ability in ["Surge Surfer"]
+
+func weatherSpeedBoost*(ability: Ability, weather: FieldWeatherKind): float = 
+  if ability == "Chlorophyll" and weather.sunny: 2f
+  elif ability == "Swift Swim" and weather.rainy: 2f
+  elif ability == "Sand Rush" and weather == fwkSand: 2f
+  elif ability == "Slush Rush" and weather == fwkHail: 2f
+  else: 1f

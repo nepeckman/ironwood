@@ -3,6 +3,13 @@ import
   state, engineutils
 
 
+proc changeWeather(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =
+  if weather.normalWeather and
+     not field.weather.strongWeather:
+    field.changeWeather(weather)
+  elif weather.strongWeather:
+    field.changeWeather(weather, -1)
+
 proc applyMoveEffect*(state: State, actingPokemon, attackTarget: Pokemon, effect: Effect) =
   let target = if effect.target == etkSelf: actingPokemon else: attackTarget
   if effect.kind == ekBoost:

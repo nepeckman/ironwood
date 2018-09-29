@@ -263,6 +263,11 @@ func getFinalDamage(baseAmount: int, i: int, effectiveness: float, isBurned: boo
   pokeRound(max(1, damageAmount * (finalMod / 0x1000)))
 
 func getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: Field): DamageSpread =
+  when not defined(release):
+    if defender.ability == "Fraility":
+      fill(result, defender.currentHP)
+      return
+
   let noDamage = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   let move = m.damageStepMoveTransformation(attacker, defender, field)
 

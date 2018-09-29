@@ -112,7 +112,7 @@ proc assessWeather*(state: State) =
          ability.effect.weather == state.field.weather:
         constantWeatherMaintained = true
     if not constantWeatherMaintained:
-      state.field.weather = fwkNone
+      state.field.changeWeather(fwkNone, 0)
 
   if state.field.weatherSuppressed:
     for ability in activeAbilities:

@@ -17,6 +17,8 @@ type
   FieldFormatKind* = enum
     ffkSingles, ffkDoubles, ffkTriples, ffkRotation
 
+  TeamSideKind* = enum tskHome, tskAway
+
 func toWeather*(weather: string): FieldWeatherKind =
   case weather
   of "Sun": fwkSun
@@ -41,3 +43,9 @@ func normalWeather*(weather: FieldWeatherKind): bool =
 
 func strongWeather*(weather: FieldWeatherKind): bool =
   weather in {fwkHarshSun, fwkHeavyRain, fwkStrongWinds}
+
+func sunny*(weather: FieldWeatherKind): bool =
+  weather in {fwkHarshSun, fwkSun}
+
+func rainy*(weather: FieldWeatherKind): bool =
+  weather in {fwkHeavyRain, fwkRain}

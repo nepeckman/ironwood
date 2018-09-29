@@ -168,3 +168,14 @@ const grassyTerrain* = """
 Celebi @
 - Grassy Terrain
 """
+
+const choiceScarfH* = """
+Tyranitar @ Choice Scarf
+- Crunch
+"""
+
+const choiceScarfA* = """
+Landorus-Therian @
+Ability: Fraility
+- Earthquake
+"""

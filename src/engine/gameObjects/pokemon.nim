@@ -1,9 +1,8 @@
 import math, hashes, uuids
 import ../gameData/[pokemonData, item, poketype, pokemove, condition, effects, ability]
+import field
 
 type
-
-  TeamSideKind* = enum tskHome, tskAway
 
   Pokemon* = ref object
     uuid*: UUID
@@ -96,6 +95,18 @@ func getWeightFactor*(pokemon: Pokemon): float =
   elif pokemon.ability == "Light Metal": 0.5
   else: 1f
 
+func getSpeedMod(mon: Pokemon, field: Field): float =
+  result = 1f
+  var mods: seq[float] = @[]
+  if mon.item == "Choice Scarf":
+    mods.add(1.5f)
+  if mon.status == sckParalyzed:
+    mods.add(0.5f)
+  if mon.ability.weatherSpeedAbility:
+    mods.add(mon.ability.weatherSpeedBoost(field.weather))
+  for m in mods:
+    result = result * m
+
 func maxHP*(mon: Pokemon): int =
   mon.stats.hp
 
@@ -111,9 +122,12 @@ func spattack*(mon: Pokemon): int =
 func spdefense*(mon: Pokemon): int =
   getModifiedStat(mon.stats.spd, mon.boosts.spd)
 
-func speed*(mon: Pokemon): int =
-  getModifiedStat(mon.stats.spe, mon.boosts.spe)
-  #TODO: Add ability + item check
+func speed*(mon: Pokemon, field: Field): int =
+  let spe = getModifiedStat(mon.stats.spe, mon.boosts.spe)
+  let m = getSpeedMod(mon, field)
+  return toInt(
+    floor(toFloat(spe) * m)
+  )
 
 func weight*(mon: Pokemon): float = mon.data.weight * mon.getWeightFactor()
 
@@ -142,3 +156,5 @@ func hash*(pokemon: Pokemon): Hash =
 func `==`*(p1, p2: Pokemon): bool = uuid(p1) == uuid(p2)
 func `==`*(p: Pokemon, uuid: UUID): bool = uuid(p) == uuid
 func `==`*(uuid: UUID, p: Pokemon): bool = uuid(p) == uuid
+
+export TeamSideKind

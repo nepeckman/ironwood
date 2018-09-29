@@ -1,9 +1,7 @@
 import tables
 import ../gameData/fieldConditions
-import pokemon
 
 type
-
 
   Field* = ref object
     format*: FieldFormatKind
@@ -61,28 +59,20 @@ func rawWeather*(field: Field): FieldWeatherKind = field.weather
 func sideEffects*(field: Field, side: TeamSideKind): set[FieldSideEffect] =
   if side == tskHome: field.homeSideEffects else: field.awaySideEffects
 
-proc `weather=`*(field: Field, weather: FieldWeatherKind) =
-  field.weather = weather
-
 func weatherSuppressed*(field: Field): bool = field.weatherSuppressed 
 
 proc `weatherSuppressed=`*(field: Field, suppressed: bool) =
   field.weatherSuppressed = suppressed
 
-proc changeWeather*(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =
-  if weather.normalWeather and
-     not field.weather.strongWeather and
-     field.weather != weather:
-    field.weather = weather
-    field.weatherCounter = 5
-  elif weather.strongWeather:
-    field.weather = weather
-    field.weatherCounter = -1
-
-proc changeTerrain*(field: Field, terrain: FieldTerrainKind) =
+proc changeTerrain*(field: Field, terrain: FieldTerrainKind, turns = 5) =
   if terrain != field.terrain:
     field.terrain = terrain
-    field.terrainCounter = 5
+    field.terrainCounter = turns
+
+proc changeWeather*(field: Field, weather: FieldWeatherKind, turns = 5) =
+  if weather != field.weather:
+    field.weather = weather
+    field.weatherCounter = turns
 
 proc decrementCounters*(field: Field) =
   if field.weatherCounter > 0:
@@ -94,3 +84,5 @@ proc decrementCounters*(field: Field) =
     field.terrainCounter = field.terrainCounter - 1
   if field.terrainCounter == 0:
     field.terrain = ftkNone
+
+export fieldConditions

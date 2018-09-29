@@ -144,12 +144,12 @@ func healthRatioToBasePower(healthRatio: float): int =
   elif healthRatio <= 32: 40
   else: 20
 
-func variableBasePower(move: PokeMove, attacker: Pokemon, defender: Pokemon): int =
+func variableBasePower(move: PokeMove, attacker: Pokemon, defender: Pokemon, field: Field): int =
   case move.name
   of "Payback":
     if gckHasAttacked in defender.conditions: 100 else: 50
-  of "Electro Ball": speedRatioToBasePower(floor(attacker.speed / defender.speed))
-  of "Gyro Ball": min(150, 1 + toInt(floor(25 * defender.speed / attacker.speed)))
+  of "Electro Ball": speedRatioToBasePower(floor(attacker.speed(field) / defender.speed(field)))
+  of "Gyro Ball": min(150, 1 + toInt(floor(25 * defender.speed(field) / attacker.speed(field))))
   of "Punishment": min(200, 60 + 20 * countBoosts(defender))
   of "Low Kick", "Grass Knot": weightToBasePower(defender.weight)
   of "Hex":
@@ -177,7 +177,7 @@ func damageStepMoveTransformation*(move: PokeMove, attacker, defender: Pokemon, 
   if move == "Nature Power": result.naturePowerTransformation(field.terrain)
   if move == "Revelation Dance": result.pokeType = attacker.pokeType1
   if attacker.hasTypeChangingAbility(): result.changeTypeWithAbility(attacker.ability)
-  result.basePower = if pmmVariablePower in move.modifiers: variableBasePower(move, attacker, defender) else: move.basePower
+  result.basePower = if pmmVariablePower in move.modifiers: variableBasePower(move, attacker, defender, field) else: move.basePower
 
 func isAuraBoosted*(move: PokeMove, field: Field): bool =
   (fakDark in field.auras and move.pokeType == ptDark) or

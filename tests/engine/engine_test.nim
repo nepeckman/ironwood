@@ -409,3 +409,15 @@ suite "Items":
     var action = @[state.getActionByMove(spindH, "Hyper Voice")]
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 102)
+
+  test "Choice Scarf":
+    var state = newGame(choiceScarfH, choiceScarfA)
+    let ttar = state.getPokemon(tskHome, 0)
+    let lando = state.getPokemon(tskAway, 0)
+    var actions = @[
+      state.getActionByMove(ttar, "Crunch"),
+      state.getActionByMove(lando, "Earthquake")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(ttar).currentHP == 341)
+    check(state.getPokemonState(lando).currentHP == 0)

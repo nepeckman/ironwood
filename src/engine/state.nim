@@ -104,6 +104,7 @@ func getTargetedPokemon*(state: State, action: Action): HashSet[Pokemon] =
 
 func compareActions*(state: State, action1, action2: Action): int =
   if action1.kind == action2.kind:
-    cmp(state.getPokemonObj(action1.actingPokemonID).speed, state.getPokemonObj(action2.actingPokemonID).speed)
+    cmp(state.getPokemonObj(action1.actingPokemonID).speed(state.field), 
+        state.getPokemonObj(action2.actingPokemonID).speed(state.field))
   elif action1.kind == akSwitchSelection: 1
   else: -1

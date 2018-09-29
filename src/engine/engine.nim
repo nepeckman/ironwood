@@ -10,7 +10,7 @@ proc weatherDamage(pokemon: Pokemon) =
 
 proc fieldEffect(state: State, effectFn: (Pokemon) -> void, f: (Pokemon) -> bool) =
     var effectedPokemon = state.allActivePokemonObj.filter(f)
-    effectedPokemon.sort((p1, p2) => cmp(p1.speed, p2.speed), SortOrder.Descending)
+    effectedPokemon.sort((p1, p2) => cmp(p1.speed(state.field), p2.speed(state.field)), SortOrder.Descending)
     for pokemon in effectedPokemon:
       effectFn(pokemon)
 
@@ -29,6 +29,8 @@ func turn*(s: State, actions: seq[Action]): State =
   orderedActions.sort((a1, a2) => state.compareActions(a1, a2), SortOrder.Descending)
   for action in orderedActions:
     var pokemon = state.getPokemonObj(action.actingPokemonID)
+    if pokemon.fainted:
+      continue
     if action.kind == akSwitchSelection:
       var team = state.getTeam(pokemon)
       team.switchPokemon(action.actingPokemonID, action.switchTargetID)
@@ -53,7 +55,7 @@ proc newGame*(homeTeamString, awayTeamString: string): State =
   let awayTeam = parseTeam(awayTeamString, tskAway)
   var state = State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
   var activePokemon = state.allActivePokemonObj
-  activePokemon.sort((p1, p2) => cmp(p1.speed, p2.speed), SortOrder.Descending)
+  activePokemon.sort((p1, p2) => cmp(p1.speed(state.field), p2.speed(state.field)), SortOrder.Descending)
   for pokemon in activePokemon:
     if pokemon.ability.effect.activation == eakOnSwitchIn:
       state.applyAbilityEffect(pokemon)
