@@ -6,7 +6,7 @@ import
 
 type
   DamageSpread* = array[0..15, int]
-  DamageInternalState = tuple[isSTAB, defAbilitySuppressed: bool, typeEffectiveness: float]
+  DamageInternalState = tuple[defAbilitySuppressed: bool, typeEffectiveness: float]
 
 func chainMods(mods: seq[int]): int =
   result = 0x1000
@@ -74,8 +74,8 @@ func auraMod(attacker, defender: Pokemon, defAbilitySuppressed: bool): int =
 func helpingHandMod(attacker: Pokemon): int = 
   if gckHandedHelp in attacker.conditions: 0x1800 else: 0x1000
 
-func calculateBasePower(move: PokeMove, attacker, defender: Pokemon, field: Field,
-  typeEffectiveness: float, defAbilitySuppressed: bool): int =
+func calculateBasePower(move: PokeMove, attacker, defender: Pokemon, field: Field, internalState: DamageInternalState): int =
+  let (defAbilitySuppressed, typeEffectiveness) = internalState
   var bpMods: seq[int] = @[]
   bpMods.add(attacker.attackerAbilityBasePowerMod(move, defender, field, typeEffectiveness))
   if not defAbilitySuppressed: bpMods.add(defender.defenderAbilityBasePowerMod(move, attacker))
@@ -93,7 +93,7 @@ func attackerAbilityAttackMod(attacker: Pokemon, move: PokeMove, field: Field): 
     attacker.ability == "Torrent" and move.pokeType == ptWater or
     attacker.ability == "Swarm" and move.pokeType == ptBug): 0x1800
   elif (gckFireFlashed in attacker.conditions) and move.pokeType == ptFire: 0x1800
-  elif field.weather in {fwkSun, fwkHarshSun} and 
+  elif field.weather.sunny and 
     (attacker.ability == "Solar Power" and move.category == pmcSpecial or
     attacker.ability == "Flower Gift" and move.category == pmcPhysical): 0x1800
   elif (attacker.ability == "Defeatist" and attacker.currentHP <= toInt(attacker.maxHP / 2)) or
@@ -141,7 +141,7 @@ func calculateAttack(attacker: Pokemon, move: PokeMove, defender: Pokemon, field
 
 func defenderAbilityDefenseMod(defender: Pokemon, field: Field, hitsPhysical: bool): int = 
     if defender.ability == "Marvel Scale" and defender.status != sckHealthy and hitsPhysical: 0x1800
-    elif defender.ability == "Flower Gift" and field.weather in {fwkSun, fwkHarshSun} and not hitsPhysical: 0x1800
+    elif defender.ability == "Flower Gift" and field.weather.sunny and not hitsPhysical: 0x1800
     elif defender.ability == "Grass Pelt" and field.terrain == ftkGrass: 0x1800
     elif defender.ability == "Fur Coat" and hitsPhysical: 0x2000
     else: 0x1000
@@ -189,8 +189,8 @@ func defenderItemFinalMod(defender, attacker: Pokemon, move: PokeMove): int =
     attacker.ability != "Unnerve": 0x800
   else: 0x1000
 
-func doesNoDamage(move: PokeMove, attacker, defender: Pokemon, field: Field,
-  typeEffectiveness: float, defAbilitySuppressed: bool): bool =
+func doesNoDamage(move: PokeMove, attacker, defender: Pokemon, field: Field, internalState: DamageInternalState): bool =
+  let (defAbilitySuppressed, typeEffectiveness) = internalState
   move.basePower == 0 or typeEffectiveness == 0 or
     defenderProtected(defender, move) or moveFails(move, defender, attacker) or
     (not defAbilitySuppressed and hasImmunityViaAbility(defender, move, typeEffectiveness)) or
@@ -221,8 +221,8 @@ func calculateBaseDamage(attacker, defender: Pokemon, move: PokeMove, field: Fie
 
   if field.format != ffkSingles and pmmSpread in move.modifiers:
     baseDamage = pokeRound(baseDamage * 0xC00 / 0x1000)
-  if (field.weather in {fwkSun, fwkHarshSun} and move.pokeType == ptFire) or
-    (field.weather in {fwkRain, fwkHeavyRain} and move.pokeType == ptWater):
+  if (field.weather.sunny and move.pokeType == ptFire) or
+    (field.weather.rainy and move.pokeType == ptWater):
     baseDamage = pokeRound(baseDamage * 0x1800 / 0x1000)
   elif (field.weather == fwkSun and move.pokeType == ptWater) or
     (field.weather == fwkRain and move.pokeType == ptFire):
@@ -238,8 +238,8 @@ func calculateBaseDamage(attacker, defender: Pokemon, move: PokeMove, field: Fie
       baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
   return baseDamage
 
-func calculateFinalMod(attacker, defender: Pokemon, move: PokeMove, field: Field,
-  typeEffectiveness: float, defAbilitySuppressed: bool): int =
+func calculateFinalMod(attacker, defender: Pokemon, move: PokeMove, field: Field, internalState: DamageInternalState): int =
+  let (defAbilitySuppressed, typeEffectiveness) = internalState
   var finalMods: seq[int] = @[]
   let defenderSideEffects = field.sideEffects(defender.side)
   if (fseAuroraVeil in defenderSideEffects) or
@@ -279,21 +279,24 @@ func getDamageSpread*(attacker: Pokemon, defender: Pokemon, m: PokeMove, field: 
     defender.hasType(ptFlying) and getTypeMatchup(move.pokeType, ptFlying) > 1:
     typeEffectiveness = typeEffectiveness / 2
 
-  if move.doesNoDamage(attacker, defender, field, typeEffectiveness, defAbilitySuppressed):
+  let internalState: DamageInternalState = (defAbilitySuppressed: defAbilitySuppressed,
+                                            typeEffectiveness: typeEffectiveness)
+
+  if move.doesNoDamage(attacker, defender, field, internalState):
     return noDamage
 
   if pmmConsistentDamage in move.modifiers:
     return move.calculateConsistentDamage(attacker, defender)
 
   var basePower = 
-    move.calculateBasePower(attacker, defender, field, typeEffectiveness, defAbilitySuppressed)
+    move.calculateBasePower(attacker, defender, field, internalState)
   var attack = attacker.calculateAttack(move, defender, field, defAbilitySuppressed)
   var defense = defender.calculateDefense(attacker, move, field, defAbilitySuppressed)
 
   var baseDamage =
     calculateBaseDamage(attacker, defender, move, field, basePower, attack, defense)
 
-  let finalMod = calculateFinalMod(attacker, defender, move, field, typeEffectiveness, defAbilitySuppressed)
+  let finalMod = calculateFinalMod(attacker, defender, move, field, internalState)
 
   var stabMod =
     if isSTAB:
