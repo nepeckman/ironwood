@@ -392,6 +392,62 @@ suite "Abilities":
     var state = newGame(grassySurge, utility)
     check(state.field.terrain == ftkGrass)
 
+  test "Chlorophyll":
+    var state = newGame(chlorophyll, frail)
+    let venu = state.getPokemon(tskHome, 0)
+    let lando = state.getPokemon(tskAway, 0)
+    var actions = @[state.getActionByMove(venu, "Sunny Day")]
+    state = turn(state, actions)
+    actions = @[
+      state.getActionByMove(venu, "Giga Drain"),
+      state.getActionByMove(lando, "Earthquake")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(venu).currentHP == 301)
+    check(state.getPokemonState(lando).currentHP == 0)
+
+  test "Swift Swim":
+    var state = newGame(swiftswim, frail)
+    let ludi = state.getPokemon(tskHome, 0)
+    let lando = state.getPokemon(tskAway, 0)
+    var actions = @[state.getActionByMove(ludi, "Rain Dance")]
+    state = turn(state, actions)
+    actions = @[
+      state.getActionByMove(ludi, "Scald"),
+      state.getActionByMove(lando, "Earthquake")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(ludi).currentHP == 301)
+    check(state.getPokemonState(lando).currentHP == 0)
+
+  test "Sand Rush":
+    var state = newGame(sandrush, frail)
+    let drill = state.getPokemon(tskHome, 0)
+    let lando = state.getPokemon(tskAway, 0)
+    var actions = @[state.getActionByMove(drill, "Sandstorm")]
+    state = turn(state, actions)
+    actions = @[
+      state.getActionByMove(drill, "Iron Head"),
+      state.getActionByMove(lando, "Earthquake")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(drill).currentHP == 361)
+    check(state.getPokemonState(lando).currentHP == 0)
+
+  test "Slush Rush":
+    var state = newGame(slushrush, frail)
+    let slash = state.getPokemon(tskHome, 0)
+    let lando = state.getPokemon(tskAway, 0)
+    var actions = @[state.getActionByMove(slash, "Hail")]
+    state = turn(state, actions)
+    actions = @[
+      state.getActionByMove(slash, "Icicle Crash"),
+      state.getActionByMove(lando, "Earthquake")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(slash).currentHP == 291)
+    check(state.getPokemonState(lando).currentHP == 0)
+
 suite "Items":
 
   test "Choice Band":
@@ -411,7 +467,7 @@ suite "Items":
     check(state.getPokemonState(spindA).currentHP == 102)
 
   test "Choice Scarf":
-    var state = newGame(choiceScarfH, choiceScarfA)
+    var state = newGame(choiceScarf, frail)
     let ttar = state.getPokemon(tskHome, 0)
     let lando = state.getPokemon(tskAway, 0)
     var actions = @[

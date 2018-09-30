@@ -169,13 +169,41 @@ Celebi @
 - Grassy Terrain
 """
 
-const choiceScarfH* = """
+const choiceScarf* = """
 Tyranitar @ Choice Scarf
 - Crunch
 """
 
-const choiceScarfA* = """
+const frail* = """
 Landorus-Therian @
 Ability: Fraility
 - Earthquake
+"""
+
+const chlorophyll* = """
+Venusaur @
+Ability: Chlorophyll
+- Sunny Day
+- Giga Drain
+"""
+
+const swiftswim* = """
+Ludicolo @
+Ability: Swift Swim
+- Rain Dance
+- Scald
+"""
+
+const sandrush* = """
+Excadrill @
+Ability: Sand Rush
+- Sandstorm
+- Iron Head
+"""
+
+const slushrush* = """
+Sandslash-Alola @
+Ability: Slush Rush
+- Hail
+- Icicle Crash
 """
