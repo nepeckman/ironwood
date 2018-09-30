@@ -214,6 +214,14 @@ suite "Terrain":
     state = turn(state, action)
     check(state.field.terrain == ftkNone)
 
+  test "Levitating Pokemon do not receive benefits":
+    var state = newGame(mistySurge, deltaStream)
+    let fini = state.getPokemon(tskHome, 0)
+    let ray = state.getPokemon(tskAway, 0)
+    let action = @[state.getActionByMove(fini, "Dragon Pulse")]
+    state = turn(state, action)
+    check(state.getPokemonState(ray).currentHP == 222)
+
   test "Psychic - Boost Psychic moves":
     var state = newGame(psychicSurge, technician)
     let lele = state.getPokemon(tskHome, 0)
@@ -446,6 +454,20 @@ suite "Abilities":
     ]
     state = turn(state, actions)
     check(state.getPokemonState(slash).currentHP == 291)
+    check(state.getPokemonState(lando).currentHP == 0)
+
+  test "Surge Surfer":
+    var state = newGame(surgesurfer, frail)
+    let pika = state.getPokemon(tskHome, 0)
+    let lando = state.getPokemon(tskAway, 0)
+    var actions = @[state.getActionByMove(pika, "Electric Terrain")]
+    state = turn(state, actions)
+    actions = @[
+      state.getActionByMove(pika, "Surf"),
+      state.getActionByMove(lando, "Earthquake")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(pika).currentHP == 211)
     check(state.getPokemonState(lando).currentHP == 0)
 
 suite "Items":

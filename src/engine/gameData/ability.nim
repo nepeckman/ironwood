@@ -40,3 +40,7 @@ func weatherSpeedBoost*(ability: Ability, weather: FieldWeatherKind): float =
   elif ability == "Sand Rush" and weather == fwkSand: 2f
   elif ability == "Slush Rush" and weather == fwkHail: 2f
   else: 1f
+
+func terrainSpeedBoost*(ability: Ability, terrain: FieldTerrainKind): float =
+  if ability == "Surge Surfer" and terrain == ftkElectric: 2f
+  else: 1f

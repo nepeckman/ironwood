@@ -104,6 +104,8 @@ func getSpeedMod(mon: Pokemon, field: Field): float =
     mods.add(0.5f)
   if mon.ability.weatherSpeedAbility:
     mods.add(mon.ability.weatherSpeedBoost(field.weather))
+  if mon.ability.terrainSpeedAbility:
+    mods.add(mon.ability.terrainSpeedBoost(field.terrain))
   for m in mods:
     result = result * m
 

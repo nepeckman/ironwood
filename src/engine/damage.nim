@@ -233,8 +233,9 @@ func calculateBaseDamage(attacker, defender: Pokemon, move: PokeMove, field: Fie
       (field.terrain == ftkPsychic and move.pokeType == ptPsychic) or
       (field.terrain == ftkElectric and move.pokeType == ptElectric):
       baseDamage = pokeRound(baseDamage * 0x1800 / 0x1000)
-    elif (field.terrain == ftkFairy and move.pokeType == ptDragon) or
-      (field.terrain == ftkGrass and move in ["Bulldoze", "Earthquake"]):
+  if isGrounded(defender, field) and field.terrain == ftkFairy and move.pokeType == ptDragon:
+      baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
+  if field.terrain == ftkGrass and move in ["Bulldoze", "Earthquake"]:
       baseDamage = pokeRound(baseDamage * 0x800 / 0x1000)
   return baseDamage
 

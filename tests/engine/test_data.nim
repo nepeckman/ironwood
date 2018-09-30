@@ -207,3 +207,10 @@ Ability: Slush Rush
 - Hail
 - Icicle Crash
 """
+
+const surgesurfer* = """
+Pikachu @
+Ability: Surge Surfer
+- Electric Terrain
+- Surf
+"""
