@@ -21,4 +21,7 @@ proc getPokeMove*(name: string): PokeMove =
       toPokeMoveTarget(moveData["targets"].getStr())
     else: pmtSelectedTarget
   let effect = parseEffect(moveData)
-  newMove(name, category, target, basePower, effect, pokeType, 0, {})
+  let zPower =
+    if moveData.hasKey("zp"): moveData["zp"].getInt()
+    else: 0
+  newMove(name, category, target, basePower, effect, pokeType, 0, {}, zPower, nil)

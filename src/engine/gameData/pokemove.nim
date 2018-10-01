@@ -23,6 +23,8 @@ type
     pokeType*: PokeType
     priority: int
     modifiers*: set[PokeMoveModifiers]
+    zPower: int
+    zEffect: Effect
 
 
 func copy*(move: PokeMove): PokeMove =
@@ -34,18 +36,21 @@ func copy*(move: PokeMove): PokeMove =
     effect: move.effect,
     pokeType: move.pokeType,
     priority: move.priority,
-    modifiers: move.modifiers
+    modifiers: move.modifiers,
+    zPower: move.zPower,
+    zEffect: move.zEffect
   )
 
 func newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, basePower: int,
-  effect: Effect, pokeType: Poketype, priority: int, modifiers: set[PokeMoveModifiers]): PokeMove =
+              effect: Effect, pokeType: Poketype, priority: int, modifiers: set[PokeMoveModifiers],
+              zPower: int, zEffect: Effect): PokeMove =
   PokeMove(
     name: name,
     category: category,
     target: target,
     basePower: basePower,
     effect: effect,
-pokeType: pokeType,
+    pokeType: pokeType,
     priority: priority,
     modifiers: modifiers
   )
@@ -58,6 +63,8 @@ func effect*(move: PokeMove): Effect = move.effect
 func pokeType*(move: PokeMove): PokeType = move.pokeType
 func priority*(move: PokeMove): int = move.priority
 func modifiers*(move: PokeMove): set[PokeMoveModifiers] = move.modifiers
+func zPower*(move: PokeMove): int = move.zPower
+func zEffect*(move: PokeMove): Effect = move.zEffect
 #TODO: For all flags and modifier sets: provide methods to check them, don't export enums
 
 func `==`*(move: PokeMove, s: string): bool = move.name == s
