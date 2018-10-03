@@ -14,5 +14,5 @@ requires "uuids 0.1.10"
 
 task testengine, "Runs tests against the game engine":
   exec "mkdir -p ./build/tests"
-  exec "nimble c -o:./build/tests/engine tests/engine/engine_test.nim"
+  exec "nimble c -o:./build/tests/engine tests/engine/engine_test.nim --warning[ProveField]: on"
   exec "./build/tests/engine"

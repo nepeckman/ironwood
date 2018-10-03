@@ -4,8 +4,8 @@ import poketype, fieldConditions
 type
 
   ItemKind* = enum
-    ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal, ikTerrainSeed,
-    ikPinchBerry , ikLifeOrb, ikLeftovers, ikShellBell, ikPokemonExclusive, ikFocusSash,
+    ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal, ikCustomZCrystal,
+    ikTerrainSeed, ikPinchBerry , ikLifeOrb, ikLeftovers, ikShellBell, ikPokemonExclusive, ikFocusSash,
     ikEviolite, ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb, ikRockyHelmet,
     ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique
 
@@ -13,11 +13,14 @@ type
     consumable: bool
     name: string
     case kind: ItemKind
-    of ikGem, ikTypeBoost, ikZCrystal, ikResistBerry,
+    of ikGem, ikTypeBoost, ikResistBerry, ikZCrystal,
       ikDrive, ikMemory, ikPlate: associatedType: PokeType
     of ikTerrainSeed: associatedTerrain: FieldTerrainKind
     of ikPinchBerry: activationPercent, restorePercent: int
     of ikMegaStone, ikPokemonExclusive: associatedPokemonName: string
+    of ikCustomZCrystal: 
+      pName, pMove: string
+      pType: PokeType
     of ikLifeOrb, ikLeftovers, ikShellBell, ikFocusSash, ikEviolite,
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique: discard

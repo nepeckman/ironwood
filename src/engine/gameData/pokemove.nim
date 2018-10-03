@@ -1,5 +1,5 @@
 import strutils
-import poketype, effects
+import poketype, item, effects
 
 type
 
@@ -53,6 +53,21 @@ func newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, 
     pokeType: pokeType,
     priority: priority,
     modifiers: modifiers
+  )
+
+func zStandardMove*(move: PokeMove): PokeMove =
+  let isStatus = move.category == pmcStatus
+  let target = if isStatus: move.target else: pmtSelectedTarget
+  let priority = if isStatus: move.priority else: 0
+  PokeMove(
+    name: "Z-" & move.name,
+    category: move.category,
+    target: target,
+    basePower: move.zPower,
+    effect: move.zEffect,
+    pokeType: move.pokeType,
+    priority: priority,
+    modifiers: {}
   )
 
 func name*(move: PokeMove): string = move.name
