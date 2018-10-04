@@ -5,14 +5,16 @@ import
   gameObjects/gameObjects,
   state, action
 
-func moveValidator(pokemon: Pokemon, move: PokeMove): bool =
-  `not`((gckTaunted in pokemon.conditions or pokemon.item == "Assualt Vest") and move.category == pmcStatus)
+func moveValidator(pokemon: Pokemon, move: PokeMove, state: State): bool =
+  let allyTeam = state.getTeam(pokemon)
+  `not`((gckTaunted in pokemon.conditions or pokemon.item == "Assualt Vest") and move.category == pmcStatus) and
+    `not`(move.isZ and allyTeam.isZUsed)
   # TODO: Choice lock, tormet lock. Both can be done by implementing last move used. Also would help mimic.
   # Disabled lock
   # Check move failure, don't provide moves that will always fail
 
-func possibleMoves*(pokemon: Pokemon): seq[PokeMove] =
-  pokemon.moves.filter((move) => moveValidator(pokemon, move))
+func possibleMoves*(state: State, pokemon: Pokemon): seq[PokeMove] =
+  pokemon.moves.filter((move) => moveValidator(pokemon, move, state))
 
 func possibleTargets*(state: State, move: PokeMove): seq[set[AttackTargetKind]] =
   case move.target
@@ -61,7 +63,7 @@ func possibleActions*(state: State, pokemonID: UUID): seq[Action] =
   result = @[]
   let pokemon = state.getPokemonObj(pokemonID)
   let team = state.getTeam(pokemon)
-  for move in possibleMoves(pokemon):
+  for move in state.possibleMoves(pokemon):
     for targets in possibleTargets(state, move):
       result.add(newMoveAction(pokemon.uuid, move, targets))
   for teammate in team:

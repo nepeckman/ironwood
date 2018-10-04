@@ -55,7 +55,7 @@ func newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, 
     modifiers: modifiers
   )
 
-func zStandardMove*(move: PokeMove): PokeMove =
+func regularZMove*(move: PokeMove): PokeMove =
   let isStatus = move.category == pmcStatus
   let target = if isStatus: move.target else: pmtSelectedTarget
   let priority = if isStatus: move.priority else: 0
@@ -80,6 +80,7 @@ func priority*(move: PokeMove): int = move.priority
 func modifiers*(move: PokeMove): set[PokeMoveModifiers] = move.modifiers
 func zPower*(move: PokeMove): int = move.zPower
 func zEffect*(move: PokeMove): Effect = move.zEffect
+func isZ*(move: PokeMove): bool = move.name[0..1] == "Z-"
 #TODO: For all flags and modifier sets: provide methods to check them, don't export enums
 
 func `==`*(move: PokeMove, s: string): bool = move.name == s

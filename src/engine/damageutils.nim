@@ -189,4 +189,4 @@ func boostedKnockOff*(defender: Pokemon): bool =
     not (defender.name == "Arceus" and defender.item.kind == ikPlate) and
     not (defender.name == "Genesect" and defender.item.kind == ikDrive) and
     not (defender.ability == "RKS System" and defender.item.kind == ikMemory) and
-    not (defender.item.kind in {ikZCrystal, ikCustomZCrystal, ikMegaStone})
+    not (defender.item.kind in {ikZCrystal, ikMegaStone})

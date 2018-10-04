@@ -4,7 +4,7 @@ import poketype, fieldConditions
 type
 
   ItemKind* = enum
-    ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal, ikCustomZCrystal,
+    ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal,
     ikTerrainSeed, ikPinchBerry , ikLifeOrb, ikLeftovers, ikShellBell, ikPokemonExclusive, ikFocusSash,
     ikEviolite, ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb, ikRockyHelmet,
     ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique
@@ -18,9 +18,6 @@ type
     of ikTerrainSeed: associatedTerrain: FieldTerrainKind
     of ikPinchBerry: activationPercent, restorePercent: int
     of ikMegaStone, ikPokemonExclusive: associatedPokemonName: string
-    of ikCustomZCrystal: 
-      pName, pMove: string
-      pType: PokeType
     of ikLifeOrb, ikLeftovers, ikShellBell, ikFocusSash, ikEviolite,
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique: discard
@@ -74,3 +71,10 @@ func getFlingPower*(item: Item): int =
   "Smooth Rock", "Soft Sand", "Soothe Bell", "White Herb", "Wide Lens", "Wise Glasses", "Zoom Lens"]: 10
   else: 0
 
+func isCustomZCrystal*(item: Item): bool =
+  item in ["Eeveeium Z"]
+
+func customZInfo*(item: Item): tuple[pokemonName: string, moveName: string] =
+  case item.name
+  of "Eeveeium Z": (pokemonName: "Eevee", moveName: "Last Resort")
+  else: (pokemonName: "", moveName: "")

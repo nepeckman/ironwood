@@ -1,4 +1,4 @@
-import math, hashes, uuids
+import math, hashes, uuids, sequtils, sugar
 import ../gameData/[pokemonData, item, poketype, pokemove, condition, effects, ability]
 import field
 
@@ -60,12 +60,22 @@ func currentHP*(mon: Pokemon): int = mon.currentHP
 func pokeType1*(mon: Pokemon): PokeType = mon.data.pokeType1
 func pokeType2*(mon: Pokemon): PokeType = mon.data.pokeType2
 func dataFlags*(mon: Pokemon): set[PokemonDataFlags] = mon.data.dataFlags
-func moves*(mon: Pokemon): seq[PokeMove] = mon.pokeSet.moves
 func level*(mon: Pokemon): int = mon.pokeSet.level
 func gender*(mon: Pokemon): PokeGenderKind = mon.pokeSet.gender
 
 func item*(mon: Pokemon): Item = mon.currentItem
 func ability*(mon: Pokemon): Ability = mon.currentAbility
+
+func zMoves(mon: Pokemon): seq[PokeMove] =
+  if not mon.item.isCustomZCrystal:
+    mon.pokeSet.moves
+      .filter((move) => move.pokeType == mon.item.associatedType)
+      .map((move) => regularZMove(move))
+  else: @[]
+
+func moves*(mon: Pokemon): seq[PokeMove] =
+  if mon.item.kind == ikZCrystal: concat(mon.pokeSet.moves, mon.zMoves)
+  else: mon.pokeSet.moves
 
 proc resetAbility*(mon: Pokemon) =
   mon.currentAbility = mon.pokeSet.ability

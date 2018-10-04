@@ -7,15 +7,17 @@ type
   Team* = ref object
     members: seq[Pokemon]
     side*: TeamSideKind
+    isZUsed*: bool
+    isMegaUsed*: bool
 
 func makeTeam*(members: seq[Pokemon], side: TeamSideKind): Team =
-  Team(members: members, side: side)
+  Team(members: members, side: side, isZUsed: false, isMegaUsed: false)
 
 func copy*(team: Team): Team =
   var members: seq[Pokemon] = @[]
   for mon in team.members:
     members.add(copy(mon))
-  Team(members: members, side: team.side)
+  Team(members: members, side: team.side, isZUsed: team.isZUsed, isMegaUsed: team.isMegaUsed)
 
 proc switchPokemon*(team: Team, actingPokemonID, switchTargetID: UUID) =
   let actingIdx = team.members.find(actingPokemonID)
