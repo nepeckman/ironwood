@@ -3,7 +3,7 @@
 version       = "0.0.1"
 author        = "Nicolas Peckman"
 description   = "Pokemon analysis software"
-license       = "GPLv3"
+license       = "AGPLv3"
 srcDir        = "src"
 bin           = @["ironwood"]
 
