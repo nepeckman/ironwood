@@ -499,3 +499,13 @@ suite "Items":
     state = turn(state, actions)
     check(state.getPokemonState(ttar).currentHP == 341)
     check(state.getPokemonState(lando).currentHP == 0)
+
+  test "Firium Z":
+    var state = newGame(firiumZ, firiumZ)
+    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeA = state.getPokemon(tskAway, 0)
+    var action = @[
+      state.getActionByMove(blazeH, "Z-Fire Blast")
+    ]
+    state = turn(state, action)
+    check(state.getPokemonState(blazeA).currentHP == 144)

@@ -52,7 +52,9 @@ func newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, 
     effect: effect,
     pokeType: pokeType,
     priority: priority,
-    modifiers: modifiers
+    modifiers: modifiers,
+    zPower: zPower,
+    zEffect: zEffect
   )
 
 func regularZMove*(move: PokeMove): PokeMove =

@@ -55,6 +55,11 @@ Spinda @ Choice Specs
 - Hyper Voice
 """
 
+const firiumZ* = """
+Blaziken @ Firium Z
+- Fire Blast
+"""
+
 const sunnyDay* = """
 Blaziken @
 - Sunny Day

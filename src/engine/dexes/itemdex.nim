@@ -1,6 +1,6 @@
 import
   json, os, strutils,
-  ../gameData/[item],
+  ../gameData/[item, poketype],
   rawDataImporter
 
 const itemdexstring = staticRead("rawdata/itemdex" & fileSuffix)
@@ -13,5 +13,9 @@ proc getItem*(name: string): Item =
   try:
     itemData = itemdex[name]
   except KeyError:
-    return newItem(name)
-  newItem(name)
+    return newUniqueItem(name)
+  let kind = toItemKind(itemData["kind"].getStr())
+
+  return case kind
+  of ikZCrystal: newZCrystal(name, toPokeType(itemData["type"].getStr()))
+  else: newUniqueItem(name)
