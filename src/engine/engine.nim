@@ -29,10 +29,10 @@ func turn*(s: State, actions: seq[Action]): State =
   orderedActions.sort((a1, a2) => state.compareActions(a1, a2), SortOrder.Descending)
   for action in orderedActions:
     var pokemon = state.getPokemonObj(action.actingPokemonID)
+    var team = state.getTeam(pokemon)
     if pokemon.fainted:
       continue
     if action.kind == akSwitchSelection:
-      var team = state.getTeam(pokemon)
       team.switchPokemon(action.actingPokemonID, action.switchTargetID)
       let switchIn = state.getPokemonObj(action.switchTargetID)
       if switchIn.ability.effect.activation == eakOnSwitchIn:
@@ -44,6 +44,8 @@ func turn*(s: State, actions: seq[Action]): State =
         target.takeDamage(damage)
         if action.move.effect.activation == eakAfterAttack:
           state.applyMoveEffect(pokemon, target, action.move.effect)
+        if action.move.isZ:
+          team.isZUsed = true
 
     state.assessWeather()
 

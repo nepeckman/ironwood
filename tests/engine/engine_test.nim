@@ -265,6 +265,7 @@ suite "Terrain":
     state = turn(state, action)
     check(state.getPokemonState(bulu).currentHP == 230)
 
+
 suite "Moves":
 
   test "Swords Dance":
@@ -509,3 +510,20 @@ suite "Items":
     ]
     state = turn(state, action)
     check(state.getPokemonState(blazeA).currentHP == 144)
+
+suite "Z Moves":
+
+  test "One Z move per game":
+    var state = newGame(firiumZ, firiumZ)
+    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeA = state.getPokemon(tskAway, 0)
+    var action = @[
+      state.getActionByMove(blazeH, "Z-Fire Blast")
+    ]
+    state = turn(state, action)
+    expect CatchableError:
+      discard state.getActionByMove(blazeH, "Z-Fire Blast")
+    action = @[
+      state.getActionByMove(blazeA, "Z-Fire Blast")
+    ]
+    state = turn(state, action)
