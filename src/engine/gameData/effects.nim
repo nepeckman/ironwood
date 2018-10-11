@@ -2,7 +2,7 @@ import condition, poketype, fieldConditions
 type
 
   EffectActivationKind* = enum
-    eakTurnStart, eakTurnEnd eakBeforeAttack, eakAfterAttack, eakOnSwitchIn, eakOnSwitchOut, eakPassive
+    eakTurnStart, eakTurnEnd, eakBeforeAttack, eakDuringAttack, eakAfterAttack, eakOnSwitchIn, eakOnSwitchOut, eakPassive
 
   EffectTargetKind* = enum
     etkField, etkSelf, etkPokemon, etkNone
@@ -54,6 +54,7 @@ func toEffectActivation*(str: string): EffectActivationKind =
   of "TurnStart": eakTurnStart
   of "TurnEnd": eakTurnEnd
   of "BeforeAttack": eakBeforeAttack
+  of "DuringAttack": eakDuringAttack
   of "AfterAttack": eakAfterAttack
   of "OnSwitchIn": eakOnSwitchIn
   of "OnSwitchOut": eakOnSwitchOut

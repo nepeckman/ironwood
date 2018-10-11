@@ -1,5 +1,5 @@
 import strutils
-import poketype, fieldConditions
+import poketype, fieldConditions, effects
 
 type
 
@@ -12,6 +12,7 @@ type
   Item* = ref object
     consumable: bool
     name: string
+    effect: Effect
     case kind: ItemKind
     of ikGem, ikTypeBoost, ikResistBerry, ikZCrystal,
       ikDrive, ikMemory, ikPlate: associatedType: PokeType
@@ -22,7 +23,7 @@ type
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique: discard
 
-func newUniqueItem*(name: string, consumable = false): Item =
+func newUniqueItem*(name: string, effect: Effect = nil, consumable = false): Item =
   Item(name: name, consumable: consumable, kind: ikUnique)
 
 func newZCrystal*(name: string, associatedType: PokeType): Item =
@@ -36,6 +37,9 @@ func name*(item: Item): string =
 
 func consumable*(item: Item): bool =
   if isNil(item): false else: item.consumable
+
+func effect*(item: Item): Effect =
+  if isNil(item): nil else: item.effect
 
 func associatedType*(item: Item): PokeType = item.associatedType
 func associatedTerrain*(item: Item): FieldTerrainKind = item.associatedTerrain
