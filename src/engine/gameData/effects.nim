@@ -8,7 +8,7 @@ type
     etkField, etkSelf, etkPokemon, etkNone
 
   EffectKind* = enum
-    ekStatus, ekCondition, ekBoost, ekHP, ekTypeChange, ekForceSwitch, 
+    ekStatus, ekCondition, ekBoost, ekHP, ekHPPercent, ekTypeChange, ekForceSwitch, 
     ekWeather, ekTerrain, ekNull
 
   Effect* = ref object of RootObj
@@ -19,6 +19,7 @@ type
     of ekCondition: condition: GeneralConditionKind
     of ekBoost: boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int]
     of ekHP: hpChange: int
+    of ekHPPercent: hpPercentChange: int
     of ekTypeChange: typeChange: PokeType
     of ekForceSwitch: isRandom: bool
     of ekWeather: weather: FieldWeatherKind

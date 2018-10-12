@@ -81,3 +81,8 @@ func toPokeType*(typeString: string): PokeType =
   of "bug": ptBug
   of "flying": ptFlying
   else: ptNull
+
+func toItemKind*(kind: string): ItemKind =
+  case kind
+  of "Z Crystal": ikZCrystal
+  else: ikUnique

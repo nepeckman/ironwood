@@ -1,7 +1,7 @@
 import
   json, os, strutils,
   ../gameData/[item, poketype],
-  dexutils
+  dexutils, effectParser
 
 const itemdexstring = staticRead("rawdata/itemdex" & fileSuffix)
 
@@ -15,7 +15,11 @@ proc getItem*(name: string): Item =
   except KeyError:
     return newUniqueItem(name)
   let kind = toItemKind(itemData["kind"].getStr())
+  let consumable = itemData.hasKey("isConsumable")
+  let effect =
+    if itemData.hasKey("effect"): parseEffect(itemData["effect"])
+    else: nil
 
   return case kind
   of ikZCrystal: newZCrystal(name, toPokeType(itemData["type"].getStr()))
-  else: newUniqueItem(name)
+  else: newUniqueItem(name, effect, consumable)

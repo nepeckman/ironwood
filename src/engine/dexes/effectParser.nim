@@ -26,7 +26,7 @@ proc parseEffect*(data: JsonNode): Effect =
     if data.hasKey("activation"): toEffectActivation(data["activation"].getStr())
     else: eakPassive
 
-  if data.hasKey("boostChange"):
+  return if data.hasKey("boostChange"):
     let boosts = parseBoostChange(data["boostChange"])
     newBoostEffect(target, boosts, activation)
   elif data.hasKey("weatherChange"):

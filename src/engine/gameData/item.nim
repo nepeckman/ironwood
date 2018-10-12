@@ -24,7 +24,7 @@ type
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique: discard
 
 func newUniqueItem*(name: string, effect: Effect = nil, consumable = false): Item =
-  Item(name: name, consumable: consumable, kind: ikUnique)
+  Item(name: name, consumable: consumable, kind: ikUnique, effect: effect)
 
 func newZCrystal*(name: string, associatedType: PokeType): Item =
   Item(name: name, consumable: false, kind: ikZCrystal, associatedType: associatedType)
@@ -85,8 +85,3 @@ func customZInfo*(item: Item): tuple[pokemonName: string, moveName: string] =
   case item.name
   of "Eeveeium Z": (pokemonName: "Eevee", moveName: "Last Resort")
   else: (pokemonName: "", moveName: "")
-
-func toItemKind*(kind: string): ItemKind =
-  case kind
-  of "Z Crystal": ikZCrystal
-  else: ikUnique
