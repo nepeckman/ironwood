@@ -20,7 +20,9 @@ proc getPokeMove*(name: string): PokeMove =
     if moveData.hasKey("targets"):
       toPokeMoveTarget(moveData["targets"].getStr())
     else: pmtSelectedTarget
-  let effect = parseEffect(moveData)
+  let effect = 
+    if moveData.hasKey("effect"): parseEffect(moveData["effect"])
+    else: nil
   let zPower =
     if moveData.hasKey("zp"): moveData["zp"].getInt()
     else: 0

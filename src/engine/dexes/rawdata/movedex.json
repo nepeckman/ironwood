@@ -429,12 +429,14 @@
     "bp": 0,
     "type": "Normal",
     "category": "Status",
-    "boostChange": {
-      "atk": 2
-    },
     "targets": "Self",
-    "effectTargets": "Self",
-    "activation": "AfterAttack"
+    "effect": {
+        "boostChange": {
+          "atk": 2
+        },
+        "effectTargets": "Self",
+        "activation": "AfterAttack"
+    }
   },
   "Tackle": {
     "bp": 40,
@@ -911,50 +913,66 @@
   "Sunny Day": {
     "bp": 0,
     "type": "Fire",
-    "weatherChange": "Sun",
-    "activation": "AfterAttack"
+    "effect": {
+        "weatherChange": "Sun",
+        "activation": "AfterAttack"
+    }
   },
   "Rain Dance": {
     "bp": 0,
     "type": "Water",
-    "weatherChange": "Rain",
-    "activation": "AfterAttack"
+    "effect": {
+        "weatherChange": "Rain",
+        "activation": "AfterAttack"
+    }
   },
   "Sandstorm": {
     "bp": 0,
     "type": "Rock",
-    "weatherChange": "Sand",
-    "activation": "AfterAttack"
+    "effect": {
+        "weatherChange": "Sand",
+        "activation": "AfterAttack"
+    }
   },
   "Hail": {
     "bp": 0,
     "type": "Ice",
-    "weatherChange": "Hail",
-    "activation": "AfterAttack"
+    "effect": {
+        "weatherChange": "Hail",
+        "activation": "AfterAttack"
+    }
   },
   "Psychic Terrain": {
     "bp": 0,
     "type": "Psychic",
-    "terrainChange": "Psychic",
-    "activation": "AfterAttack"
+    "effect": {
+        "terrainChange": "Psychic",
+        "activation": "AfterAttack"
+    }
   },
   "Electric Terrain": {
     "bp": 0,
     "type": "Electric",
-    "terrainChange": "Electric",
-    "activation": "AfterAttack"
+    "effect": {
+        "terrainChange": "Electric",
+        "activation": "AfterAttack"
+    }
   },
   "Misty Terrain": {
     "bp": 0,
     "type": "Fairy",
-    "terrainChange": "Fairy",
-    "activation": "AfterAttack"
+    "effect": {
+        "terrainChange": "Fairy",
+        "activation": "AfterAttack"
+    }
   },
   "Grassy Terrain": {
     "bp": 0,
     "type": "Grass",
-    "terrainChange": "Grass",
-    "activation": "AfterAttack"
+    "effect": {
+        "terrainChange": "Grass",
+        "activation": "AfterAttack"
+    }
   },
   "Swagger": {
     "bp": 0,
