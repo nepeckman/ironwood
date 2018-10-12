@@ -19,25 +19,6 @@ type
 
   TeamSideKind* = enum tskHome, tskAway
 
-func toWeather*(weather: string): FieldWeatherKind =
-  case weather
-  of "Sun": fwkSun
-  of "Rain": fwkRain
-  of "Sand": fwkSand
-  of "Hail": fwkHail
-  of "HeavyRain": fwkHeavyRain
-  of "HarshSun": fwkHarshSun
-  of "StrongWinds": fwkStrongWinds
-  else: fwkNone
-
-func toTerrain*(terrain: string): FieldTerrainKind =
-  case terrain
-  of "Psychic": ftkPsychic
-  of "Electric": ftkElectric
-  of "Fairy": ftkFairy
-  of "Grass": ftkGrass
-  else: ftkNone
-
 func normalWeather*(weather: FieldWeatherKind): bool =
   weather in {fwkSun, fwkRain, fwkSand, fwkHail}
 

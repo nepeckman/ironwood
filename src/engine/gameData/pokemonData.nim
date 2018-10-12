@@ -53,9 +53,6 @@ func newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: Po
     dataFlags: dataFlags
   )
 
-func stringToNature*(nature: string): PokeNature =
-  parseEnum[PokeNature]("pn" & nature, pnBashful)
-
 func calculateHP(baseHP: int, hpIV: int, hpEV: int, level: int): int =
   let numerator = (2 * baseHP + hpIV + toInt(floor(hpEV / 4))) * level
   toInt(floor(numerator / 100)) + level + 10

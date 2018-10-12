@@ -1,7 +1,7 @@
 import
   json, os,
   ../gameData/[pokemove, poketype, effects],
-  effectParser, rawDataImporter
+  effectParser, dexutils
 
 const movedexString = staticRead("rawdata/movedex" & fileSuffix)
 

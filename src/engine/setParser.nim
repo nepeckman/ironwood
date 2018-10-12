@@ -48,7 +48,7 @@ proc tokenize(teamString: string): seq[PokeTokens] =
     elif line =~ peg"\s* '-' \s* {.*}":
       result[result.len - 1].moves.add(matches[0])
     elif line =~ peg"\s* {\w*} \s* 'Nature' \s*":
-      result[result.len - 1].nature = stringToNature(matches[0])
+      result[result.len - 1].nature = toPokemonNature(matches[0])
 
 proc parseTeam*(teamString: string, side: TeamSideKind): Team =
   var pokeTokens = tokenize(teamString)

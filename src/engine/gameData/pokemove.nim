@@ -1,4 +1,3 @@
-import strutils
 import poketype, item, effects
 
 type
@@ -90,17 +89,3 @@ func `==`*(move: PokeMove, s: string): bool = move.name == s
 func `==`*(s: string, move: PokeMove): bool = move.name == s
 
 func `contains`*(arr: openArray[string], move: PokeMove): bool = find(arr, move.name) >= 0
-
-func toPokeMoveCategory*(category: string): PokeMoveCategory =
-  case category.toLowerAscii
-  of "physical": pmcPhysical
-  of "special": pmcSpecial
-  else: pmcStatus
-
-func toPokeMoveTarget*(target: string): PokeMoveTarget =
-  case target
-  of "Self": pmtUser
-  of "Ally": pmtAlly
-  of "AllOthers": pmtAllOthers
-  of "AllOpponents": pmtAllOpponents
-  else: pmtSelectedTarget

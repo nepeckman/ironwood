@@ -1,7 +1,7 @@
 import
   json, os, strutils,
   ../gameData/[item, poketype],
-  rawDataImporter
+  dexutils
 
 const itemdexstring = staticRead("rawdata/itemdex" & fileSuffix)
 

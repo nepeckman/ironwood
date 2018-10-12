@@ -43,23 +43,6 @@ func isRandom*(effect: Effect): bool = effect.isRandom
 func weather*(effect: Effect): FieldWeatherKind = effect.weather
 func terrain*(effect: Effect): FieldTerrainKind = effect.terrain
 
-func toEffectTarget*(str: string): EffectTargetKind =
-  case str
-  of "Field": etkField
-  of "Self": etkSelf
-  else: etkPokemon
-
-func toEffectActivation*(str: string): EffectActivationKind =
-  case str
-  of "TurnStart": eakTurnStart
-  of "TurnEnd": eakTurnEnd
-  of "BeforeAttack": eakBeforeAttack
-  of "DuringAttack": eakDuringAttack
-  of "AfterAttack": eakAfterAttack
-  of "OnSwitchIn": eakOnSwitchIn
-  of "OnSwitchOut": eakOnSwitchOut
-  else: eakPassive
-
 func newBoostEffect*(target: EffectTargetKind, 
                      boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int],
                      activation = eakAfterAttack): Effect =

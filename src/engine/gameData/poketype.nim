@@ -31,25 +31,3 @@ const PokeTypeEffectiveness = {
 
 func getTypeMatchup*(attackerType, defenderType: PokeType): float =
   if defenderType in PokeTypeEffectiveness[attackerType]: PokeTypeEffectiveness[attackerType][defenderType] else: 1
-
-func toPokeType*(typeString: string): PokeType =
-  case toLowerAscii(typestring)
-  of "water": ptWater
-  of "fire": ptFire
-  of "electric": ptElectric
-  of "dark": ptDark
-  of "psychic": ptPsychic
-  of "grass": ptGrass
-  of "ice": ptIce
-  of "dragon": ptDragon
-  of "fairy": ptFairy
-  of "normal": ptNormal
-  of "fighting": ptFighting
-  of "rock": ptRock
-  of "ground": ptGround
-  of "steel": ptSteel
-  of "ghost": ptGhost
-  of "posion": ptPoison
-  of "bug": ptBug
-  of "flying": ptFlying
-  else: ptNull

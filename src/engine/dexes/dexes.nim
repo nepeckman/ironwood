@@ -1,3 +1,3 @@
-import pokedex, movedex, abilitydex, itemdex
+import pokedex, movedex, abilitydex, itemdex, dexutils
 
-export pokedex, movedex, abilitydex, itemdex
+export pokedex, movedex, abilitydex, itemdex, dexutils

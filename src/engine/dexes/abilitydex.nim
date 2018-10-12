@@ -1,7 +1,7 @@
 import
   json, os, strutils,
   ../gameData/[effects, ability],
-  effectParser, rawDataImporter
+  effectParser, dexutils
 
 const abilitydexString = staticRead("rawdata/abilitydex" & fileSuffix)
 

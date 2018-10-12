@@ -1,7 +1,7 @@
 import
   json, os,
   ../gameData/[pokemonData, poketype],
-  rawDataImporter
+  dexutils
 
 const pokedexString = staticRead("rawdata/pokedex" & fileSuffix)
 

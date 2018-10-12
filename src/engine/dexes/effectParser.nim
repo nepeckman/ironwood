@@ -1,6 +1,7 @@
 import
   json,
-  ../gameData/gameData
+  ../gameData/gameData,
+  dexutils
 
 proc parseBoostChange(boostData: JsonNode):
                         tuple[atk: int, def: int, spa: int, spd: int, spe: int] =
