@@ -86,4 +86,5 @@ func toItemKind*(kind: string): ItemKind =
   case kind
   of "Z Crystal": ikZCrystal
   of "Pinch Berry": ikPinchBerry
+  of "Resist Berry": ikResistBerry
   else: ikUnique

@@ -520,6 +520,25 @@ suite "Items":
     state = turn(state, action)
     check(state.getPokemonState(venu).currentHP == 186)
 
+  test "Resist Berries - Should be consumed":
+    var state = newGame(occaBerryAttacker, occaBerry)
+    let heatran = state.getPokemon(tskHome, 0)
+    let venu = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(heatran, "Hidden Power Fire")]
+    state = turn(state, action)
+    check(state.getPokemonState(venu).currentHP == 212)
+    state = turn(state, action)
+    check(state.getPokemonState(venu).currentHP == 34)
+
+
+  test "Occa Berry":
+    var state = newGame(occaBerryAttacker, occaBerry)
+    let heatran = state.getPokemon(tskHome, 0)
+    let venu = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(heatran, "Hidden Power Fire")]
+    state = turn(state, action)
+    check(state.getPokemonState(venu).currentHP == 212)
+
   test "Z moves - One Z move per game":
     var state = newGame(firiumZ, firiumZ)
     let blazeH = state.getPokemon(tskHome, 0)

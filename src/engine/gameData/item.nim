@@ -32,6 +32,9 @@ func newZCrystal*(name: string, associatedType: PokeType): Item =
 func newPinchBerry*(name: string, activationPercent: int, effect: Effect): Item =
   Item(name: name, consumable: true, kind: ikPinchBerry, activationPercent: activationPercent, effect: effect)
 
+func newResistBerry*(name: string, associatedType: PokeType): Item =
+  Item(name: name, consumable: true, kind: ikResistBerry, associatedType: associatedType, effect: nil)
+
 func kind*(item: Item): ItemKind =
   if isNil(item): ikUnique else: item.kind
 

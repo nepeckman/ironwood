@@ -5,6 +5,7 @@ import
 func defenderItemActivates*(defender: Pokemon, move: PokeMove): bool =
   case defender.item.kind
   of ikPinchBerry: defender.currentPercentHP <= defender.item.activationPercent
+  of ikResistBerry: defender.item.associatedType == move.pokeType
   else: false
 
 proc changeWeather(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =

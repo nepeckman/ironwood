@@ -11,5 +11,9 @@
             "percentHP": 50,
             "effectTargets": "Self"
         }
+    },
+    "Occa Berry": {
+        "kind": "Resist Berry",
+        "associatedType": "Fire"
     }
 }

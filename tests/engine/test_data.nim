@@ -229,3 +229,9 @@ Heatran @
 const magoBerry* = """
 Venusaur @ Mago Berry
 """
+
+const occaBerryAttacker* = pinchBerryAttacker
+
+const occaBerry* = """
+Venusaur @ Occa Berry
+"""
