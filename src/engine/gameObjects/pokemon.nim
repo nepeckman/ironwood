@@ -56,7 +56,6 @@ func copy*(pokemon: Pokemon): Pokemon =
 func name*(mon: Pokemon): string = mon.data.name
 func uuid*(mon: Pokemon): UUID =
   if isNil(mon): initUUID(0, 0) else: mon.uuid
-func currentHP*(mon: Pokemon): int = mon.currentHP
 func pokeType1*(mon: Pokemon): PokeType = mon.data.pokeType1
 func pokeType2*(mon: Pokemon): PokeType = mon.data.pokeType2
 func dataFlags*(mon: Pokemon): set[PokemonDataFlags] = mon.data.dataFlags
@@ -76,24 +75,6 @@ func zMoves(mon: Pokemon): seq[PokeMove] =
 func moves*(mon: Pokemon): seq[PokeMove] =
   if mon.item.kind == ikZCrystal: concat(mon.pokeSet.moves, mon.zMoves)
   else: mon.pokeSet.moves
-
-proc resetAbility*(mon: Pokemon) =
-  mon.currentAbility = mon.pokeSet.ability
-proc resetItem*(mon: Pokemon) =
-  mon.currentItem = mon.pokeSet.item
-
-proc takeDamage*(mon: Pokemon, damage: int) =
-  mon.currentHP = max(0, mon.currentHP - damage)
-
-proc addBoosts(b1, b2: int): int = min(6, (max(-6, b1 + b2)))
-proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd: int, spe: int]) =
-  mon.boosts = (
-    hp: mon.boosts.hp,
-    atk: addBoosts(mon.boosts.atk, boosts.atk),
-    def: addBoosts(mon.boosts.def, boosts.def),
-    spa: addBoosts(mon.boosts.spa, boosts.spa),
-    spd: addBoosts(mon.boosts.spd, boosts.spd),
-    spe: addBoosts(mon.boosts.spe, boosts.spe))
 
 func getModifiedStat(stat: int, boost: int): int =
   if boost > 0: toInt(floor(stat * (2 + boost) / 2))
@@ -119,8 +100,7 @@ func getSpeedMod(mon: Pokemon, field: Field): float =
   for m in mods:
     result = result * m
 
-func maxHP*(mon: Pokemon): int =
-  mon.stats.hp
+func maxHP*(mon: Pokemon): int = mon.stats.hp
 
 func attack*(mon: Pokemon): int =
   getModifiedStat(mon.stats.atk, mon.boosts.atk)
@@ -140,6 +120,9 @@ func speed*(mon: Pokemon, field: Field): int =
   return toInt(
     floor(toFloat(spe) * m)
   )
+
+func currentHP*(mon: Pokemon): int = mon.currentHP
+func currentPercentHP*(mon: Pokemon): int = toInt(floor(mon.currentHP / mon.maxHP))
 
 func weight*(mon: Pokemon): float = mon.data.weight * mon.getWeightFactor()
 
@@ -168,5 +151,31 @@ func hash*(pokemon: Pokemon): Hash =
 func `==`*(p1, p2: Pokemon): bool = uuid(p1) == uuid(p2)
 func `==`*(p: Pokemon, uuid: UUID): bool = uuid(p) == uuid
 func `==`*(uuid: UUID, p: Pokemon): bool = uuid(p) == uuid
+
+proc resetAbility*(mon: Pokemon) =
+  mon.currentAbility = mon.pokeSet.ability
+
+proc resetItem*(mon: Pokemon) =
+  mon.currentItem = mon.pokeSet.item
+
+proc consumeItem*(mon: Pokemon) =
+  mon.currentItem = nil
+
+proc takeDamage*(mon: Pokemon, damage: int) =
+  mon.currentHP = max(0, mon.currentHP - damage)
+
+proc restoreHPByPercent*(mon: Pokemon, restorePercent: int) =
+  let restoreAmount = toInt(floor((mon.maxHP * restorePercent) / 100))
+  mon.currentHP = min(mon.maxHP, (mon.currentHP + restoreAmount))
+
+proc addBoosts(b1, b2: int): int = min(6, (max(-6, b1 + b2)))
+proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd: int, spe: int]) =
+  mon.boosts = (
+    hp: mon.boosts.hp,
+    atk: addBoosts(mon.boosts.atk, boosts.atk),
+    def: addBoosts(mon.boosts.def, boosts.def),
+    spa: addBoosts(mon.boosts.spa, boosts.spa),
+    spd: addBoosts(mon.boosts.spd, boosts.spd),
+    spe: addBoosts(mon.boosts.spe, boosts.spe))
 
 export TeamSideKind

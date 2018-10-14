@@ -85,4 +85,5 @@ func toPokeType*(typeString: string): PokeType =
 func toItemKind*(kind: string): ItemKind =
   case kind
   of "Z Crystal": ikZCrystal
+  of "Pinch Berry": ikPinchBerry
   else: ikUnique

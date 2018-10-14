@@ -33,4 +33,6 @@ proc parseEffect*(data: JsonNode): Effect =
     newWeatherEffect(toWeather(data["weatherChange"].getStr()), activation)
   elif data.hasKey("terrainChange"):
     newTerrainEffect(toTerrain(data["terrainChange"].getStr()), activation)
+  elif data.hasKey("percentHP"):
+    newPercentHPEffect(data["percentHP"].getInt(), target, activation)
   else: nil

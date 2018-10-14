@@ -501,19 +501,26 @@ suite "Items":
     check(state.getPokemonState(ttar).currentHP == 341)
     check(state.getPokemonState(lando).currentHP == 0)
 
-  test "Firium Z":
-    var state = newGame(firiumZ, firiumZ)
-    let blazeH = state.getPokemon(tskHome, 0)
-    let blazeA = state.getPokemon(tskAway, 0)
-    var action = @[
-      state.getActionByMove(blazeH, "Z-Fire Blast")
-    ]
+  test "Pinch Berries - Should be consumed":
+    var state = newGame(pinchBerryAttacker, magoBerry)
+    let heatran = state.getPokemon(tskHome, 0)
+    let venu = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(heatran, "Flamethrower")]
     state = turn(state, action)
-    check(state.getPokemonState(blazeA).currentHP == 144)
+    check(state.getPokemonState(venu).currentHP == 186)
+    action = @[state.getActionByMove(heatran, "Hidden Power Fire")]
+    state = turn(state, action)
+    check(state.getPokemonState(venu).currentHP == 8)
 
-suite "Z Moves":
+  test "Mago Berry":
+    var state = newGame(pinchBerryAttacker, magoBerry)
+    let heatran = state.getPokemon(tskHome, 0)
+    let venu = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(heatran, "Flamethrower")]
+    state = turn(state, action)
+    check(state.getPokemonState(venu).currentHP == 186)
 
-  test "One Z move per game":
+  test "Z moves - One Z move per game":
     var state = newGame(firiumZ, firiumZ)
     let blazeH = state.getPokemon(tskHome, 0)
     let blazeA = state.getPokemon(tskAway, 0)
@@ -527,3 +534,13 @@ suite "Z Moves":
       state.getActionByMove(blazeA, "Z-Fire Blast")
     ]
     state = turn(state, action)
+
+  test "Firium Z":
+    var state = newGame(firiumZ, firiumZ)
+    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeA = state.getPokemon(tskAway, 0)
+    var action = @[
+      state.getActionByMove(blazeH, "Z-Fire Blast")
+    ]
+    state = turn(state, action)
+    check(state.getPokemonState(blazeA).currentHP == 144)

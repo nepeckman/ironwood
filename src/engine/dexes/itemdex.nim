@@ -22,4 +22,5 @@ proc getItem*(name: string): Item =
 
   return case kind
   of ikZCrystal: newZCrystal(name, toPokeType(itemData["type"].getStr()))
+  of ikPinchBerry: newPinchBerry(name, itemData["activationPercent"].getInt(), effect)
   else: newUniqueItem(name, effect, consumable)

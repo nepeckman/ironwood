@@ -39,6 +39,7 @@ func status*(effect: Effect): StatusConditionKind = effect.status
 func condition*(effect: Effect): GeneralConditionKind = effect.condition
 func boostChange*(effect: Effect): tuple[atk: int, def: int, spa: int, spd: int, spe: int] = effect.boostChange
 func hpChange*(effect: Effect): int = effect.hpChange
+func hpPercentChange*(effect: Effect): int = effect.hpPercentChange
 func typeChange*(effect: Effect): PokeType = effect.typeChange
 func isRandom*(effect: Effect): bool = effect.isRandom
 func weather*(effect: Effect): FieldWeatherKind = effect.weather
@@ -54,3 +55,6 @@ func newWeatherEffect*(weather: FieldWeatherKind, activation = eakAfterAttack): 
 
 func newTerrainEffect*(terrain: FieldTerrainKind, activation = eakAfterAttack): Effect =
   Effect(target: etkField, activation: activation, kind: ekTerrain, terrain: terrain)
+
+func newPercentHPEffect*(percentHP: int, target = etkSelf, activation = eakAfterAttack): Effect =
+  Effect(target: target, activation: activation, kind: ekHPPercent, hpPercentChange: percentHP)

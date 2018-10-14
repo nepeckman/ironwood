@@ -219,3 +219,13 @@ Ability: Surge Surfer
 - Electric Terrain
 - Surf
 """
+
+const pinchBerryAttacker* = """
+Heatran @
+- Flamethrower
+- Hidden Power Fire
+"""
+
+const magoBerry* = """
+Venusaur @ Mago Berry
+"""

@@ -44,6 +44,10 @@ func turn*(s: State, actions: seq[Action]): State =
         target.takeDamage(damage)
         if action.move.effect.activation == eakAfterAttack:
           state.applyMoveEffect(pokemon, target, action.move.effect)
+        if target.item.effect.activation == eakAfterAttack and target.defenderItemActivates(action.move):
+          state.applyItemEffect(target)
+          if target.item.consumable:
+            target.consumeItem()
         if action.move.isZ:
           team.isZUsed = true
 

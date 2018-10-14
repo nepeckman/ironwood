@@ -2,5 +2,14 @@
     "Firium Z": {
         "kind": "Z Crystal",
         "type": "Fire"
+    },
+    "Mago Berry": {
+        "kind": "Pinch Berry",
+        "activationPercent": 25,
+        "effect": {
+            "activation": "AfterAttack",
+            "percentHP": 50,
+            "effectTargets": "Self"
+        }
     }
 }

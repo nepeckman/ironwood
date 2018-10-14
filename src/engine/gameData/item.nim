@@ -17,7 +17,7 @@ type
     of ikGem, ikTypeBoost, ikResistBerry, ikZCrystal,
       ikDrive, ikMemory, ikPlate: associatedType: PokeType
     of ikTerrainSeed: associatedTerrain: FieldTerrainKind
-    of ikPinchBerry: activationPercent, restorePercent: int
+    of ikPinchBerry: activationPercent: int
     of ikMegaStone, ikPokemonExclusive: associatedPokemonName: string
     of ikLifeOrb, ikLeftovers, ikShellBell, ikFocusSash, ikEviolite,
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
@@ -28,6 +28,9 @@ func newUniqueItem*(name: string, effect: Effect = nil, consumable = false): Ite
 
 func newZCrystal*(name: string, associatedType: PokeType): Item =
   Item(name: name, consumable: false, kind: ikZCrystal, associatedType: associatedType)
+
+func newPinchBerry*(name: string, activationPercent: int, effect: Effect): Item =
+  Item(name: name, consumable: true, kind: ikPinchBerry, activationPercent: activationPercent, effect: effect)
 
 func kind*(item: Item): ItemKind =
   if isNil(item): ikUnique else: item.kind

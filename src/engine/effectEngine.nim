@@ -2,6 +2,10 @@ import
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
   state, engineutils
 
+func defenderItemActivates*(defender: Pokemon, move: PokeMove): bool =
+  case defender.item.kind
+  of ikPinchBerry: defender.currentPercentHP <= defender.item.activationPercent
+  else: false
 
 proc changeWeather(field: Field, pokemon: Pokemon, weather: FieldWeatherKind) =
   if weather.normalWeather and
@@ -32,3 +36,9 @@ proc applyAbilityEffect*(state: State, actingPokemon: Pokemon) =
     elif effect.kind == ekTerrain:
       state.field.changeTerrain(effect.terrain)
 
+proc applyItemEffect*(state: State, actingPokemon: Pokemon) =
+  let item = actingPokemon.item
+  let effect = item.effect
+  if effect.target == etkSelf:
+    if effect.kind == ekHPPercent:
+      actingPokemon.restoreHPByPercent(effect.hpPercentChange)
