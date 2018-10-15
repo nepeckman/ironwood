@@ -85,4 +85,16 @@ proc decrementCounters*(field: Field) =
   if field.terrainCounter == 0:
     field.terrain = ftkNone
 
+proc activateFairyAura*(field: Field) =
+  field.auras.incl(fakFairy)
+
+proc removeFairyAura*(field: Field) =
+  field.auras.excl(fakFairy)
+
+proc activateDarkAura*(field: Field) =
+  field.auras.incl(fakDark)
+
+proc removeDarkAura*(field: Field) = 
+  field.auras.excl(fakDark)
+
 export fieldConditions

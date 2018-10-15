@@ -220,6 +220,18 @@ Ability: Surge Surfer
 - Surf
 """
 
+const fairyAura* = """
+Xerneas @
+Ability: Fairy Aura
+- Dazzling Gleam
+"""
+
+const darkAura* = """
+Yveltal @
+Ability: Dark Aura
+- Dark Pulse
+"""
+
 const pinchBerryAttacker* = """
 Heatran @
 - Flamethrower

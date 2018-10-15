@@ -4,6 +4,45 @@ import
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
   state, action, damage, effectEngine, engineutils, setParser
 
+proc assessWeather*(state: State) =
+  let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
+  var constantWeatherMaintained, weatherSuppressed = false
+
+  if state.field.rawWeather.strongWeather:
+    for ability in activeAbilities:
+      if ability.effect.kind == ekWeather and
+         ability.effect.weather.strongWeather and
+         ability.effect.weather == state.field.weather:
+        constantWeatherMaintained = true
+    if not constantWeatherMaintained:
+      state.field.changeWeather(fwkNone, 0)
+
+  if state.field.weatherSuppressed:
+    for ability in activeAbilities:
+      if ability.suppressesWeather:
+        weatherSuppressed = true
+    state.field.weatherSuppressed = weatherSuppressed
+
+proc assessAuras(state: State) =
+  let activeAuras = state.field.auras
+  let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
+  var darkAuraActive, fairyAuraActive = false
+  for ability in activeAbilities:
+    if ability == "Dark Aura":
+      darkAuraActive = true
+    if ability == "Fairy Aura":
+      fairyAuraActive = true
+
+  if darkAuraActive and not (fakDark in activeAuras):
+    state.field.activateDarkAura()
+  elif not darkAuraActive and fakDark in activeAuras:
+    state.field.removeDarkAura()
+
+  if fairyAuraActive and not (fakFairy in activeAuras):
+    state.field.activateFairyAura()
+  elif not fairyAuraActive and fakFairy in activeAuras:
+    state.field.removeFairyAura()
+
 proc weatherDamage(pokemon: Pokemon) =
   let damage = toInt(floor(pokemon.maxHP / 16))
   pokemon.takeDamage(damage)
@@ -21,6 +60,7 @@ proc turnTeardown(state: State) =
   elif state.field.weather == fwkHail:
     state.fieldEffect(weatherDamage, (pokemon) => not pokemon.hasType(ptIce))
   state.assessWeather()
+  state.assessAuras()
 
 func turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)
@@ -53,6 +93,7 @@ func turn*(s: State, actions: seq[Action]): State =
           team.isZUsed = true
 
     state.assessWeather()
+    state.assessAuras()
 
   state.turnTeardown()
   return state
@@ -67,6 +108,7 @@ proc newGame*(homeTeamString, awayTeamString: string): State =
     if pokemon.ability.effect.activation == eakOnSwitchIn:
       state.applyAbilityEffect(pokemon)
   state.assessWeather()
+  state.assessAuras()
   return state
 
 export

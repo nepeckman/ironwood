@@ -5,6 +5,8 @@ import
   gameObjects/gameObjects,
   state, action
 
+#TODO: Move all procs to get Pokemon to a file
+#TODO: Move all procs to get actions to a file
 func moveValidator(pokemon: Pokemon, move: PokeMove, state: State): bool =
   let allyTeam = state.getTeam(pokemon)
   `not`((gckTaunted in pokemon.conditions or pokemon.item == "Assualt Vest") and move.category == pmcStatus) and
@@ -102,22 +104,3 @@ func getActionBySwitch(state: State, actions: seq[Action], switchTargetID: UUID)
 
 func getActionBySwitch*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
   getActionBySwitch(state, state.possibleActions(pokemonID), switchTargetID)
-
-proc assessWeather*(state: State) =
-  let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
-  var constantWeatherMaintained, weatherSuppressed = false
-
-  if state.field.rawWeather.strongWeather:
-    for ability in activeAbilities:
-      if ability.effect.kind == ekWeather and
-         ability.effect.weather.strongWeather and
-         ability.effect.weather == state.field.weather:
-        constantWeatherMaintained = true
-    if not constantWeatherMaintained:
-      state.field.changeWeather(fwkNone, 0)
-
-  if state.field.weatherSuppressed:
-    for ability in activeAbilities:
-      if ability.suppressesWeather:
-        weatherSuppressed = true
-    state.field.weatherSuppressed = weatherSuppressed

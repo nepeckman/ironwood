@@ -471,6 +471,22 @@ suite "Abilities":
     check(state.getPokemonState(pika).currentHP == 211)
     check(state.getPokemonState(lando).currentHP == 0)
 
+  test "Fairy Aura":
+    var state = newGame(fairyAura, darkAura)
+    let xerneas = state.getPokemon(tskHome, 0)
+    let yveltal = state.getPokemon(tskAway, 0)
+    var actions = @[state.getActionByMove(xerneas, "Dazzling Gleam")]
+    state = turn(state, actions)
+    check(state.getPokemonState(yveltal).currentHP == 73)
+
+  test "Dark Aura":
+    var state = newGame(fairyAura, darkAura)
+    let xerneas = state.getPokemon(tskHome, 0)
+    let yveltal = state.getPokemon(tskAway, 0)
+    var actions = @[state.getActionByMove(yveltal, "Dark Pulse")]
+    state = turn(state, actions)
+    check(state.getPokemonState(xerneas).currentHP == 313)
+
 suite "Items":
 
   test "Choice Band":
@@ -529,7 +545,6 @@ suite "Items":
     check(state.getPokemonState(venu).currentHP == 212)
     state = turn(state, action)
     check(state.getPokemonState(venu).currentHP == 34)
-
 
   test "Occa Berry":
     var state = newGame(occaBerryAttacker, occaBerry)
