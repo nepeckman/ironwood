@@ -224,12 +224,14 @@ const fairyAura* = """
 Xerneas @
 Ability: Fairy Aura
 - Dazzling Gleam
+- Dark Pulse
 """
 
 const darkAura* = """
 Yveltal @
 Ability: Dark Aura
 - Dark Pulse
+- Dazzling Gleam
 """
 
 const pinchBerryAttacker* = """

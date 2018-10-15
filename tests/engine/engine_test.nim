@@ -265,6 +265,31 @@ suite "Terrain":
     state = turn(state, action)
     check(state.getPokemonState(bulu).currentHP == 230)
 
+suite "Auras":
+
+  test "Should end on switch out":
+    var state = newGame(fairyAura & technician, darkAura)
+    let xerneas = state.getPokemon(tskHome, 0)
+    let scizor = state.getPokemon(tskHome, 1)
+    let yveltal = state.getPokemon(tskAway, 0)
+    var actions = @[
+      state.getActionBySwitch(xerneas, scizor),
+      state.getActionByMove(yveltal, "Dazzling Gleam")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(scizor).currentHP == 233)
+
+  test "Should start on switch in":
+    var state = newGame(technician & fairyAura, darkAura)
+    let scizor = state.getPokemon(tskHome, 0)
+    let xerneas = state.getPokemon(tskHome, 1)
+    let yveltal = state.getPokemon(tskAway, 0)
+    var actions = @[
+      state.getActionBySwitch(scizor, xerneas),
+      state.getActionByMove(yveltal, "Dazzling Gleam")
+    ]
+    state = turn(state, actions)
+    check(state.getPokemonState(xerneas).currentHP == 286)
 
 suite "Moves":
 
