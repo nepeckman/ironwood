@@ -542,6 +542,13 @@ suite "Items":
     check(state.getPokemonState(ttar).currentHP == 341)
     check(state.getPokemonState(lando).currentHP == 0)
 
+  test "Life Orb":
+    var state = newGame(lifeOrb, lifeOrb)
+    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeA = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(blazeH, "Flamethrower")]
+    state = turn(state, action)
+
   test "Pinch Berries - Should be consumed":
     var state = newGame(pinchBerryAttacker, magoBerry)
     let heatran = state.getPokemon(tskHome, 0)

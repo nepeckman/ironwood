@@ -1,4 +1,12 @@
 {
+    "Life Orb": {
+        "kind": "Unique",
+        "effect": {
+            "activation": "AfterAttack",
+            "percentHP": -10,
+            "effectTargets": "Self"
+        }
+    },
     "Firium Z": {
         "kind": "Z Crystal",
         "type": "Fire"

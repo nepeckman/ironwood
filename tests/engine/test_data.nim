@@ -55,6 +55,11 @@ Spinda @ Choice Specs
 - Hyper Voice
 """
 
+const lifeOrb* = """
+Blaziken @ Life Orb
+- Flamethrower
+"""
+
 const firiumZ* = """
 Blaziken @ Firium Z
 - Fire Blast
