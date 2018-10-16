@@ -164,9 +164,13 @@ proc consumeItem*(mon: Pokemon) =
 proc takeDamage*(mon: Pokemon, damage: int) =
   mon.currentHP = max(0, mon.currentHP - damage)
 
-proc restoreHPByPercent*(mon: Pokemon, restorePercent: int) =
-  let restoreAmount = toInt(floor((mon.maxHP * restorePercent) / 100))
-  mon.currentHP = min(mon.maxHP, (mon.currentHP + restoreAmount))
+proc changeHPByPercent*(mon: Pokemon, percent: int) =
+  if percent > 0:
+    let restoreAmount = toInt(floor((mon.maxHP * percent) / 100))
+    mon.currentHP = min(mon.maxHP, (mon.currentHP + restoreAmount))
+  else:
+    let damageAmount = toInt(ceil((mon.maxHP * percent) / 100))
+    mon.currentHP = max(0, (mon.currentHP + damageAmount))
 
 proc addBoosts(b1, b2: int): int = min(6, (max(-6, b1 + b2)))
 proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd: int, spe: int]) =

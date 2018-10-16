@@ -82,6 +82,7 @@ func turn*(s: State, actions: seq[Action]): State =
       for target in targets:
         let damage = getAvgDamage(pokemon, target, action.move, state.field)
         target.takeDamage(damage)
+        #TODO: This will break in doubles for moves that target the attacker
         if action.move.effect.activation == eakAfterAttack:
           state.applyMoveEffect(pokemon, target, action.move.effect)
         if target.defenderItemActivates(action.move):
@@ -91,6 +92,8 @@ func turn*(s: State, actions: seq[Action]): State =
             target.consumeItem()
         if action.move.isZ:
           team.isZUsed = true
+      if pokemon.item.effect.activation == eakAfterAttack:
+        state.applyItemEffect(pokemon)
 
     state.assessWeather()
     state.assessAuras()
