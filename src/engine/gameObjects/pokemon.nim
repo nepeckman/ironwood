@@ -1,4 +1,4 @@
-import math, hashes, uuids, sequtils, sugar
+import math, hashes, uuids, sequtils, sugar, tables
 import ../gameData/[pokemonData, item, poketype, pokemove, condition, effects, ability]
 import field
 
@@ -16,7 +16,8 @@ type
     currentAbility: Ability
     boosts*: PokeStats
     status*: StatusConditionKind
-    conditions*: set[GeneralConditionKind]
+    conditions*: Table[GeneralConditionKind, int]
+    previousMove*: PokeMove
 
 proc makePokemon*(data: PokemonData, pokeSet: PokemonSet, side: TeamSideKind): Pokemon =
 
@@ -34,7 +35,8 @@ proc makePokemon*(data: PokemonData, pokeSet: PokemonSet, side: TeamSideKind): P
     currentAbility: pokeSet.ability,
     boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
     status: sckHealthy,
-    conditions: {},
+    conditions: initTable[GeneralConditionKind, int](),
+    previousMove: nil
   )
 
 func copy*(pokemon: Pokemon): Pokemon =
@@ -50,7 +52,8 @@ func copy*(pokemon: Pokemon): Pokemon =
     currentAbility: pokemon.currentAbility,
     boosts: pokemon.boosts,
     status: pokemon.status,
-    conditions: pokemon.conditions
+    conditions: pokemon.conditions,
+    previousMove: pokemon.previousMove
   )
 
 func name*(mon: Pokemon): string = mon.data.name
@@ -182,4 +185,4 @@ proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd:
     spd: addBoosts(mon.boosts.spd, boosts.spd),
     spe: addBoosts(mon.boosts.spe, boosts.spe))
 
-export TeamSideKind
+export TeamSideKind, tables
