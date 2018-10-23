@@ -42,4 +42,4 @@ proc applyItemEffect*(state: State, actingPokemon: Pokemon) =
   let effect = item.effect
   if effect.target == etkSelf:
     if effect.kind == ekHPPercent:
-      actingPokemon.restoreHPByPercent(effect.hpPercentChange)
+      actingPokemon.changeHPByPercent(effect.hpPercentChange)

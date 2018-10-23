@@ -548,6 +548,8 @@ suite "Items":
     let blazeA = state.getPokemon(tskAway, 0)
     var action = @[state.getActionByMove(blazeH, "Flamethrower")]
     state = turn(state, action)
+    check(state.getPokemonState(blazeA).currentHP == 202)
+    check(state.getPokemonState(blazeH).currentHP == 271)
 
   test "Pinch Berries - Should be consumed":
     var state = newGame(pinchBerryAttacker, magoBerry)
