@@ -1569,7 +1569,7 @@
     "category": "Physical",
     "makesContact": true,
     "isPunch": true,
-    "hasPriority": true,
+    "priority": 1,
     "zp": 100
   },
   "Charge Beam": {
