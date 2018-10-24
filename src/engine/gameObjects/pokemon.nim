@@ -185,4 +185,9 @@ proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd:
     spd: addBoosts(mon.boosts.spd, boosts.spd),
     spe: addBoosts(mon.boosts.spe, boosts.spe))
 
+proc reset*(mon: Pokemon) =
+  mon.resetAbility()
+  mon.previousMove = nil
+  mon.boosts = (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0)
+
 export TeamSideKind, tables

@@ -57,6 +57,12 @@ proc fieldAssessment(state: State) =
   state.assessWeather()
   state.assessAuras()
 
+proc turnConditionReset(state: State) =
+  for pokemon in state.allActivePokemonObj():
+    for condition in pokemon.conditions.keys:
+      if condition.oneTurnCondition:
+        pokemon.conditions.del(condition)
+
 proc turnTeardown(state: State) =
   state.field.decrementCounters()
   if state.field.weather == fwkSand:
@@ -64,8 +70,11 @@ proc turnTeardown(state: State) =
   elif state.field.weather == fwkHail:
     state.fieldEffect(weatherDamage, (pokemon) => not pokemon.hasType(ptIce))
   state.fieldAssessment()
+  state.turnConditionReset()
 
-proc executeSwitch(state: State, team: Team, action: Action) =
+
+proc executeSwitch(state: State, pokemon: Pokemon, team: Team, action: Action) =
+  pokemon.reset()
   team.switchPokemon(action.actingPokemonID, action.switchTargetID)
   let switchIn = state.getPokemonObj(action.switchTargetID)
   if switchIn.ability.effect.activation == eakOnSwitchIn:
@@ -73,21 +82,24 @@ proc executeSwitch(state: State, team: Team, action: Action) =
 
 proc executeAttack(state: State, pokemon: Pokemon, team: Team, action: Action) =
   let targets = state.getTargetedPokemon(action)
+  let move = action.move
   for target in targets:
     let damage = getAvgDamage(pokemon, target, action.move, state.field)
     target.takeDamage(damage)
     #TODO: This will break in doubles for moves that target the attacker
-    if action.move.effect.activation == eakAfterAttack:
-      state.applyMoveEffect(pokemon, target, action.move.effect)
-    if target.defenderItemActivates(action.move):
+    if move.effect.activation == eakAfterAttack:
+      state.applyMoveEffect(pokemon, target, move.effect)
+    if target.defenderItemActivates(move):
       if target.item.effect.activation == eakAfterAttack:
         state.applyItemEffect(target)
       if target.item.consumable:
         target.consumeItem()
-    if action.move.isZ:
-      team.isZUsed = true
+  if move.isZ:
+    team.isZUsed = true
   if pokemon.item.effect.activation == eakAfterAttack:
     state.applyItemEffect(pokemon)
+  pokemon.previousMove = move
+  pokemon.conditions[gckHasAttacked] = 1
 
 proc executeAction(state: State, action: Action) =
   var pokemon = state.getPokemonObj(action.actingPokemonID)
@@ -95,7 +107,7 @@ proc executeAction(state: State, action: Action) =
   if pokemon.fainted:
     return
   if action.kind == akSwitchSelection:
-    state.executeSwitch(team, action)
+    state.executeSwitch(pokemon, team, action)
   else:
     state.executeAttack(pokemon, team, action)
 
