@@ -237,7 +237,7 @@ suite "Terrain":
     var state = newGame(psychicSurge, technician)
     let lele = state.getPokemon(tskHome, 0)
     let scizor = state.getPokemon(tskAway, 0)
-    var action = @[state.getActionByMove(scizor, "Bullet Punch")]
+    var action = @[state.getMoveAction(scizor, "Bullet Punch")]
     state = turn(state, action)
     check(state.getPokemonState(lele).currentHP == 281)
 
@@ -375,8 +375,8 @@ suite "Moves":
     let scizor = state.getPokemon(tskHome, 0)
     let lando = state.getPokemon(tskAway, 0)
     var action = @[
-      state.getActionByMove(scizor, "Bullet Punch"),
-      state.getActionByMove(lando, "Earthquake")
+      state.getMoveAction(scizor, "Bullet Punch"),
+      state.getMoveAction(lando, "Earthquake")
     ]
     state = turn(state, action)
     check(state.getPokemonState(lando).currentHP == 0)
