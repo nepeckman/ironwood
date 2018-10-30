@@ -233,6 +233,14 @@ suite "Terrain":
     state = turn(state, action)
     check(state.getPokemonState(scizor).currentHP == 161)
 
+  test "Psychic - Block Priority moves":
+    var state = newGame(psychicSurge, technician)
+    let lele = state.getPokemon(tskHome, 0)
+    let scizor = state.getPokemon(tskAway, 0)
+    var action = @[state.getActionByMove(scizor, "Bullet Punch")]
+    state = turn(state, action)
+    check(state.getPokemonState(lele).currentHP == 281)
+
   test "Electric - Boost Electric moves":
     var state = newGame(electricSurge, technician)
     let koko = state.getPokemon(tskHome, 0)
@@ -361,6 +369,18 @@ suite "Moves":
     var action = @[state.getMoveAction(celebi, "Grassy Terrain")]
     state = turn(state, action)
     check(state.field.terrain == ftkGrass)
+
+  test "Bullet Punch":
+    var state = newGame(technician, frail)
+    let scizor = state.getPokemon(tskHome, 0)
+    let lando = state.getPokemon(tskAway, 0)
+    var action = @[
+      state.getActionByMove(scizor, "Bullet Punch"),
+      state.getActionByMove(lando, "Earthquake")
+    ]
+    state = turn(state, action)
+    check(state.getPokemonState(lando).currentHP == 0)
+    check(state.getPokemonState(scizor).currentHP == 281)
 
 suite "Abilities":
 

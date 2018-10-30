@@ -26,4 +26,7 @@ proc getPokeMove*(name: string): PokeMove =
   let zPower =
     if moveData.hasKey("zp"): moveData["zp"].getInt()
     else: 0
-  newMove(name, category, target, basePower, effect, pokeType, 0, {}, zPower, nil)
+  let priority =
+    if moveData.hasKey("priority"): moveData["priority"].getInt()
+    else: 0
+  newMove(name, category, target, basePower, effect, pokeType, priority, {}, zPower, nil)

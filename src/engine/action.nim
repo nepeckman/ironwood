@@ -24,5 +24,9 @@ func newMoveAction*(actingPokemonID: UUID, move: PokeMove, targets: set[AttackTa
 func newSwitchAction*(actingPokemonID, targetPokemonID: UUID): Action = 
   Action(kind: akSwitchSelection, actingPokemonID: actingPokemonID, switchTargetID: targetPokemonID)
 
+func priority*(action: Action): int =
+  if action.kind == akMoveSelection: action.move.priority
+  else: 7
+
 func hash*(action: Action): Hash =
   action.actingPokemonID.hash
