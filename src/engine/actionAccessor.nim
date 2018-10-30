@@ -3,10 +3,8 @@ import
   uuids,
   gameData/gameData,
   gameObjects/gameObjects,
-  state, action
+  state, action, pokemonAccessor
 
-#TODO: Move all procs to get Pokemon to a file
-#TODO: Move all procs to get actions to a file
 func moveValidator(pokemon: Pokemon, move: PokeMove, state: State): bool =
   let allyTeam = state.getTeam(pokemon)
   `not`((gckTaunted in pokemon.conditions or pokemon.item == "Assualt Vest") and move.category == pmcStatus) and
@@ -29,38 +27,6 @@ func possibleTargets*(state: State, move: PokeMove): seq[set[AttackTargetKind]] 
   of pmtSelectedTarget:
     if state.field.format == ffkSingles: @[{atkEnemyOne}] else: @[{atkAlly}, {atkEnemyOne}, {atkEnemyTwo}]
 
-func activePokemonObj*(state: State, team: Team): seq[Pokemon] =
-  result = @[]
-  if state.isActive(team[0]):
-    result.add(team[0])
-  if state.isActive(team[1]) and state.field.format == ffkDoubles:
-    result.add(team[1])
-
-func homeActivePokemonObj*(state: State): seq[Pokemon] =
-  state.activePokemonObj(state.homeTeam)
-
-func awayActivePokemonObj*(state: State): seq[Pokemon] =
-  state.activePokemonObj(state.awayTeam)
-
-func allActivePokemonObj*(state: State): seq[Pokemon] =
-  concat(state.homeActivePokemonObj, state.awayActivePokemonObj)
-
-func activePokemon*(state: State, team: Team): seq[UUID] =
-  result = @[]
-  if state.isActive(team[0]):
-    result.add(team[0].uuid)
-  if state.isActive(team[1]) and state.field.format == ffkDoubles:
-    result.add(team[1].uuid)
-
-func homeActivePokemon*(state: State): seq[UUID] =
-  state.activePokemon(state.homeTeam)
-
-func awayActivePokemon*(state: State): seq[UUID] =
-  state.activePokemon(state.awayTeam)
-
-func allActivePokemon*(state: State): seq[UUID] =
-  concat(state.homeActivePokemon, state.awayActivePokemon)
-
 func possibleActions*(state: State, pokemonID: UUID): seq[Action] =
   result = @[]
   let pokemon = state.getPokemonObj(pokemonID)
@@ -82,7 +48,7 @@ func possibleActions*(state: State, side: TeamSideKind): seq[Action] =
     if side == tskHome: state.homeActivePokemon() else: state.awayActivePokemon()
   state.possibleActions(activeMons)
 
-func getActionByMove(actions: seq[Action], move: string): Action = 
+func getMoveAction(actions: seq[Action], move: string): Action = 
   for action in actions:
     if action.kind == akMoveSelection and action.move == move:
       return action
@@ -90,10 +56,10 @@ func getActionByMove(actions: seq[Action], move: string): Action =
   error.msg = "No action for move: " & move
   raise error
 
-func getActionByMove*(state: State, pokemonID: UUID, move: string): Action =
-  getActionByMove(state.possibleActions(pokemonID), move)
+func getMoveAction*(state: State, pokemonID: UUID, move: string): Action =
+  getMoveAction(state.possibleActions(pokemonID), move)
 
-func getActionBySwitch(state: State, actions: seq[Action], switchTargetID: UUID): Action =
+func getSwitchAction(state: State, actions: seq[Action], switchTargetID: UUID): Action =
   for action in actions:
     if action.kind == akSwitchSelection and 
        action.switchTargetID == switchTargetID:
@@ -102,5 +68,5 @@ func getActionBySwitch(state: State, actions: seq[Action], switchTargetID: UUID)
   error.msg = "No action for switch: " & $switchTargetID
   raise error
 
-func getActionBySwitch*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
-  getActionBySwitch(state, state.possibleActions(pokemonID), switchTargetID)
+func getSwitchAction*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
+  getSwitchAction(state, state.possibleActions(pokemonID), switchTargetID)

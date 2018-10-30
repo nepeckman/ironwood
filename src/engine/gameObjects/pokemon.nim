@@ -125,7 +125,7 @@ func speed*(mon: Pokemon, field: Field): int =
   )
 
 func currentHP*(mon: Pokemon): int = mon.currentHP
-func currentPercentHP*(mon: Pokemon): int = toInt(floor(mon.currentHP / mon.maxHP))
+func percentHP*(mon: Pokemon): int = toInt(floor(mon.currentHP / mon.maxHP))
 
 func weight*(mon: Pokemon): float = mon.data.weight * mon.getWeightFactor()
 

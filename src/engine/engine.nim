@@ -2,7 +2,7 @@ import
   algorithm, sugar, sequtils, sets, math,
   uuids,
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
-  state, action, damage, effectEngine, engineutils, setParser
+  state, action, damage, effectEngine, actionAccessor, pokemonAccessor, setParser
 
 proc assessWeather*(state: State) =
   let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
@@ -136,4 +136,4 @@ proc newGame*(homeTeamString, awayTeamString: string): State =
   return state
 
 export
-  engineutils, state, action, setParser, gameObjects, gameData, dexes
+  actionAccessor, pokemonAccessor, state, action, setParser, gameObjects, gameData, dexes, uuids

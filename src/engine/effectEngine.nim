@@ -1,10 +1,10 @@
 import
   gameObjects/gameObjects, gameData/gameData, dexes/dexes,
-  state, engineutils
+  state, pokemonAccessor
 
 func defenderItemActivates*(defender: Pokemon, move: PokeMove): bool =
   case defender.item.kind
-  of ikPinchBerry: defender.currentPercentHP <= defender.item.activationPercent
+  of ikPinchBerry: defender.percentHP <= defender.item.activationPercent
   of ikResistBerry: defender.item.associatedType == move.pokeType
   else: false
 

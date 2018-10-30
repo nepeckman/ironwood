@@ -10,12 +10,6 @@ type
     homeTeam*: Team
     awayTeam*: Team
     field*: Field
-
-  PokemonState* = ref object
-    uuid*: UUID
-    percentHP*: int
-    currentHP*: int
-
   
 func copy*(state: State): State =
   State(
@@ -40,16 +34,12 @@ func getPokemonObj*(state: State, side: TeamSideKind, position: int): Pokemon =
 func getPokemon*(state: State, side: TeamSideKind, position: int): UUID =
   state.getTeam(side).get(position)
 
-func getPokemonState(pokemon: Pokemon): PokemonState =
-  PokemonState(
-    uuid: pokemon.uuid, 
-    percentHP: toInt(pokemon.currentHP / pokemon.maxHP),
-    currentHP: pokemon.currentHP)
+func getPokemonState(pokemon: Pokemon): Pokemon = copy(pokemon)
 
-func getPokemonState*(state: State, pokemonID: UUID): PokemonState =
+func getPokemonState*(state: State, pokemonID: UUID): Pokemon =
   getPokemonState(state.getPokemonObj(pokemonID))
 
-func getPokemonState*(state: State, side: TeamSideKind, position: int): PokemonState =
+func getPokemonState*(state: State, side: TeamSideKind, position: int): Pokemon =
   let id = state.getPokemon(side, position)
   state.getPokemonState(id)
   
