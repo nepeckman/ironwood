@@ -5,12 +5,17 @@ import ../../src/engine/engine
 template checkHP(state: State, pokemon: UUID, hp: int) =
   check(state.getPokemonState(pokemon).currentHP == hp)
 
+template gameSetup(state: untyped, homeString, awayString: string, homePoke, awayPoke: untyped) =
+  var state = newGame(homeString, awayString)
+  let homePoke = state.getPokemonID(tskHome, 0)
+  let awayPoke = state.getPokemonID(tskAway, 0)
+
 suite "Sanity":
 
   test "engine":
     var gameState = newGame(sanityTeam, sanityTeam)
-    let snorlaxH = gameState.getPokemon(tskHome, 0)
-    let snorlaxA = gameState.getPokemon(tskAway, 0)
+    let snorlaxH = gameState.getPokemonID(tskHome, 0)
+    let snorlaxA = gameState.getPokemonID(tskAway, 0)
     var action = @[gameState.getMoveAction(snorlaxH, "Return")]
     var nextState = gameState.turn(action)
 
@@ -23,7 +28,7 @@ suite "Weather":
 
   test "Should end in 5 turns":
     var state = newGame(sunnyDay, sunnyDay)
-    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeH = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(blazeH, "Sunny Day")]
     state = turn(state, action)
     check(state.field.weather == fwkSun)
@@ -38,8 +43,8 @@ suite "Weather":
 
   test "Slower weather wins":
     var state = newGame(sunnyDay, rainDance)
-    let blaze = state.getPokemon(tskHome, 0)
-    let ludi = state.getPokemon(tskAway, 0)
+    let blaze = state.getPokemonID(tskHome, 0)
+    let ludi = state.getPokemonID(tskAway, 0)
     var action = @[
       state.getMoveAction(blaze, "Sunny Day"),
       state.getMoveAction(ludi, "Rain Dance")
@@ -49,7 +54,7 @@ suite "Weather":
 
   test "Cannot reset same weather":
     var state = newGame(sunnyDay, sunnyDay)
-    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeH = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(blazeH, "Sunny Day")]
     state = turn(state, action)
     check(state.field.weather == fwkSun)
@@ -64,7 +69,7 @@ suite "Weather":
 
   test "Strong weather prevents normal weather":
     var state = newGame(desolateLand, sunnyDay)
-    let blaze = state.getPokemon(tskAway, 0)
+    let blaze = state.getPokemonID(tskAway, 0)
     check(state.field.weather == fwkHarshSun)
     var action = @[state.getMoveAction(blaze, "Sunny Day")]
     state = turn(state, action)
@@ -89,8 +94,8 @@ suite "Weather":
 
   test "Strong weather ends on switch out":
     var state = newGame(deltaStream, primordialSea & rainDance)
-    let ky = state.getPokemon(tskAway, 0)
-    let ludi = state.getPokemon(tskAway, 1)
+    let ky = state.getPokemonID(tskAway, 0)
+    let ludi = state.getPokemonID(tskAway, 1)
     check(state.field.weather == fwkHeavyRain)
     var action = @[state.getSwitchAction(ky, ludi)]
     state = turn(state, action)
@@ -98,8 +103,8 @@ suite "Weather":
 
   test "Sun - Boost Fire moves":
     var state = newGame(sunnyDay, sunnyDay)
-    let blazeH = state.getPokemon(tskHome, 0)
-    let blazeA = state.getPokemon(tskAway, 0)
+    let blazeH = state.getPokemonID(tskHome, 0)
+    let blazeA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(blazeH, "Sunny Day")]
     state = turn(state, action)
     action = @[state.getMoveAction(blazeH, "Flamethrower")]
@@ -108,8 +113,8 @@ suite "Weather":
 
   test "Sun - Weaken Water moves":
     var state = newGame(sunnyDay, sunnyDay)
-    let blazeH = state.getPokemon(tskHome, 0)
-    let blazeA = state.getPokemon(tskAway, 0)
+    let blazeH = state.getPokemonID(tskHome, 0)
+    let blazeA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(blazeH, "Sunny Day")]
     state = turn(state, action)
     action = @[state.getMoveAction(blazeH, "Water Pulse")]
@@ -118,8 +123,8 @@ suite "Weather":
 
   test "Rain - Boost Water moves":
     var state = newGame(rainDance, rainDance)
-    let ludiH = state.getPokemon(tskHome, 0)
-    let ludiA = state.getPokemon(tskAway, 0)
+    let ludiH = state.getPokemonID(tskHome, 0)
+    let ludiA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(ludiH, "Rain Dance")]
     state = turn(state, action)
     action = @[state.getMoveAction(ludiH, "Hydro Pump")]
@@ -128,8 +133,8 @@ suite "Weather":
 
   test "Rain - Weaken Sun moves":
     var state = newGame(rainDance, rainDance)
-    let ludiH = state.getPokemon(tskHome, 0)
-    let ludiA = state.getPokemon(tskAway, 0)
+    let ludiH = state.getPokemonID(tskHome, 0)
+    let ludiA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(ludiH, "Rain Dance")]
     state = turn(state, action)
     action = @[state.getMoveAction(ludiH, "Fire Punch")]
@@ -138,15 +143,15 @@ suite "Weather":
 
   test "Sand - Damage relevant types":
     var state = newGame(sandstorm1, sandstorm1)
-    let dun = state.getPokemon(tskHome, 0)
+    let dun = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(dun, "Sandstorm")]
     state = turn(state, action)
     check(state.getPokemonState(dun).currentHP == 320)
 
   test "Sand - Boost Rock types SpD":
     var state = newGame(sandstorm2, sandstorm2)
-    let ttarH = state.getPokemon(tskHome, 0)
-    let ttarA = state.getPokemon(tskAway, 0)
+    let ttarH = state.getPokemonID(tskHome, 0)
+    let ttarA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(ttarH, "Sandstorm")]
     state = turn(state, action)
     action = @[state.getMoveAction(ttarH, "Dark Pulse")]
@@ -155,8 +160,8 @@ suite "Weather":
 
   test "Hail - Damage relevant types":
     var state = newGame(hail1, hail2)
-    let abom = state.getPokemon(tskHome, 0)
-    let ky = state.getPokemon(tskAway, 0)
+    let abom = state.getPokemonID(tskHome, 0)
+    let ky = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(abom, "Hail")]
     state = turn(state, action)
     check(state.getPokemonState(abom).currentHP == 321)
@@ -164,24 +169,24 @@ suite "Weather":
 
   test "Harsh Sun - nullify Water moves":
     var state = newGame(desolateLand, rainDance)
-    let groudon = state.getPokemon(tskHome, 0)
-    let ludi = state.getPokemon(tskAway, 0)
+    let groudon = state.getPokemonID(tskHome, 0)
+    let ludi = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(ludi, "Hydro Pump")]
     state = turn(state, action)
     check(state.getPokemonState(groudon).currentHP == 341)
 
   test "Heavy Rain - nullify Fire moves":
     var state = newGame(primordialSea, sunnyDay)
-    let ky = state.getPokemon(tskHome, 0)
-    let blaze = state.getPokemon(tskAway, 0)
+    let ky = state.getPokemonID(tskHome, 0)
+    let blaze = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(blaze, "Flamethrower")]
     state = turn(state, action)
     check(state.getPokemonState(ky).currentHP == 341)
 
   test "Strong Winds - remove Flying weaknesses":
     var state = newGame(deltaStream, utility)
-    let ray = state.getPokemon(tskHome, 0)
-    let smeargle = state.getPokemon(tskAway, 0)
+    let ray = state.getPokemonID(tskHome, 0)
+    let smeargle = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(smeargle, "Stone Edge")]
     state = turn(state, action)
     check(state.getPokemonState(ray).currentHP == 325)
@@ -204,7 +209,7 @@ suite "Terrain":
 
   test "Cannot reset same terrain":
     var state = newGame(psychicTerrain, utility)
-    let mew = state.getPokemon(tskHome, 0)
+    let mew = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(mew, "Psychic Terrain")]
     state = turn(state, action)
     check(state.field.terrain == ftkPsychic)
@@ -219,56 +224,56 @@ suite "Terrain":
 
   test "Levitating Pokemon do not receive benefits":
     var state = newGame(mistySurge, deltaStream)
-    let fini = state.getPokemon(tskHome, 0)
-    let ray = state.getPokemon(tskAway, 0)
+    let fini = state.getPokemonID(tskHome, 0)
+    let ray = state.getPokemonID(tskAway, 0)
     let action = @[state.getMoveAction(fini, "Dragon Pulse")]
     state = turn(state, action)
     check(state.getPokemonState(ray).currentHP == 222)
 
   test "Psychic - Boost Psychic moves":
     var state = newGame(psychicSurge, technician)
-    let lele = state.getPokemon(tskHome, 0)
-    let scizor = state.getPokemon(tskAway, 0)
+    let lele = state.getPokemonID(tskHome, 0)
+    let scizor = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(lele, "Psychic")]
     state = turn(state, action)
     check(state.getPokemonState(scizor).currentHP == 161)
 
   test "Psychic - Block Priority moves":
     var state = newGame(psychicSurge, technician)
-    let lele = state.getPokemon(tskHome, 0)
-    let scizor = state.getPokemon(tskAway, 0)
+    let lele = state.getPokemonID(tskHome, 0)
+    let scizor = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(scizor, "Bullet Punch")]
     state = turn(state, action)
     check(state.getPokemonState(lele).currentHP == 281)
 
   test "Electric - Boost Electric moves":
     var state = newGame(electricSurge, technician)
-    let koko = state.getPokemon(tskHome, 0)
-    let scizor = state.getPokemon(tskAway, 0)
+    let koko = state.getPokemonID(tskHome, 0)
+    let scizor = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(koko, "Volt Switch")]
     state = turn(state, action)
     check(state.getPokemonState(scizor).currentHP == 139)
 
   test "Misty - Weaken Dragon moves":
     var state = newGame(mistySurge, adaptability)
-    let fini = state.getPokemon(tskHome, 0)
-    let drag = state.getPokemon(tskAway, 0)
+    let fini = state.getPokemonID(tskHome, 0)
+    let drag = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(fini, "Dragon Pulse")]
     state = turn(state, action)
     check(state.getPokemonState(drag).currentHP == 218)
 
   test "Grassy - Boost Grass moves":
     var state = newGame(grassySurge, technician)
-    let bulu = state.getPokemon(tskHome, 0)
-    let scizor = state.getPokemon(tskAway, 0)
+    let bulu = state.getPokemonID(tskHome, 0)
+    let scizor = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(bulu, "Giga Drain")]
     state = turn(state, action)
     check(state.getPokemonState(scizor).currentHP == 246)
   
   test "Grassy - Weaken EQ / Bulldoze":
     var state = newGame(grassySurge, earthquake)
-    let bulu = state.getPokemon(tskHome, 0)
-    let chomp = state.getPokemon(tskAway, 0)
+    let bulu = state.getPokemonID(tskHome, 0)
+    let chomp = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(chomp, "Earthquake")]
     state = turn(state, action)
     check(state.getPokemonState(bulu).currentHP == 249)
@@ -280,9 +285,9 @@ suite "Auras":
 
   test "Should end on switch out":
     var state = newGame(fairyAura & technician, darkAura)
-    let xerneas = state.getPokemon(tskHome, 0)
-    let scizor = state.getPokemon(tskHome, 1)
-    let yveltal = state.getPokemon(tskAway, 0)
+    let xerneas = state.getPokemonID(tskHome, 0)
+    let scizor = state.getPokemonID(tskHome, 1)
+    let yveltal = state.getPokemonID(tskAway, 0)
     var actions = @[
       state.getSwitchAction(xerneas, scizor),
       state.getMoveAction(yveltal, "Dazzling Gleam")
@@ -292,9 +297,9 @@ suite "Auras":
 
   test "Should start on switch in":
     var state = newGame(technician & fairyAura, darkAura)
-    let scizor = state.getPokemon(tskHome, 0)
-    let xerneas = state.getPokemon(tskHome, 1)
-    let yveltal = state.getPokemon(tskAway, 0)
+    let scizor = state.getPokemonID(tskHome, 0)
+    let xerneas = state.getPokemonID(tskHome, 1)
+    let yveltal = state.getPokemonID(tskAway, 0)
     var actions = @[
       state.getSwitchAction(scizor, xerneas),
       state.getMoveAction(yveltal, "Dazzling Gleam")
@@ -306,8 +311,8 @@ suite "Moves":
 
   test "Swords Dance":
     var state = newGame(swordsDance, swordsDance)
-    let smeargleH = state.getPokemon(tskHome, 0)
-    let smeargleA = state.getPokemon(tskAway, 0)
+    let smeargleH = state.getPokemonID(tskHome, 0)
+    let smeargleA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(smeargleH, "Swords Dance")]
     state = turn(state, action)
     action = @[state.getMoveAction(smeargleH, "Headbutt")]
@@ -316,64 +321,64 @@ suite "Moves":
 
   test "Sunny Day":
     var state = newGame(sunnyDay, sunnyDay)
-    let blazeH = state.getPokemon(tskHome, 0)
+    let blazeH = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(blazeH, "Sunny Day")]
     state = turn(state, action)
     check(state.field.weather == fwkSun)
 
   test "Rain Dance":
     var state = newGame(rainDance, rainDance)
-    let ludiH = state.getPokemon(tskHome, 0)
+    let ludiH = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(ludiH, "Rain Dance")]
     state = turn(state, action)
     check(state.field.weather == fwkRain)
 
   test "Sandstorm":
     var state = newGame(sandstorm1, sandstorm1)
-    let dun = state.getPokemon(tskHome, 0)
+    let dun = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(dun, "Sandstorm")]
     state = turn(state, action)
     check(state.field.weather == fwkSand)
 
   test "Hail":
     var state = newGame(hail1, hail1)
-    let abom = state.getPokemon(tskHome, 0)
+    let abom = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(abom, "Hail")]
     state = turn(state, action)
     check(state.field.weather == fwkHail)
 
   test "Psychic Terrain":
     var state = newGame(psychicTerrain, utility)
-    let mew = state.getPokemon(tskHome, 0)
+    let mew = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(mew, "Psychic Terrain")]
     state = turn(state, action)
     check(state.field.terrain == ftkPsychic)
 
   test "Electric Terrain":
     var state = newGame(electricTerrain, utility)
-    let raikou = state.getPokemon(tskHome, 0)
+    let raikou = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(raikou, "Electric Terrain")]
     state = turn(state, action)
     check(state.field.terrain == ftkElectric)
 
   test "Misty Terrain":
     var state = newGame(mistyTerrain, utility)
-    let mew = state.getPokemon(tskHome, 0)
+    let mew = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(mew, "Misty Terrain")]
     state = turn(state, action)
     check(state.field.terrain == ftkFairy)
 
   test "Grassy Terrain":
     var state = newGame(grassyTerrain, utility)
-    let celebi = state.getPokemon(tskHome, 0)
+    let celebi = state.getPokemonID(tskHome, 0)
     var action = @[state.getMoveAction(celebi, "Grassy Terrain")]
     state = turn(state, action)
     check(state.field.terrain == ftkGrass)
 
   test "Bullet Punch":
     var state = newGame(technician, frail)
-    let scizor = state.getPokemon(tskHome, 0)
-    let lando = state.getPokemon(tskAway, 0)
+    let scizor = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
     var action = @[
       state.getMoveAction(scizor, "Bullet Punch"),
       state.getMoveAction(lando, "Earthquake")
@@ -386,17 +391,17 @@ suite "Abilities":
 
   test "Adaptability":
     var state = newGame(adaptability, adaptability)
-    let dragH = state.getPokemon(tskHome, 0)
-    let dragA = state.getPokemon(tskAway, 0)
+    let dragH = state.getPokemonID(tskHome, 0)
+    let dragA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(dragH, "Dragon Pulse")]
     state = turn(state, action)
     check(state.getPokemonState(dragA).currentHP == 50)
 
   test "Intimidate":
     var state = newGame(intimidate, intimidate)
-    let smearH = state.getPokemon(tskHome, 0)
-    let smearA = state.getPokemon(tskAway, 0)
-    let spindA = state.getPokemon(tskAway, 1)
+    let smearH = state.getPokemonID(tskHome, 0)
+    let smearA = state.getPokemonID(tskAway, 0)
+    let spindA = state.getPokemonID(tskAway, 1)
     var action = @[state.getMoveAction(smearH, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(smearA).currentHP == 212)
@@ -451,8 +456,8 @@ suite "Abilities":
 
   test "Chlorophyll":
     var state = newGame(chlorophyll, frail)
-    let venu = state.getPokemon(tskHome, 0)
-    let lando = state.getPokemon(tskAway, 0)
+    let venu = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
     var actions = @[state.getMoveAction(venu, "Sunny Day")]
     state = turn(state, actions)
     actions = @[
@@ -465,8 +470,8 @@ suite "Abilities":
 
   test "Swift Swim":
     var state = newGame(swiftswim, frail)
-    let ludi = state.getPokemon(tskHome, 0)
-    let lando = state.getPokemon(tskAway, 0)
+    let ludi = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
     var actions = @[state.getMoveAction(ludi, "Rain Dance")]
     state = turn(state, actions)
     actions = @[
@@ -479,8 +484,8 @@ suite "Abilities":
 
   test "Sand Rush":
     var state = newGame(sandrush, frail)
-    let drill = state.getPokemon(tskHome, 0)
-    let lando = state.getPokemon(tskAway, 0)
+    let drill = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
     var actions = @[state.getMoveAction(drill, "Sandstorm")]
     state = turn(state, actions)
     actions = @[
@@ -493,8 +498,8 @@ suite "Abilities":
 
   test "Slush Rush":
     var state = newGame(slushrush, frail)
-    let slash = state.getPokemon(tskHome, 0)
-    let lando = state.getPokemon(tskAway, 0)
+    let slash = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
     var actions = @[state.getMoveAction(slash, "Hail")]
     state = turn(state, actions)
     actions = @[
@@ -507,8 +512,8 @@ suite "Abilities":
 
   test "Surge Surfer":
     var state = newGame(surgesurfer, frail)
-    let pika = state.getPokemon(tskHome, 0)
-    let lando = state.getPokemon(tskAway, 0)
+    let pika = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
     var actions = @[state.getMoveAction(pika, "Electric Terrain")]
     state = turn(state, actions)
     actions = @[
@@ -521,16 +526,16 @@ suite "Abilities":
 
   test "Fairy Aura":
     var state = newGame(fairyAura, darkAura)
-    let xerneas = state.getPokemon(tskHome, 0)
-    let yveltal = state.getPokemon(tskAway, 0)
+    let xerneas = state.getPokemonID(tskHome, 0)
+    let yveltal = state.getPokemonID(tskAway, 0)
     var actions = @[state.getMoveAction(xerneas, "Dazzling Gleam")]
     state = turn(state, actions)
     check(state.getPokemonState(yveltal).currentHP == 73)
 
   test "Dark Aura":
     var state = newGame(fairyAura, darkAura)
-    let xerneas = state.getPokemon(tskHome, 0)
-    let yveltal = state.getPokemon(tskAway, 0)
+    let xerneas = state.getPokemonID(tskHome, 0)
+    let yveltal = state.getPokemonID(tskAway, 0)
     var actions = @[state.getMoveAction(yveltal, "Dark Pulse")]
     state = turn(state, actions)
     check(state.getPokemonState(xerneas).currentHP == 313)
@@ -539,24 +544,24 @@ suite "Items":
 
   test "Choice Band":
     var state = newGame(choiceBand, choiceBand)
-    let spindH = state.getPokemon(tskHome, 0)
-    let spindA = state.getPokemon(tskAway, 0)
+    let spindH = state.getPokemonID(tskHome, 0)
+    let spindA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(spindH, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 137)
 
   test "Choice Specs":
     var state = newGame(choiceSpecs, choiceSpecs)
-    let spindH = state.getPokemon(tskHome, 0)
-    let spindA = state.getPokemon(tskAway, 0)
+    let spindH = state.getPokemonID(tskHome, 0)
+    let spindA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(spindH, "Hyper Voice")]
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 102)
 
   test "Choice Scarf":
     var state = newGame(choiceScarf, frail)
-    let ttar = state.getPokemon(tskHome, 0)
-    let lando = state.getPokemon(tskAway, 0)
+    let ttar = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
     var actions = @[
       state.getMoveAction(ttar, "Crunch"),
       state.getMoveAction(lando, "Earthquake")
@@ -567,8 +572,8 @@ suite "Items":
 
   test "Life Orb":
     var state = newGame(lifeOrb, lifeOrb)
-    let blazeH = state.getPokemon(tskHome, 0)
-    let blazeA = state.getPokemon(tskAway, 0)
+    let blazeH = state.getPokemonID(tskHome, 0)
+    let blazeA = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(blazeH, "Flamethrower")]
     state = turn(state, action)
     check(state.getPokemonState(blazeA).currentHP == 202)
@@ -576,8 +581,8 @@ suite "Items":
 
   test "Pinch Berries - Should be consumed":
     var state = newGame(pinchBerryAttacker, magoBerry)
-    let heatran = state.getPokemon(tskHome, 0)
-    let venu = state.getPokemon(tskAway, 0)
+    let heatran = state.getPokemonID(tskHome, 0)
+    let venu = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(heatran, "Flamethrower")]
     state = turn(state, action)
     check(state.getPokemonState(venu).currentHP == 186)
@@ -587,16 +592,16 @@ suite "Items":
 
   test "Mago Berry":
     var state = newGame(pinchBerryAttacker, magoBerry)
-    let heatran = state.getPokemon(tskHome, 0)
-    let venu = state.getPokemon(tskAway, 0)
+    let heatran = state.getPokemonID(tskHome, 0)
+    let venu = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(heatran, "Flamethrower")]
     state = turn(state, action)
     check(state.getPokemonState(venu).currentHP == 186)
 
   test "Resist Berries - Should be consumed":
     var state = newGame(occaBerryAttacker, occaBerry)
-    let heatran = state.getPokemon(tskHome, 0)
-    let venu = state.getPokemon(tskAway, 0)
+    let heatran = state.getPokemonID(tskHome, 0)
+    let venu = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(heatran, "Hidden Power Fire")]
     state = turn(state, action)
     check(state.getPokemonState(venu).currentHP == 212)
@@ -605,16 +610,16 @@ suite "Items":
 
   test "Occa Berry":
     var state = newGame(occaBerryAttacker, occaBerry)
-    let heatran = state.getPokemon(tskHome, 0)
-    let venu = state.getPokemon(tskAway, 0)
+    let heatran = state.getPokemonID(tskHome, 0)
+    let venu = state.getPokemonID(tskAway, 0)
     var action = @[state.getMoveAction(heatran, "Hidden Power Fire")]
     state = turn(state, action)
     check(state.getPokemonState(venu).currentHP == 212)
 
   test "Z moves - One Z move per game":
     var state = newGame(firiumZ, firiumZ)
-    let blazeH = state.getPokemon(tskHome, 0)
-    let blazeA = state.getPokemon(tskAway, 0)
+    let blazeH = state.getPokemonID(tskHome, 0)
+    let blazeA = state.getPokemonID(tskAway, 0)
     var action = @[
       state.getMoveAction(blazeH, "Z-Fire Blast")
     ]
@@ -627,9 +632,7 @@ suite "Items":
     state = turn(state, action)
 
   test "Firium Z":
-    var state = newGame(firiumZ, firiumZ)
-    let blazeH = state.getPokemon(tskHome, 0)
-    let blazeA = state.getPokemon(tskAway, 0)
+    gameSetup(state, firiumZ, firiumZ, blazeH, blazeA)
     var action = @[
       state.getMoveAction(blazeH, "Z-Fire Blast")
     ]

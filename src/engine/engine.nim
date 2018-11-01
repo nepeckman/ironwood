@@ -76,7 +76,7 @@ proc turnTeardown(state: State) =
 proc executeSwitch(state: State, pokemon: Pokemon, team: Team, action: Action) =
   pokemon.reset()
   team.switchPokemon(action.actingPokemonID, action.switchTargetID)
-  let switchIn = state.getPokemonObj(action.switchTargetID)
+  let switchIn = state.getPokemon(action.switchTargetID)
   if switchIn.ability.effect.activation == eakOnSwitchIn:
     state.applyAbilityEffect(switchIn)
 
@@ -102,7 +102,7 @@ proc executeAttack(state: State, pokemon: Pokemon, team: Team, action: Action) =
   pokemon.conditions[gckHasAttacked] = 1
 
 proc executeAction(state: State, action: Action) =
-  var pokemon = state.getPokemonObj(action.actingPokemonID)
+  var pokemon = state.getPokemon(action.actingPokemonID)
   var team = state.getTeam(pokemon)
   if pokemon.fainted:
     return

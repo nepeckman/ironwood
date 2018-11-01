@@ -29,7 +29,7 @@ func possibleTargets*(state: State, move: PokeMove): seq[set[AttackTargetKind]] 
 
 func possibleActions*(state: State, pokemonID: UUID): seq[Action] =
   result = @[]
-  let pokemon = state.getPokemonObj(pokemonID)
+  let pokemon = state.getPokemon(pokemonID)
   let team = state.getTeam(pokemon)
   for move in state.possibleMoves(pokemon):
     for targets in possibleTargets(state, move):
@@ -70,3 +70,6 @@ func getSwitchAction(state: State, actions: seq[Action], switchTargetID: UUID): 
 
 func getSwitchAction*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
   getSwitchAction(state, state.possibleActions(pokemonID), switchTargetID)
+
+#func getMegaEvolutionAction(state: State, pokemonID: UUID): Action =
+#  let pokemon = state.getPokemon(pokemonID)
