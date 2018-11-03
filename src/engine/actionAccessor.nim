@@ -71,5 +71,12 @@ func getSwitchAction(state: State, actions: seq[Action], switchTargetID: UUID): 
 func getSwitchAction*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
   getSwitchAction(state, state.possibleActions(pokemonID), switchTargetID)
 
-#func getMegaEvolutionAction(state: State, pokemonID: UUID): Action =
-#  let pokemon = state.getPokemon(pokemonID)
+func getMegaEvolutionAction(state: State, pokemonID: UUID): Action =
+  let pokemon = state.getPokemon(pokemonID)
+  let team = state.getTeam(pokemon)
+  if pokemon.item.kind == ikMegaStone:
+    if pokemon.item.associatedPokemonName == pokemon.name and not team.isMegaUsed:
+        return newMegaAction(pokemonID)
+  var error = new(CatchableError)
+  error.msg = "No action for mega: " & $pokemon.name
+  raise error

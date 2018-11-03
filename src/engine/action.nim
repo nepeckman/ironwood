@@ -19,11 +19,14 @@ type
     of akSwitchSelection: switchTargetID*: UUID
     of akMegaEvolution: discard
 
-func newMoveAction*(actingPokemonID: UUID, move: PokeMove, targets: set[AttackTargetKind] = {}): Action =
+func newMoveAction*(actingPokemonID: UUID, move: PokeMove, targets: set[AttackTargetKind]): Action =
   Action(kind: akMoveSelection, actingPokemonID: actingPokemonID, move: move, targets: targets)
 
 func newSwitchAction*(actingPokemonID, targetPokemonID: UUID): Action = 
   Action(kind: akSwitchSelection, actingPokemonID: actingPokemonID, switchTargetID: targetPokemonID)
+
+func newMegaAction*(actingPokemonID: UUID): Action =
+  Action(kind: akMegaEvolution, actingPokemonID: actingPokemonID)
 
 func priority*(action: Action): int =
   if action.kind == akMoveSelection: action.move.priority
