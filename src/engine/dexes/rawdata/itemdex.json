@@ -16,6 +16,11 @@
         "basePokemon": "Blaziken",
         "megaPokemon": "Blaziken-Mega"
     },
+    "Charizardite Y": {
+        "kind": "Mega Stone",
+        "basePokemon": "Charizard",
+        "megaPokemon": "Charizard-Mega-Y"
+    },
     "Mago Berry": {
         "kind": "Pinch Berry",
         "activationPercent": 25,

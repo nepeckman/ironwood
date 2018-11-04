@@ -13,6 +13,8 @@ func name*(a: Ability): string =
 func effect*(a: Ability): Effect =
   if isNil(a): nil else: a.effect
 
+func activation*(a: Ability): EffectActivationKind = effect(a).activation
+
 func `==`*(a: Ability, s: string): bool =
   if isNil(a): "" == s else: a.name == s
 

@@ -105,6 +105,8 @@ proc executeMegaEvo(state: State, pokemon: Pokemon) =
   if not team.isMegaUsed:
     pokemon.megaEvolve()
     team.isMegaUsed = true
+    if pokemon.ability.activation == eakOnSwitchIn:
+      state.applyAbilityEffect(pokemon)
 
 proc executeAction(state: State, action: Action) =
   var pokemon = state.getPokemon(action.actingPokemonID)
@@ -137,7 +139,7 @@ proc newGame*(homeTeamString, awayTeamString: string): State =
   var activePokemon = state.allActivePokemon
   activePokemon.sort((p1, p2) => cmp(p1.speed(state.field), p2.speed(state.field)), SortOrder.Descending)
   for pokemon in activePokemon:
-    if pokemon.ability.effect.activation == eakOnSwitchIn:
+    if pokemon.ability.activation == eakOnSwitchIn:
       state.applyAbilityEffect(pokemon)
   state.assessWeather()
   state.assessAuras()

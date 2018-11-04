@@ -656,3 +656,13 @@ suite "Items":
     ]
     state = turn(state, action)
     checkHP(state, blazeA, 193)
+
+  test "Charizardite Y":
+    gameSetup(state, charizarditeY, charizarditeY, megaCharizard, charizard)
+    var actions = @[
+      state.megaEvolve(megaCharizard),
+      state.attack(megaCharizard, "Fire Blast")
+    ]
+    state = turn(state, actions)
+    checkHP(state, charizard, 131)
+    check(state.field.weather == fwkSun)

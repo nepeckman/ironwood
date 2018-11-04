@@ -70,6 +70,11 @@ Blaziken @ Blazikenite
 - Fire Blast
 """
 
+const charizarditeY* = """
+Charizard @ Charizardite Y
+- Fire Blast
+"""
+
 const sunnyDay* = """
 Blaziken @
 - Sunny Day
