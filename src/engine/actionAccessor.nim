@@ -1,5 +1,5 @@
 import
-  math, sequtils, sets, sugar,
+  math, sequtils, sets, sugar, options,
   uuids,
   gameData/gameData,
   gameObjects/gameObjects,
@@ -16,6 +16,20 @@ func moveValidator(state: State, pokemon: Pokemon, move: PokeMove): bool =
 func switchValidator(state: State, actingPokemon, teammate: Pokemon): bool =
   return not state.isActive(teammate) and not teammate.fainted and
     state.isActive(actingPokemon) and not actingPokemon.fainted
+
+func targetValidator(state: State, move: PokeMove, targets: set[AttackTargetKind]): bool =
+  if move.target in {pmtUser, pmtAlly, pmtSelectedTarget} and targets.card > 1:
+    return false
+  if move.target == pmtUser and `not`(atkSelf in targets):
+    return false
+  if move.target == pmtAlly and `not`(atkAlly in targets):
+    return false
+  if move.target == pmtSelectedTarget and atkSelf in targets:
+    return false
+  for target in targets:
+    if state.field.format == ffkSingles and target in {atkEnemyTwo, atkAlly}:
+      return false
+  return true
 
 func defaultTargets(state: State, move: PokeMove): set[AttackTargetKind] =
   case move.target
@@ -39,35 +53,35 @@ func idsToTargets(state: State, actingPokemon: Pokemon, ids: HashSet[UUID]): set
       let target = if targetPokemon == enemyTeam[0]: atkEnemyOne else: atkEnemyTwo
       result.incl(target)
 
-func getMoveAction*(state: State, pokemonID: UUID, moveStr: string, targetIDs: HashSet[UUID] = initSet[UUID]()): Action =
+func getMoveAction*(state: State, pokemonID: UUID, moveStr: string, targetIDs: HashSet[UUID] = initSet[UUID]()): Option[Action] =
   let pokemon = state.getPokemon(pokemonID)
   let moveIdx = pokemon.moves.find(moveStr)
   let move = if moveIdx > -1: pokemon.moves[moveIdx] else: nil
   if isNil(move) or not state.moveValidator(pokemon, move):
-    var error = new(CatchableError)
-    error.msg = "No action for move: " & moveStr
-    raise error
-  if targetIDs.len == 0:
-    result = newMoveAction(pokemonID, move, state.defaultTargets(move))
+    result = none[Action]()
+  elif targetIDs.len == 0:
+    result = some(newMoveAction(pokemonID, move, state.defaultTargets(move)))
   else:
-    # validate targets
-    result = newMoveAction(pokemonID, move, state.idsToTargets(pokemon, targetIDs))
+    let targets = state.idsToTargets(pokemon, targetIDs)
+    result =
+      if state.targetValidator(move, targets): some(newMoveAction(pokemonID, move, targets))
+      else: none[Action]()
 
-func getSwitchAction*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
+func getSwitchAction*(state: State, pokemonID: UUID, switchTargetID: UUID): Option[Action] =
   let actingPokemon = state.getPokemon(pokemonID)
   let teammate = state.getPokemon(switchTargetID)
   if state.switchValidator(actingPokemon, teammate):
-    return newSwitchAction(pokemonID, switchTargetID)
-  var error = new(CatchableError)
-  error.msg = "No action for switch: " & teammate.name
-  raise error
+    result = some(newSwitchAction(pokemonID, switchTargetID))
+  else:
+    result = none[Action]()
 
-func getMegaEvolutionAction(state: State, pokemonID: UUID): Action =
+func getMegaEvolutionAction*(state: State, pokemonID: UUID): Option[Action] =
   let pokemon = state.getPokemon(pokemonID)
   let team = state.getTeam(pokemon)
-  if pokemon.item.kind == ikMegaStone:
-    if pokemon.item.associatedPokemonName == pokemon.name and not team.isMegaUsed:
-        return newMegaAction(pokemonID)
-  var error = new(CatchableError)
-  error.msg = "No action for mega: " & $pokemon.name
-  raise error
+  if pokemon.item.kind == ikMegaStone and
+    pokemon.item.associatedPokemonName == pokemon.name and
+    not team.isMegaUsed:
+        result = some(newMegaAction(pokemonID))
+  else: result = none[Action]()
+
+export options
