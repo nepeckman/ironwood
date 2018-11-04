@@ -86,7 +86,7 @@ proc executeAttack(state: State, pokemon: Pokemon, team: Team, action: Action) =
   for target in targets:
     let damage = getAvgDamage(pokemon, target, action.move, state.field)
     target.takeDamage(damage)
-    #TODO: This will break in doubles for moves that target the attacker
+    #This might break in doubles for moves that target the attacker
     if move.effect.activation == eakAfterAttack:
       state.applyMoveEffect(pokemon, target, move.effect)
     if target.defenderItemActivates(move):

@@ -121,10 +121,6 @@ func calculateAttack(attacker: Pokemon, move: PokeMove, defender: Pokemon, field
   var attack: int
   var attackSource = if move == "Foul Play": defender else: attacker
 
-  if (pmmUsesHighestAtkStat in move.modifiers):
-    move.category = if attackSource.attack >= attackSource.spattack: pmcPhysical else: pmcSpecial
-    #TODO: move this to move transformation
-
   attack = if move.category == pmcPhysical: attackSource.attack else: attackSource.spattack
   if not defAbilitySuppressed and defender.ability == "Unaware":
     attack =

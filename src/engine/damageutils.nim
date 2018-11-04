@@ -69,7 +69,7 @@ func hasImmunityViaAbility*(defender: Pokemon, move: PokeMove, typeEffectiveness
     (defender.ability == "Soundproof" and pmmSound in move.modifiers) or
     (defender.ability in ["Queenly Majesty", "Dazzling"] and move.priority > 0)
 
-func changeTypeWithAbility(move: PokeMove, ability: Ability) =
+proc changeTypeWithAbility(move: PokeMove, ability: Ability) =
   if move.pokeType == ptNormal:
     if ability == "Aerilate":
       move.pokeType = ptFlying
@@ -171,13 +171,14 @@ func isItemDependant(move: PokeMove): bool =
 
 func damageStepMoveTransformation*(move: PokeMove, attacker, defender: Pokemon, field: Field): PokeMove =
   result = copy(move)
-  #TODO: return new moves by querying the movedex
   if move == "Weather Ball": result.weatherBallTransformation(field.weather)
   if move.isItemDependant() : result.changeTypeWithItem(attacker.item)
   if move == "Nature Power": result.naturePowerTransformation(field.terrain)
   if move == "Revelation Dance": result.pokeType = attacker.pokeType1
   if attacker.hasTypeChangingAbility(): result.changeTypeWithAbility(attacker.ability)
   result.basePower = if pmmVariablePower in move.modifiers: variableBasePower(move, attacker, defender, field) else: move.basePower
+  if pmmUsesHighestAtkStat in move.modifiers:
+    result.category = if attacker.attack >= attacker.spattack: pmcPhysical else: pmcSpecial
 
 func isAuraBoosted*(move: PokeMove, field: Field): bool =
   (fakDark in field.auras and move.pokeType == ptDark) or

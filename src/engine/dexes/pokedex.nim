@@ -8,7 +8,6 @@ const pokedexString = staticRead("rawdata/pokedex" & fileSuffix)
 let pokedex = parseJson(pokedexString)
 
 proc getPokemonData*(name: string): PokemonData =
-  #TODO: handle missing pokemon
   let pokeData = pokedex[name]
   let statsJson = pokeData["bs"]
   let stats: PokeStats = (

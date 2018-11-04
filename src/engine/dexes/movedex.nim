@@ -8,7 +8,6 @@ const movedexString = staticRead("rawdata/movedex" & fileSuffix)
 let movedex = parseJson(movedexString)
   
 proc getPokeMove*(name: string): PokeMove =
-  #TODO: handle missing move
   let moveData = movedex[name]
   let category = 
     if moveData.hasKey("category"):

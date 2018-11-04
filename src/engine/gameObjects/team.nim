@@ -26,8 +26,7 @@ proc switchPokemon*(team: Team, actingPokemonID, switchTargetID: UUID) =
   team.members[actingIdx] = team.members[switchIdx]
   team.members[switchIdx] = tmp
 
-func position*(team: Team, pokemon: Pokemon): int =
-  team.members.find(pokemon) #TODO throw error
+func position*(team: Team, pokemon: Pokemon): int = team.members.find(pokemon)
 
 func `[]`*(team: Team, idx: int): Pokemon =
   if idx < team.members.len: team.members[idx]

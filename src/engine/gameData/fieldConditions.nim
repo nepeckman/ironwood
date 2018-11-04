@@ -11,8 +11,8 @@ type
 
   FieldSideEffect* = enum #Effects targeting just one side
     fseLightScreen, fseReflect, fseAuroraVeil, fseStealthRocks,
-    fseSpikes, fseToxicSpikes, fseTailwind
-    #TODO: add pledge effects
+    fseSpikes, fseToxicSpikes, fseTailwind,
+    fsePledgeRainbow, fsePledgeFireSea, fsePledgeSwamp
 
   FieldFormatKind* = enum
     ffkSingles, ffkDoubles, ffkTriples, ffkRotation

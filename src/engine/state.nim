@@ -18,8 +18,6 @@ func copy*(state: State): State =
     field: copy(state.field)
   )
 
-#TODO PokemonObj -> Pokemon, Pokemon -> PokemonID
-
 ## Team accessors
 func getTeam*(state: State, side: TeamSideKind): Team =
   if side == tskHome: state.homeTeam else: state.awayTeam
