@@ -63,5 +63,6 @@ proc parseTeam*(teamString: string, side: TeamSideKind): Team =
       level: token.level, evs: token.evs, ivs: token.ivs, nature: token.nature
     )
     let data = getPokemonData(token.name)
-    pokemonSeq.add(makePokemon(data, pokeSet, side))
+    let formeData = getFormeData(token.name)
+    pokemonSeq.add(makePokemon(data, pokeSet, side, formeData))
   makeTeam(pokemonSeq, side)

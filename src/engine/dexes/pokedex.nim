@@ -1,7 +1,7 @@
 import
-  json, os,
-  ../gameData/[pokemonData, poketype],
-  dexutils
+  json, os, tables,
+  ../gameData/[pokemonData, poketype, ability],
+  abilitydex, dexutils
 
 const pokedexString = staticRead("rawdata/pokedex" & fileSuffix)
 
@@ -25,5 +25,15 @@ proc getPokemonData*(name: string): PokemonData =
     if pokeData.hasKey("t2"): toPokeType(pokeData["t2"].getStr())
     else: ptNull
   let weight = pokeData["w"].getFloat()
+  let ability =
+    if pokeData.hasKey("ab"): getAbility(pokeData["ab"].getStr())
+    else: nil
 
-  newPokemonData(name, pokeType1, pokeType2, stats, weight, {})
+  result = newPokemonData(name, pokeType1, pokeType2, stats, ability, weight, {})
+
+proc getFormeData*(name: string): Table[string, PokemonData] =
+  result = initTable[string, PokemonData]()
+  let pokeData = pokedex[name]
+  if pokeData.hasKey("formes") and pokeData["formes"].kind == JArray:
+    for forme in pokeData["formes"]:
+      result[forme.getStr()] = getPokemonData(forme.getStr())

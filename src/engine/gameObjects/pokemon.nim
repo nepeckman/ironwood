@@ -7,7 +7,8 @@ type
   Pokemon* = ref object
     uuid*: UUID
     data: PokemonData
-    pokeSet: PokemonSet
+    formeData*: Table[string, PokemonData]
+    pokeSet*: PokemonSet
     pokeTypes: set[PokeType]
     side*: TeamSideKind
     stats: PokeStats
@@ -19,13 +20,13 @@ type
     conditions*: Table[GeneralConditionKind, int]
     previousMove*: PokeMove
 
-proc makePokemon*(data: PokemonData, pokeSet: PokemonSet, side: TeamSideKind): Pokemon =
-
+proc makePokemon*(data: PokemonData, pokeSet: PokemonSet, side: TeamSideKind, formeData: Table[string, PokemonData]): Pokemon =
   let uuid = genUUID()
   let stats = calculateStats(data, pokeSet)
   Pokemon(
     uuid: uuid,
     data: data,
+    formeData: formeData,
     pokeSet: pokeSet,
     pokeTypes: {data.pokeType1, data.pokeType2},
     side: side,
@@ -43,6 +44,7 @@ func copy*(pokemon: Pokemon): Pokemon =
   Pokemon(
     uuid: pokemon.uuid,
     data: pokemon.data,
+    formeData: pokemon.formeData,
     pokeSet: pokemon.pokeSet,
     pokeTypes: pokemon.pokeTypes,
     side: pokemon.side,
@@ -67,6 +69,7 @@ func gender*(mon: Pokemon): PokeGenderKind = mon.pokeSet.gender
 
 func item*(mon: Pokemon): Item = mon.currentItem
 func ability*(mon: Pokemon): Ability = mon.currentAbility
+proc `ability=`*(mon: Pokemon, ability: Ability) = mon.currentAbility = ability
 
 func zMoves(mon: Pokemon): seq[PokeMove] =
   if not mon.item.isCustomZCrystal:
@@ -189,5 +192,19 @@ proc reset*(mon: Pokemon) =
   mon.resetAbility()
   mon.previousMove = nil
   mon.boosts = (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0)
+
+proc transform*(pokemon: Pokemon, transformData: PokemonData, transformSet: PokemonSet = nil) =
+  if not isNil(transformSet): pokemon.pokeSet = transformSet
+  pokemon.data = transformData
+  pokemon.pokeTypes = {transformData.pokeType1, transformData.pokeType2}
+  pokemon.stats = calculateStats(transformData, pokemon.pokeSet)
+  pokemon.ability = pokemon.pokeSet.ability
+
+proc megaEvolve*(pokemon: Pokemon) =
+  if not pokemon.formeData.hasKey(pokemon.name & "-Mega"): return
+  pokemon.data = pokemon.formeData[pokemon.name & "-Mega"]
+  pokemon.pokeTypes = {pokemon.data.pokeType1, pokemon.data.pokeType2}
+  pokemon.stats = calculateStats(pokemon.data, pokemon.pokeSet)
+  pokemon.ability = pokemon.data.ability
 
 export TeamSideKind, tables

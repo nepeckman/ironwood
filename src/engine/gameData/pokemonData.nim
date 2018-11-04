@@ -22,6 +22,7 @@ type
     pokeType1: PokeType
     pokeType2: PokeType
     baseStats: PokeStats
+    ability: Ability
     weight: float
     dataFlags: set[PokemonDataFlags]
 
@@ -39,15 +40,17 @@ func name*(data: PokemonData): string = data.name
 func pokeType1*(data: PokemonData): PokeType = data.pokeType1
 func pokeType2*(data: PokemonData): PokeType = data.pokeType2
 func baseStats*(data: PokemonData): PokeStats = data.baseStats
+func ability*(data: PokemonData): Ability = data.ability
 func weight*(data: PokemonData): float = data.weight
 func dataFlags*(data: PokemonData): set[PokemonDataFlags] = data.dataFlags
 
-func newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: PokeStats, 
+func newPokemonData*(name: string, pokeType1, pokeType2: PokeType, baseStats: PokeStats, ability: Ability,
   weight: float, dataFlags: set[PokemonDataFlags]): PokemonData =
   PokemonData(
     name: name,
     pokeType1: pokeType1,
     pokeType2: pokeType2,
+    ability: ability,
     baseStats: baseStats,
     weight: weight,
     dataFlags: dataFlags

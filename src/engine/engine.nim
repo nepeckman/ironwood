@@ -72,7 +72,6 @@ proc turnTeardown(state: State) =
   state.fieldAssessment()
   state.turnConditionReset()
 
-
 proc executeSwitch(state: State, pokemon: Pokemon, team: Team, action: Action) =
   pokemon.reset()
   team.switchPokemon(action.actingPokemonID, action.switchTargetID)
@@ -101,15 +100,24 @@ proc executeAttack(state: State, pokemon: Pokemon, team: Team, action: Action) =
   pokemon.previousMove = move
   pokemon.conditions[gckHasAttacked] = 1
 
+proc executeMegaEvo(state: State, pokemon: Pokemon) =
+  let team = state.getTeam(pokemon)
+  if not team.isMegaUsed:
+    pokemon.megaEvolve()
+    team.isMegaUsed = true
+
 proc executeAction(state: State, action: Action) =
   var pokemon = state.getPokemon(action.actingPokemonID)
   var team = state.getTeam(pokemon)
   if pokemon.fainted:
     return
-  if action.kind == akSwitchSelection:
+  case action.kind
+  of akSwitchSelection:
     state.executeSwitch(pokemon, team, action)
-  else:
+  of akMoveSelection:
     state.executeAttack(pokemon, team, action)
+  of akMegaEvolution:
+    state.executeMegaEvo(pokemon)
 
 func turn*(s: State, actions: seq[Action]): State =
   var state = copy(s)
