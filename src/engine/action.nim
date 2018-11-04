@@ -28,9 +28,7 @@ func newSwitchAction*(actingPokemonID, targetPokemonID: UUID): Action =
 func newMegaAction*(actingPokemonID: UUID): Action =
   Action(kind: akMegaEvolution, actingPokemonID: actingPokemonID)
 
-func priority*(action: Action): int =
-  if action.kind == akMoveSelection: action.move.priority
-  else: 7
+func priority*(action: Action): int = action.move.priority
 
 func hash*(action: Action): Hash =
   action.actingPokemonID.hash

@@ -54,11 +54,23 @@ func isActive*(state: State, pokemon: Pokemon): bool =
   else:
     return false
 
+func cmp(state: State, p1, p2: UUID): int =
+    cmp(state.getPokemon(p1).speed(state.field),
+        state.getPokemon(p2).speed(state.field))
 
 ## Helper to determine action order
 func compareActions*(state: State, action1, action2: Action): int =
-  if action1.priority == action2.priority:
-    cmp(state.getPokemon(action1.actingPokemonID).speed(state.field), 
-        state.getPokemon(action2.actingPokemonID).speed(state.field))
-  elif action1.priority > action2.priority: 1
-  else: -1
+  case action1.kind
+  of akSwitchSelection:
+    case action2.kind
+    of akSwitchSelection: cmp(state, action1.actingPokemonID, action2.actingPokemonID)
+    else: 1
+  of akMegaEvolution:
+    case action2.kind
+    of akSwitchSelection: -1
+    of akMegaEvolution: cmp(state, action1.actingPokemonID, action2.actingPokemonID)
+    else: 1
+  of akMoveSelection:
+    case action2.kind
+    of akMoveSelection: cmp(action1.priority, action2.priority)
+    else: -1
