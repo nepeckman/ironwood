@@ -11,6 +11,11 @@
         "kind": "Z Crystal",
         "type": "Fire"
     },
+    "Blazikenite": {
+        "kind": "Mega Stone",
+        "basePokemon": "Blaziken",
+        "megaPokemon": "Blaziken-Mega"
+    },
     "Mago Berry": {
         "kind": "Pinch Berry",
         "activationPercent": 25,

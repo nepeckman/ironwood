@@ -65,6 +65,11 @@ Blaziken @ Firium Z
 - Fire Blast
 """
 
+const blazikenite* = """
+Blaziken @ Blazikenite
+- Fire Blast
+"""
+
 const sunnyDay* = """
 Blaziken @
 - Sunny Day

@@ -79,7 +79,7 @@ func getMegaEvolutionAction*(state: State, pokemonID: UUID): Option[Action] =
   let pokemon = state.getPokemon(pokemonID)
   let team = state.getTeam(pokemon)
   if pokemon.item.kind == ikMegaStone and
-    pokemon.item.associatedPokemonName == pokemon.name and
+    pokemon.item.basePokemonName == pokemon.name and
     not team.isMegaUsed:
         result = some(newMegaAction(pokemonID))
   else: result = none[Action]()

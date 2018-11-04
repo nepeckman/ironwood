@@ -201,7 +201,7 @@ proc transform*(pokemon: Pokemon, transformData: PokemonData, transformSet: Poke
   pokemon.ability = pokemon.pokeSet.ability
 
 proc megaEvolve*(pokemon: Pokemon) =
-  if not pokemon.formeData.hasKey(pokemon.name & "-Mega"): return
+  if pokemon.item.kind != ikMegaStone or not pokemon.formeData.hasKey(pokemon.item.megaPokemonName): return
   pokemon.data = pokemon.formeData[pokemon.name & "-Mega"]
   pokemon.pokeTypes = {pokemon.data.pokeType1, pokemon.data.pokeType2}
   pokemon.stats = calculateStats(pokemon.data, pokemon.pokeSet)

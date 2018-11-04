@@ -18,7 +18,8 @@ type
       ikDrive, ikMemory, ikPlate: associatedType: PokeType
     of ikTerrainSeed: associatedTerrain: FieldTerrainKind
     of ikPinchBerry: activationPercent: int
-    of ikMegaStone, ikPokemonExclusive: associatedPokemonName: string
+    of ikPokemonExclusive: associatedPokemonName: string
+    of ikMegaStone: basePokemonName, megaPokemonName: string
     of ikLifeOrb, ikLeftovers, ikShellBell, ikFocusSash, ikEviolite,
       ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb,
       ikRockyHelmet, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique: discard
@@ -28,6 +29,9 @@ func newUniqueItem*(name: string, effect: Effect = nil, consumable = false): Ite
 
 func newZCrystal*(name: string, associatedType: PokeType): Item =
   Item(name: name, consumable: false, kind: ikZCrystal, associatedType: associatedType)
+
+func newMegaStone*(name, basePokemonName, megaPokemonName: string): Item =
+  Item(name: name, consumable: false, kind: ikMegaStone, basePokemonName: basePokemonName, megaPokemonName: megaPokemonName)
 
 func newPinchBerry*(name: string, activationPercent: int, effect: Effect): Item =
   Item(name: name, consumable: true, kind: ikPinchBerry, activationPercent: activationPercent, effect: effect)
@@ -52,6 +56,8 @@ func associatedTerrain*(item: Item): FieldTerrainKind = item.associatedTerrain
 func activationPercent*(item: Item): int = item.activationPercent
 func restorePercent*(item: Item): int = item.restorePercent
 func associatedPokemonName*(item: Item): string = item.associatedPokemonName
+func basePokemonName*(item: Item): string = item.basePokemonName
+func megaPokemonName*(item: Item): string = item.megaPokemonName
 
 func `==`*(item: Item, s: string): bool =
   if isNil(item): "" == s else: item.name == s

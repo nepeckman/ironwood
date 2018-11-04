@@ -16,6 +16,9 @@ func switch(state: State, actingPokemon, switchTarget: UUID): Action =
 func attack(state: State, pokemonID: UUID, moveStr: string, targetIDs: HashSet[UUID] = initSet[UUID]()): Action =
   state.getMoveAction(pokemonID, moveStr, targetIDs).get()
 
+func megaEvolve(state: State, pokemonID: UUID): Action =
+  state.getMegaEvolutionAction(pokemonID).get()
+
 suite "Sanity":
 
   test "engine":
@@ -644,3 +647,12 @@ suite "Items":
     ]
     state = turn(state, action)
     check(state.getPokemonState(blazeA).currentHP == 144)
+
+  test "Blazikenite":
+    gameSetup(state, blazikenite, blazikenite, blazeH, blazeA)
+    var action = @[
+      state.megaEvolve(blazeH),
+      state.attack(blazeH, "Fire Blast")
+    ]
+    state = turn(state, action)
+    checkHP(state, blazeA, 193)

@@ -24,4 +24,5 @@ proc getItem*(name: string): Item =
   of ikZCrystal: newZCrystal(name, toPokeType(itemData["type"].getStr()))
   of ikPinchBerry: newPinchBerry(name, itemData["activationPercent"].getInt(), effect)
   of ikResistBerry: newResistBerry(name, toPokeType(itemData["associatedType"].getStr()))
+  of ikMegaStone: newMegaStone(name, itemData["basePokemon"].getStr(), itemData["megaPokemon"].getStr())
   else: newUniqueItem(name, effect, consumable)
