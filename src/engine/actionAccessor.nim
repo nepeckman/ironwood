@@ -1,5 +1,5 @@
 import
-  math, sequtils, sugar,
+  math, sequtils, sets, sugar,
   uuids,
   gameData/gameData,
   gameObjects/gameObjects,
@@ -17,48 +17,41 @@ func switchValidator(state: State, actingPokemon, teammate: Pokemon): bool =
   return not state.isActive(teammate) and not teammate.fainted and
     state.isActive(actingPokemon) and not actingPokemon.fainted
 
-func possibleMoves*(state: State, pokemon: Pokemon): seq[PokeMove] =
-  pokemon.moves.filter((move) => state.moveValidator(pokemon, move))
-
-func possibleTargets*(state: State, move: PokeMove): seq[set[AttackTargetKind]] =
+func defaultTargets(state: State, move: PokeMove): set[AttackTargetKind] =
   case move.target
-  of pmtUser: @[{atkSelf}]
-  of pmtAlly: @[{atkAlly}]
-  of pmtAllOpponents: 
-    if state.field.format == ffkSingles: @[{atkEnemyOne}] else: @[{atkEnemyOne, atkEnemyTwo}]
+  of pmtUser: {atkSelf}
+  of pmtAlly: {atkAlly}
+  of pmtSelectedTarget: {atkEnemyOne}
+  of pmtAllOpponents:
+    if state.field.format == ffkSingles: {atkEnemyOne} else: {atkEnemyOne, atkEnemyTwo}
   of pmtAllOthers:
-    if state.field.format == ffkSingles: @[{atkEnemyOne}] else: @[{atkAlly, atkEnemyOne, atkEnemyTwo}]
-  of pmtSelectedTarget:
-    if state.field.format == ffkSingles: @[{atkEnemyOne}] else: @[{atkAlly}, {atkEnemyOne}, {atkEnemyTwo}]
+    if state.field.format == ffkSingles: {atkEnemyOne} else: {atkAlly, atkEnemyOne, atkEnemyTwo}
 
-func possibleActions*(state: State, pokemonID: UUID): seq[Action] =
-  result = @[]
+func idsToTargets(state: State, actingPokemon: Pokemon, ids: HashSet[UUID]): set[AttackTargetKind] =
+  let allyTeam = state.getTeam(actingPokemon)
+  let enemyTeam = state.getOpposingTeam(actingPokemon)
+  for id in ids:
+    let targetPokemon = state.getPokemon(id)
+    if targetPokemon.side == allyTeam:
+      let target = if targetPokemon == actingPokemon: atkSelf else: atkAlly
+      result.incl(target)
+    else:
+      let target = if targetPokemon == enemyTeam[0]: atkEnemyOne else: atkEnemyTwo
+      result.incl(target)
+
+func getMoveAction*(state: State, pokemonID: UUID, moveStr: string, targetIDs: HashSet[UUID] = initSet[UUID]()): Action =
   let pokemon = state.getPokemon(pokemonID)
-  let team = state.getTeam(pokemon)
-  for move in state.possibleMoves(pokemon):
-    for targets in possibleTargets(state, move):
-      result.add(newMoveAction(pokemon.uuid, move, targets))
-
-func possibleActions*(state: State, pokemonIDs: seq[UUID]): seq[Action] =
-  result = @[]
-  for id in pokemonIDs:
-    result = result.concat(state.possibleActions(id))
-
-func possibleActions*(state: State, side: TeamSideKind): seq[Action] =
-  let activeMons =
-    if side == tskHome: state.homeActivePokemon() else: state.awayActivePokemon()
-  state.possibleActions(activeMons)
-
-func getMoveAction(actions: seq[Action], move: string): Action = 
-  for action in actions:
-    if action.kind == akMoveSelection and action.move == move:
-      return action
-  var error = new(CatchableError)
-  error.msg = "No action for move: " & move
-  raise error
-
-func getMoveAction*(state: State, pokemonID: UUID, move: string): Action =
-  getMoveAction(state.possibleActions(pokemonID), move)
+  let moveIdx = pokemon.moves.find(moveStr)
+  let move = if moveIdx > -1: pokemon.moves[moveIdx] else: nil
+  if isNil(move) or not state.moveValidator(pokemon, move):
+    var error = new(CatchableError)
+    error.msg = "No action for move: " & moveStr
+    raise error
+  if targetIDs.len == 0:
+    result = newMoveAction(pokemonID, move, state.defaultTargets(move))
+  else:
+    # validate targets
+    result = newMoveAction(pokemonID, move, state.idsToTargets(pokemon, targetIDs))
 
 func getSwitchAction*(state: State, pokemonID: UUID, switchTargetID: UUID): Action =
   let actingPokemon = state.getPokemon(pokemonID)

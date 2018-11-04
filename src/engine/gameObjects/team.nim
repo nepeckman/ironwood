@@ -36,6 +36,10 @@ func `[]`*(team: Team, idx: int): Pokemon =
 func get*(team: Team, idx: int): UUID =
   team[idx].uuid
 
+func `==`*(t1, t2: Team): bool = t1.side == t2.side
+func `==`*(team: Team, side: TeamSideKind): bool = team.side == side
+func `==`*(side: TeamSideKind, team: Team): bool = team.side == side
+
 iterator items*(team: Team): Pokemon =
   for pokemon in team.members:
     yield pokemon
