@@ -27,7 +27,7 @@ proc applyMoveEffect*(state: State, actingPokemon, attackTarget: Pokemon, effect
 proc applyAbilityEffect*(state: State, actingPokemon: Pokemon) =
   let effect = actingPokemon.ability.effect
   if effect.target == etkPokemon:
-    let targets = state.activePokemonObj(state.getOpposingTeam(actingPokemon))
+    let targets = state.activePokemon(state.getOpposingTeam(actingPokemon))
     if effect.kind == ekBoost:
       for target in targets:
         target.applyBoosts(effect.boostChange)

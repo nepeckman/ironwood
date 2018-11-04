@@ -5,7 +5,7 @@ import
   state, action, damage, effectEngine, actionAccessor, pokemonAccessor, setParser
 
 proc assessWeather*(state: State) =
-  let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
+  let activeAbilities = state.allActivePokemon().map((p) => p.ability)
   var constantWeatherMaintained, weatherSuppressed = false
 
   if state.field.rawWeather.strongWeather:
@@ -25,7 +25,7 @@ proc assessWeather*(state: State) =
 
 proc assessAuras(state: State) =
   let activeAuras = state.field.auras
-  let activeAbilities = state.allActivePokemonObj().map((p) => p.ability)
+  let activeAbilities = state.allActivePokemon().map((p) => p.ability)
   var darkAuraActive, fairyAuraActive = false
   for ability in activeAbilities:
     if ability == "Dark Aura":
@@ -48,7 +48,7 @@ proc weatherDamage(pokemon: Pokemon) =
   pokemon.takeDamage(damage)
 
 proc fieldEffect(state: State, effectFn: (Pokemon) -> void, f: (Pokemon) -> bool) =
-    var effectedPokemon = state.allActivePokemonObj.filter(f)
+    var effectedPokemon = state.allActivePokemon.filter(f)
     effectedPokemon.sort((p1, p2) => cmp(p1.speed(state.field), p2.speed(state.field)), SortOrder.Descending)
     for pokemon in effectedPokemon:
       effectFn(pokemon)
@@ -58,7 +58,7 @@ proc fieldAssessment(state: State) =
   state.assessAuras()
 
 proc turnConditionReset(state: State) =
-  for pokemon in state.allActivePokemonObj():
+  for pokemon in state.allActivePokemon():
     for condition in pokemon.conditions.keys:
       if condition.oneTurnCondition:
         pokemon.conditions.del(condition)
@@ -126,7 +126,7 @@ proc newGame*(homeTeamString, awayTeamString: string): State =
   let homeTeam = parseTeam(homeTeamString, tskHome)
   let awayTeam = parseTeam(awayTeamString, tskAway)
   var state = State(homeTeam: homeTeam, awayTeam: awayTeam, field: makeField())
-  var activePokemon = state.allActivePokemonObj
+  var activePokemon = state.allActivePokemon
   activePokemon.sort((p1, p2) => cmp(p1.speed(state.field), p2.speed(state.field)), SortOrder.Descending)
   for pokemon in activePokemon:
     if pokemon.ability.effect.activation == eakOnSwitchIn:
