@@ -27,7 +27,7 @@ func attackerAbilityBasePowerMod(attacker: Pokemon, move: PokeMove, defender: Po
     (attacker.ability == "Iron Fist" and pmmPunch in move.modifiers): 0x1333
   elif attacker.ability == "Sheer Force" and pmmSecondaryEffect in move.modifiers: 0x14CD
   elif pmmAerilated in move.modifiers or pmmPixilated in move.modifiers or
-    pmmRefrigerated in move.modifiers or pmmGalvanized in move.modifiers: 0x1200
+    pmmRefrigerated in move.modifiers or pmmGalvanized in move.modifiers: 0x1333
   elif attacker.ability == "Strong Jaw" and pmmJaw in move.modifiers or
     attacker.ability == "Mega Launcher" and pmmPulse in move.modifiers: 0x1400
   elif attacker.ability == "Tough Claws" and pmmMakesContact in move.modifiers: 0x14CD

@@ -406,6 +406,12 @@ suite "Abilities":
     state = turn(state, action)
     check(state.getPokemonState(dragA).currentHP == 50)
 
+  test "Aerilate":
+    gameSetup(state, aerilate, aerilate, salamenceH, salamenceA)
+    var action = @[state.attack(salamenceH, "Return")]
+    state = turn(state, action)
+    state.checkHP(salamenceA, 174)
+
   test "Intimidate":
     var state = newGame(intimidate, intimidate)
     let smearH = state.getPokemonID(tskHome, 0)

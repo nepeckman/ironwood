@@ -149,7 +149,7 @@ func hasItem*(mon: Pokemon): bool = isNil(mon.item)
 func fainted*(mon: Pokemon): bool = mon.currentHP <= 0
 
 func hasTypeChangingAbility*(pokemon: Pokemon): bool =
-  pokemon.ability in ["Aerliate", "Pixilate", "Refrigerate", "Galvanize", "Liquid Voice", "Normalize"]
+  pokemon.ability in ["Aerilate", "Pixilate", "Refrigerate", "Galvanize", "Liquid Voice", "Normalize"]
 
 func hash*(pokemon: Pokemon): Hash =
   pokemon.uuid.hash

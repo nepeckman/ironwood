@@ -45,6 +45,12 @@ Ability: Adaptability
 - Dragon Pulse
 """
 
+const aerilate* = """
+Salamence-Mega @
+Ability: Aerilate
+- Return
+"""
+
 const choiceBand* = """
 Spinda @ Choice Band
 - Headbutt
