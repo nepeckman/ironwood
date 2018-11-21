@@ -412,6 +412,15 @@ suite "Abilities":
     state = turn(state, action)
     state.checkHP(salamenceA, 174)
 
+  test "Analytic":
+    gameSetup(state, analytic, aerilate, porygon, mence)
+    var actions = @[state.attack(mence, "Return"), state.attack(porygon, "Discharge")]
+    state = turn(state, actions)
+    state.checkHP(mence, 238)
+    actions = @[state.attack(porygon, "Discharge")]
+    state = turn(state, actions)
+    state.checkHP(mence, 166)
+
   test "Intimidate":
     var state = newGame(intimidate, intimidate)
     let smearH = state.getPokemonID(tskHome, 0)
@@ -424,6 +433,23 @@ suite "Abilities":
     action = @[state.switch(smearA, spindA), state.attack(smearH, "Headbutt")]
     state = turn(state, action)
     check(state.getPokemonState(spindA).currentHP == 240)
+
+  test "Air Lock":
+    var state = newGame(airLock & rainDance, drought & drizzle)
+    let rayquaza = state.getPokemonID(tskHome, 0)
+    let ludi = state.getPokemonID(tskHome, 1)
+    let torkoal = state.getPokemonID(tskAway, 0)
+    let politoed = state.getPokemonID(tskAway, 1)
+    
+    var action = @[state.attack(rayquaza, "Flamethrower")]
+    state = turn(state, action)
+    state.checkHP(torkoal, 214)
+
+    action = @[state.switch(rayquaza, ludi)]
+    state = turn(state, action)
+    action = @[state.attack(ludi, "Hydro Pump")]
+    state = turn(state, action)
+    state.checkHP(torkoal, 58)
 
   test "Drought":
     var state = newGame(drought, drought)

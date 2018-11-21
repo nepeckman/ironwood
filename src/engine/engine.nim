@@ -17,10 +17,9 @@ proc assessWeather*(state: State) =
     if not constantWeatherMaintained:
       state.field.changeWeather(fwkNone, 0)
 
-  if state.field.weatherSuppressed:
-    for ability in activeAbilities:
-      if ability.suppressesWeather:
-        weatherSuppressed = true
+  for ability in activeAbilities:
+    if ability.suppressesWeather:
+      weatherSuppressed = true
     state.field.weatherSuppressed = weatherSuppressed
 
 proc assessAuras(state: State) =

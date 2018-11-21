@@ -51,6 +51,12 @@ Ability: Aerilate
 - Return
 """
 
+const analytic* = """
+Porygon2 @
+Ability: Analytic
+- Discharge
+"""
+
 const choiceBand* = """
 Spinda @ Choice Band
 - Headbutt
@@ -79,6 +85,13 @@ Blaziken @ Blazikenite
 const charizarditeY* = """
 Charizard @ Charizardite Y
 - Fire Blast
+"""
+
+const airLock* = """
+Rayquaza @
+Ability: Air Lock
+- Water Pulse
+- Flamethrower
 """
 
 const sunnyDay* = """
