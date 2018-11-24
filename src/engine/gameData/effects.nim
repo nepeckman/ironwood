@@ -10,7 +10,7 @@ type
 
   EffectKind* = enum
     ekStatus, ekCondition, ekBoost, ekHP, ekHPPercent, ekTypeChange, ekForceSwitch, 
-    ekWeather, ekTerrain, ekNull
+    ekWeather, ekTerrain, ekUnique
 
   Effect* = ref object of RootObj
     activation: EffectActivationKind
@@ -25,7 +25,7 @@ type
     of ekForceSwitch: isRandom: bool
     of ekWeather: weather: FieldWeatherKind
     of ekTerrain: terrain: FieldTerrainKind
-    of ekNull: discard
+    of ekUnique: discard
 
 func activation*(effect: Effect): EffectActivationKind =
   if isNil(effect): eakPassive else: effect.activation
@@ -34,7 +34,7 @@ func target*(effect: Effect): EffectTargetKind =
   if isNil(effect): etkNone else: effect.target
 
 func kind*(effect: Effect): EffectKind =
-  if isNil(effect): ekNull else: effect.kind
+  if isNil(effect): ekUnique else: effect.kind
 
 func status*(effect: Effect): StatusConditionKind = effect.status
 func condition*(effect: Effect): GeneralConditionKind = effect.condition
@@ -46,6 +46,8 @@ func isRandom*(effect: Effect): bool = effect.isRandom
 func weather*(effect: Effect): FieldWeatherKind = effect.weather
 func terrain*(effect: Effect): FieldTerrainKind = effect.terrain
 
+func newUniqueEffect*(target: EffectTargetKind, activation = eakPassive): Effect =
+  Effect(target: target, activation: activation, kind: ekUnique)
 func newBoostEffect*(target: EffectTargetKind, 
                      boostChange: tuple[atk: int, def: int, spa: int, spd: int, spe: int],
                      activation = eakAfterAttack): Effect =
