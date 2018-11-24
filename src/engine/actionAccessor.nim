@@ -14,8 +14,7 @@ func moveValidator(state: State, pokemon: Pokemon, move: PokeMove): bool =
   # Check move failure, don't provide moves that will always fail
 
 func switchValidator(state: State, actingPokemon, teammate: Pokemon): bool =
-  return not state.isActive(teammate) and not teammate.fainted and
-    state.isActive(actingPokemon) and not actingPokemon.fainted
+  not state.isActive(teammate) and not teammate.fainted and state.isOnField(actingPokemon)
 
 func targetValidator(state: State, move: PokeMove, targets: set[AttackTargetKind]): bool =
   if move.target in {pmtUser, pmtAlly, pmtSelectedTarget} and targets.card > 1:

@@ -421,6 +421,19 @@ suite "Abilities":
     state = turn(state, actions)
     state.checkHP(mence, 166)
 
+  test "Beast Boost":
+    var state = newGame(beastBoost, frail & lifeOrb)
+    let kartana = state.getPokemonID(tskHome, 0)
+    let lando = state.getPokemonID(tskAway, 0)
+    let blaze = state.getPokemonID(tskAway, 1)
+    var actions = @[state.attack(kartana, "Leaf Blade")]
+    state = turn(state, actions)
+    actions = @[state.switch(lando, blaze)]
+    state = turn(state, actions)
+    actions = @[state.attack(kartana, "Leaf Blade")]
+    state = turn(state, actions)
+    state.checkHP(blaze, 123)
+
   test "Intimidate":
     var state = newGame(intimidate, intimidate)
     let smearH = state.getPokemonID(tskHome, 0)
@@ -580,6 +593,12 @@ suite "Abilities":
     var actions = @[state.attack(yveltal, "Dark Pulse")]
     state = turn(state, actions)
     check(state.getPokemonState(xerneas).currentHP == 313)
+
+  test "Aura Break":
+    gameSetup(state, auraBreak, darkAura, z, y)
+    var actions = @[state.attack(y, "Dark Pulse")]
+    state = turn(state, actions)
+    state.checkHP(z, 264)
 
 suite "Items":
 

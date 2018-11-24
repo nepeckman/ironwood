@@ -57,6 +57,12 @@ Ability: Analytic
 - Discharge
 """
 
+const beastBoost* = """
+Kartana @
+Ability: Beast Boost
+- Leaf Blade
+"""
+
 const choiceBand* = """
 Spinda @ Choice Band
 - Headbutt
@@ -266,6 +272,11 @@ Yveltal @
 Ability: Dark Aura
 - Dark Pulse
 - Dazzling Gleam
+"""
+
+const auraBreak* = """
+Zygarde @
+Ability: Aura Break
 """
 
 const pinchBerryAttacker* = """

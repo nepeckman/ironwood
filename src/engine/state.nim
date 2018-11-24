@@ -52,6 +52,19 @@ func isActive*(state: State, pokemon: Pokemon): bool =
   else:
     return false
 
+## Like isActive but doesn't check for fainting
+func isOnField*(state: State, pokemon: Pokemon): bool =
+  if isNil(pokemon):
+    return false
+  let team = state.getTeam(pokemon)
+  if team.position(pokemon) == 0 and state.field.format == ffkSingles:
+    return true
+  elif team.position(pokemon) < 2 and state.field.format == ffkDoubles:
+    return true
+  else:
+    return false
+
+
 func cmp(state: State, p1, p2: UUID): int =
     cmp(state.getPokemon(p1).speed(state.field),
         state.getPokemon(p2).speed(state.field))

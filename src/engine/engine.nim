@@ -110,7 +110,7 @@ proc executeMegaEvo(state: State, pokemon: Pokemon) =
 proc executeAction(state: State, action: Action) =
   var pokemon = state.getPokemon(action.actingPokemonID)
   var team = state.getTeam(pokemon)
-  if pokemon.fainted:
+  if pokemon.fainted and action.kind != akSwitchSelection:
     return
   case action.kind
   of akSwitchSelection:
