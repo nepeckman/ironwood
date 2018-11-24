@@ -36,6 +36,8 @@ func toEffectActivation*(str: string): EffectActivationKind =
   of "AfterAttack": eakAfterAttack
   of "OnSwitchIn": eakOnSwitchIn
   of "OnSwitchOut": eakOnSwitchOut
+  of "AfterKO": eakAfterKO
+  of "AfterFainting": eakAfterFainting
   else: eakPassive
 
 func toWeather*(weather: string): FieldWeatherKind =

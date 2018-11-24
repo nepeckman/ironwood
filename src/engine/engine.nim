@@ -92,6 +92,8 @@ proc executeAttack(state: State, pokemon: Pokemon, team: Team, action: Action) =
         state.applyItemEffect(target)
       if target.item.consumable:
         target.consumeItem()
+    if target.fainted:
+      state.afterKOAbility(pokemon, target)
   if move.isZ:
     team.isZUsed = true
   if pokemon.item.effect.activation == eakAfterAttack:
