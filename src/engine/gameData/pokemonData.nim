@@ -1,9 +1,7 @@
 import math, strutils
-import poketype, pokemove, item, ability
+import poketype, pokemove, item, ability, pokeStats
 
 type
-
-  PokeStats* = tuple[hp: int, atk: int, def: int, spa: int, spd: int, spe: int]
 
   PokeNature* = enum
     pnHardy, pnLonely, pnBrave, pnAdamant, pnNaughty,

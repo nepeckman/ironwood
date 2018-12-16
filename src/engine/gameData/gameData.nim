@@ -1,3 +1,3 @@
-import ability, condition, effects, fieldConditions, item, pokemonData, pokemove, poketype
+import ability, condition, effects, fieldConditions, item, pokemonData, pokemove, poketype, pokeStats
 
-export ability, condition, effects, fieldConditions, item, pokemonData, pokemove, poketype
+export ability, condition, effects, fieldConditions, item, pokemonData, pokemove, poketype, pokeStats

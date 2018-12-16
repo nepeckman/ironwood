@@ -1,6 +1,6 @@
 import
   json, os, tables,
-  ../gameData/[pokemonData, poketype, ability],
+  ../gameData/[pokemonData, poketype, ability, pokeStats],
   abilitydex, dexutils
 
 const pokedexString = staticRead("rawdata/pokedex" & fileSuffix)

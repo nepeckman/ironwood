@@ -1,5 +1,5 @@
 import math, hashes, uuids, sequtils, sugar, tables
-import ../gameData/[pokemonData, item, poketype, pokemove, condition, effects, ability]
+import ../gameData/[pokemonData, item, poketype, pokemove, condition, effects, ability, pokeStats]
 import field
 
 type
@@ -15,7 +15,7 @@ type
     currentHP: int
     currentItem*: Item
     currentAbility: Ability
-    boosts*: PokeStats
+    boosts*: BoostableStats
     status*: StatusConditionKind
     conditions*: Table[GeneralConditionKind, int]
     previousMove*: PokeMove
@@ -34,7 +34,7 @@ proc makePokemon*(data: PokemonData, pokeSet: PokemonSet, side: TeamSideKind, fo
     currentHP: stats.hp,
     currentItem: pokeSet.item,
     currentAbility: pokeSet.ability,
-    boosts: (hp: 0, atk: 0, def: 0, spa:0, spd: 0, spe: 0),
+    boosts: initBoostableStats(),
     status: sckHealthy,
     conditions: initTable[GeneralConditionKind, int](),
     previousMove: nil
@@ -179,9 +179,8 @@ proc changeHPByPercent*(mon: Pokemon, percent: int) =
     mon.currentHP = max(0, (mon.currentHP + damageAmount))
 
 proc addBoosts(b1, b2: int): int = min(6, (max(-6, b1 + b2)))
-proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd: int, spe: int]) =
+proc applyBoosts*(mon: Pokemon, boosts: BoostableStats) =
   mon.boosts = (
-    hp: mon.boosts.hp,
     atk: addBoosts(mon.boosts.atk, boosts.atk),
     def: addBoosts(mon.boosts.def, boosts.def),
     spa: addBoosts(mon.boosts.spa, boosts.spa),
@@ -191,7 +190,7 @@ proc applyBoosts*(mon: Pokemon, boosts: tuple[atk: int, def: int, spa: int, spd:
 proc reset*(mon: Pokemon) =
   mon.resetAbility()
   mon.previousMove = nil
-  mon.boosts = (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0)
+  mon.boosts = initBoostableStats()
 
 proc transform*(pokemon: Pokemon, transformData: PokemonData, transformSet: PokemonSet = nil) =
   if not isNil(transformSet): pokemon.pokeSet = transformSet

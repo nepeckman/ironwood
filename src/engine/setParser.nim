@@ -12,28 +12,28 @@ type
     moves: seq[string]
 
 proc parseStatSpread(statString: string, default = 0): PokeStats =
-  result = (hp: default, atk: default, def: default, spa: default, spd: default, spe: default)
+  result = initPokeStats(default)
   for stat in split(statString, '/'):
     if stat =~ peg"\s* {\d*} \s* i'hp' \s*":
-      result = (hp: parseInt(matches[0]), atk: result.atk, def: result.def, spa: result.spa, spd: result.spd, spe: result.spe)
+      result = result.update(Hp, parseInt(matches[0]))
     elif stat =~ peg"\s* {\d*} \s* i'atk' \s*":
-      result = (hp: result.hp, atk: parseInt(matches[0]), def: result.def, spa: result.spa, spd: result.spd, spe: result.spe)
+      result = result.update(Atk, parseInt(matches[0]))
     elif stat =~ peg"\s* {\d*} \s* i'def' \s*":
-      result = (hp: result.hp, atk: result.atk, def: parseInt(matches[0]), spa: result.spa, spd: result.spd, spe: result.spe)
+      result = result.update(Def, parseInt(matches[0]))
     elif stat =~ peg"\s* {\d*} \s* i'spa' \s*":
-      result = (hp: result.hp, atk: result.atk, def: result.def, spa: parseInt(matches[0]), spd: result.spd, spe: result.spe)
+      result = result.update(Spa, parseInt(matches[0]))
     elif stat =~ peg"\s* {\d*} \s* i'spd' \s*":
-      result = (hp: result.hp, atk: result.atk, def: result.def, spa: result.spa, spd: parseInt(matches[0]), spe: result.spe)
+      result = result.update(Spd, parseInt(matches[0]))
     elif stat =~ peg"\s* {\d*} \s* i'spe' \s*":
-      result = (hp: result.hp, atk: result.atk, def: result.def, spa: result.spa, spd: result.spd, spe: parseInt(matches[0]))
+      result = result.update(Spe, parseInt(matches[0]))
   
 proc tokenize(teamString: string): seq[PokeTokens] =
   result = @[]
   for line in split(teamString, '\n'):
     if line =~ peg"\s* {(\w / '-' / \s)+} \s* '@' \s* {(\w / '-' / \s)*}":
       result.add(PokeTokens(
-        name: "", item: "", ability: "", level: 100, evs: (hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0),
-        ivs: (hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31), nature: pnBashful, moves: @[])
+        name: "", item: "", ability: "", level: 100, evs: initPokeStats(0),
+        ivs: initPokeStats(31), nature: pnBashful, moves: @[])
       )
       result[result.len - 1].name = matches[0].strip
       result[result.len - 1].item = matches[1].strip
