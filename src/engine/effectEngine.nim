@@ -46,24 +46,24 @@ proc applyItemEffect*(state: State, actingPokemon: Pokemon) =
     if effect.kind == ekHPPercent:
       actingPokemon.changeHPByPercent(effect.hpPercentChange)
 
-func greater(first: int, rest: openArray[int]): bool =
-  for n in rest:
-    if first >= n:
-      return true
-  return false
+func isGreatest(stat: Stat, stats: PokeStats): bool =
+  result = true
+  for s in @[Atk, Def, Spa, Spd, Spe]:
+    if stats.get(stat) < stats.get(s):
+      result = false
 
 proc beastBoost(pokemon: Pokemon) =
   let stats = pokemon.rawStats
-  if greater(stats.atk, [stats.def, stats.spa, stats.spd, stats.spe]):
-    pokemon.applyBoosts((atk: 1, def: 0, spa: 0, spd: 0, spe: 0))
-  elif greater(stats.def, [stats.atk, stats.spa, stats.spd, stats.spe]):
-    pokemon.applyBoosts((atk: 0, def: 1, spa: 0, spd: 0, spe: 0))
-  elif greater(stats.spa, [stats.atk, stats.def, stats.spd, stats.spe]):
-    pokemon.applyBoosts((atk: 0, def: 0, spa: 1, spd: 0, spe: 0))
-  elif greater(stats.spd, [stats.atk, stats.def, stats.spa, stats.spe]):
-    pokemon.applyBoosts((atk: 0, def: 0, spa: 0, spd: 1, spe: 0))
-  elif greater(stats.spe, [stats.atk, stats.def, stats.spa, stats.spd]):
-    pokemon.applyBoosts((atk: 0, def: 0, spa: 0, spd: 0, spe: 1))
+  if isGreatest(Atk, stats):
+    pokemon.applyBoosts(initBoostableStats({Atk: 1}))
+  elif isGreatest(Def, stats):
+    pokemon.applyBoosts(initBoostableStats({Def: 1}))
+  elif isGreatest(Spa, stats):
+    pokemon.applyBoosts(initBoostableStats({Spa: 1}))
+  elif isGreatest(Spd, stats):
+    pokemon.applyBoosts(initBoostableStats({Spd: 1}))
+  elif isGreatest(Spe, stats):
+    pokemon.applyBoosts(initBoostableStats({Spe: 1}))
 
 proc afterKOAbility*(state: State, actingPokemon, faintedPokemon: Pokemon) =
   let effect = actingPokemon.ability.effect
