@@ -11,6 +11,74 @@
         "kind": "Z Crystal",
         "type": "Fire"
     },
+    "Waterium Z": {
+        "kind": "Z Crystal",
+        "type": "Water"
+    },
+    "Grassium Z": {
+        "kind": "Z Crystal",
+        "type": "Grass"
+    },
+    "Electrium Z": {
+        "kind": "Z Crystal",
+        "type": "Electric"
+    },
+    "Icium Z": {
+        "kind": "Z Crystal",
+        "type": "Ice"
+    },
+    "Psychium Z": {
+        "kind": "Z Crystal",
+        "type": "Psychic"
+    },
+    "Darkinium Z": {
+        "kind": "Z Crystal",
+        "type": "Dark"
+    },
+    "Dragonium Z": {
+        "kind": "Z Crystal",
+        "type": "Dragon"
+    },
+    "Fairium Z": {
+        "kind": "Z Crystal",
+        "type": "Fairy"
+    },
+    "Groundium Z": {
+        "kind": "Z Crystal",
+        "type": "Ground"
+    },
+    "Steelium Z": {
+        "kind": "Z Crystal",
+        "type": "Steel"
+    },
+    "Rockium Z": {
+        "kind": "Z Crystal",
+        "type": "Rock"
+    },
+    "Fightinium Z": {
+        "kind": "Z Crystal",
+        "type": "Fighting"
+    },
+    "Flyinium Z": {
+        "kind": "Z Crystal",
+        "type": "Flying"
+    },
+    "Buginium Z": {
+        "kind": "Z Crystal",
+        "type": "Bug"
+    },
+    "Poisonium Z": {
+        "kind": "Z Crystal",
+        "type": "Poison"
+    },
+    "Ghostium Z": {
+        "kind": "Z Crystal",
+        "type": "Ghost"
+    },
+    "Normalium Z": {
+        "kind": "Z Crystal",
+        "type": "Normal"
+    },
     "Blazikenite": {
         "kind": "Mega Stone",
         "basePokemon": "Blaziken",

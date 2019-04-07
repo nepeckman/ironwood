@@ -5,10 +5,13 @@ import ../../src/engine/engine
 template checkHP(state: State, pokemon: UUID, hp: int) =
   check(state.getPokemonState(pokemon).currentHP == hp)
 
-template gameSetup(state: untyped, homeString, awayString: string, homePoke, awayPoke: untyped) =
+type GameSetup = tuple[state: State, homePoke, awayPoke: UUID]
+
+template gameSetup(homeString, awayString: string): GameSetup =
   var state = newGame(homeString, awayString)
   let homePoke = state.getPokemonID(tskHome, 0)
   let awayPoke = state.getPokemonID(tskAway, 0)
+  (state: state, homePoke: homePoke, awayPoke: awayPoke)
 
 func switch(state: State, actingPokemon, switchTarget: UUID): Action =
   state.getSwitchAction(actingPokemon, switchTarget).get()
@@ -407,13 +410,13 @@ suite "Abilities":
     check(state.getPokemonState(dragA).currentHP == 50)
 
   test "Aerilate":
-    gameSetup(state, aerilate, aerilate, salamenceH, salamenceA)
+    var (state, salamenceH, salamenceA) = gameSetup(aerilate, aerilate)
     var action = @[state.attack(salamenceH, "Return")]
     state = turn(state, action)
     state.checkHP(salamenceA, 174)
 
   test "Analytic":
-    gameSetup(state, analytic, aerilate, porygon, mence)
+    var (state, porygon, mence) = gameSetup(analytic, aerilate)
     var actions = @[state.attack(mence, "Return"), state.attack(porygon, "Discharge")]
     state = turn(state, actions)
     state.checkHP(mence, 238)
@@ -595,7 +598,7 @@ suite "Abilities":
     check(state.getPokemonState(xerneas).currentHP == 313)
 
   test "Aura Break":
-    gameSetup(state, auraBreak, darkAura, z, y)
+    var (state, z, y) = gameSetup(auraBreak, darkAura)
     var actions = @[state.attack(y, "Dark Pulse")]
     state = turn(state, actions)
     state.checkHP(z, 264)
@@ -692,15 +695,115 @@ suite "Items":
     state = turn(state, action)
 
   test "Firium Z":
-    gameSetup(state, firiumZ, firiumZ, blazeH, blazeA)
-    var action = @[
-      state.attack(blazeH, "Z-Fire Blast")
-    ]
+    var (state, blazeH, blazeA) = gameSetup(firiumZ, firiumZ)
+    var action = @[state.attack(blazeH, "Z-Fire Blast")]
     state = turn(state, action)
     check(state.getPokemonState(blazeA).currentHP == 144)
 
+  test "Waterium Z":
+    var (state, ludiH, ludiA) = gameSetup(wateriumZ, wateriumZ)
+    var action = @[state.attack(ludiH, "Z-Hydro Pump")]
+    state = turn(state, action)
+    check(state.getPokemonState(ludiA).currentHP == 252)
+
+  test "Grassium Z":
+    var (state, venuH, venuA) = gameSetup(grassiumZ, grassiumZ)
+    var action = @[state.attack(venuH, "Z-Energy Ball")]
+    state = turn(state, action)
+    check(state.getPokemonState(venuA).currentHP == 250)
+
+  test "Electrium Z":
+    var (state, pikaH, pikaA) = gameSetup(electriumZ, electriumZ)
+    var action = @[state.attack(pikaH, "Z-Thunderbolt")]
+    state = turn(state, action)
+    check(state.getPokemonState(pikaA).currentHP == 108)
+
+  test "Icium Z":
+    var (state, glaceonH, glaceonA) = gameSetup(iciumZ, iciumZ)
+    var action = @[state.attack(glaceonH, "Z-Blizzard")]
+    state = turn(state, action)
+    check(state.getPokemonState(glaceonA).currentHP == 129)
+
+  test "Psychium Z":
+    var (state, mewH, mewA) = gameSetup(psychiumZ, psychiumZ)
+    var action = @[state.attack(mewH, "Z-Psychic")]
+    state = turn(state, action)
+    check(state.getPokemonState(mewA).currentHP == 238)
+
+  test "Darkium Z":
+    var (state, darkH, darkA) = gameSetup(darkiumZ, darkiumZ)
+    var action = @[state.attack(darkH, "Z-Dark Pulse")]
+    state = turn(state, action)
+    check(state.getPokemonState(darkA).currentHP == 148)
+
+  test "Dragonium Z":
+    var (state, dialgaH, dialgaA) = gameSetup(dragoniumZ, dragoniumZ)
+    var action = @[state.attack(dialgaH, "Z-Dragon Pulse")]
+    state = turn(state, action)
+    check(state.getPokemonState(dialgaA).currentHP == 74)
+
+  test "Fairium Z":
+    var (state, sylfH, sylfA) = gameSetup(fairiumZ, fairiumZ)
+    var action = @[state.attack(sylfH, "Z-Moonblast")]
+    state = turn(state, action)
+    check(state.getPokemonState(sylfA).currentHP == 153)
+  
+  test "Groundium Z":
+    var (state, mudH, mudA) = gameSetup(groundiumZ, groundiumZ)
+    var action = @[state.attack(mudH, "Z-Earthquake")]
+    state = turn(state, action)
+    check(state.getPokemonState(mudA).currentHP == 85)
+
+  test "Steelium Z":
+    var (state, metaH, metaA) = gameSetup(steeliumZ, steeliumZ)
+    var action = @[state.attack(metaH, "Z-Meteor Mash")]
+    state = turn(state, action)
+    check(state.getPokemonState(metaA).currentHP == 196)
+
+  test "Rockium Z":
+    var (state, golemH, golemA) = gameSetup(rockiumZ, rockiumZ)
+    var action = @[state.attack(golemH, "Z-Rock Slide")]
+    state = turn(state, action)
+    check(state.getPokemonState(golemA).currentHP == 225)
+
+  test "Fightinium Z":
+    var (state, luchaH, luchaA) = gameSetup(fightiniumZ, fightiniumZ)
+    var action = @[state.attack(luchaH, "Z-High Jump Kick")]
+    state = turn(state, action)
+    check(state.getPokemonState(luchaA).currentHP == 162)
+
+  test "Flyinium Z":
+    var (state, skarmH, skarmA) = gameSetup(flyiniumZ, flyiniumZ)
+    var action = @[state.attack(skarmH, "Z-Brave Bird")]
+    state = turn(state, action)
+    check(state.getPokemonState(skarmA).currentHP == 202)
+
+  test "Buginium Z":
+    var (state, beeH, beeA) = gameSetup(buginiumZ, buginiumZ)
+    var action = @[state.attack(beeH, "Z-X-Scissor")]
+    state = turn(state, action)
+    check(state.getPokemonState(beeA).currentHP == 97)
+
+  test "Poison Z":
+    var (state, beeH, beeA) = gameSetup(poisoniumZ, poisoniumZ)
+    var action = @[state.attack(beeH, "Z-Poison Jab")]
+    state = turn(state, action)
+    check(state.getPokemonState(beeA).currentHP == 97)
+
+  test "Ghostium Z":
+    var (state, mimiH, mimiA) = gameSetup(ghostiumZ, ghostiumZ)
+    var action = @[state.attack(mimiH, "Z-Shadow Ball")]
+    state = turn(state, action)
+    check(state.getPokemonState(mimiA).currentHP == 42)
+
+  test "Normalium Z":
+    var (state, snorlaxH, snorlaxA) = gameSetup(normaliumZ, normaliumZ)
+    var action = @[state.attack(snorlaxH, "Z-Body Slam")]
+    state = turn(state, action)
+    check(state.getPokemonState(snorlaxA).currentHP == 172)
+
   test "Blazikenite":
-    gameSetup(state, blazikenite, blazikenite, blazeH, blazeA)
+    var (state, blazeH, blazeA) = gameSetup(blazikenite, blazikenite)
     var action = @[
       state.megaEvolve(blazeH),
       state.attack(blazeH, "Fire Blast")
@@ -709,7 +812,7 @@ suite "Items":
     checkHP(state, blazeA, 193)
 
   test "Charizardite Y":
-    gameSetup(state, charizarditeY, charizarditeY, megaCharizard, charizard)
+    var (state, megaCharizard, charizard) = gameSetup(charizarditeY, charizarditeY)
     var actions = @[
       state.megaEvolve(megaCharizard),
       state.attack(megaCharizard, "Fire Blast")

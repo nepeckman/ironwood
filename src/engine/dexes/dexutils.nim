@@ -79,7 +79,7 @@ func toPokeType*(typeString: string): PokeType =
   of "ground": ptGround
   of "steel": ptSteel
   of "ghost": ptGhost
-  of "posion": ptPoison
+  of "poison": ptPoison
   of "bug": ptBug
   of "flying": ptFlying
   else: ptNull

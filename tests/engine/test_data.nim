@@ -83,6 +83,91 @@ Blaziken @ Firium Z
 - Fire Blast
 """
 
+const wateriumZ* = """
+Ludicolo @ Waterium Z
+- Hydro Pump
+"""
+
+const grassiumZ* = """
+Venusaur @ Grassium Z
+- Energy Ball
+"""
+
+const electriumZ* = """
+Pikachu @ Electrium Z
+- Thunderbolt
+"""
+
+const iciumZ* = """
+Glaceon @ Icium Z
+- Blizzard
+"""
+
+const psychiumZ* = """
+Mew @ Psychium Z
+- Psychic
+"""
+
+const darkiumZ* = """
+Darkrai @ Darkinium Z
+- Dark Pulse
+"""
+
+const dragoniumZ* = """
+Dialga @ Dragonium Z
+- Dragon Pulse
+"""
+
+const fairiumZ* = """
+Sylveon @ Fairium Z
+- Moonblast
+"""
+
+const groundiumZ* = """
+Mudsdale @ Groundium Z
+- Earthquake
+"""
+
+const steeliumZ* = """
+Metagross @ Steelium Z
+- Meteor Mash
+"""
+
+const rockiumZ* = """
+Golem @ Rockium Z
+- Rock Slide
+"""
+
+const fightiniumZ* = """
+Hawlucha @ Fightinium Z
+- High Jump Kick
+"""
+
+const flyiniumZ* = """
+Skarmory @ Flyinium Z
+- Brave Bird
+"""
+
+const buginiumZ* = """
+Beedrill @ Buginium Z
+- X-Scissor
+"""
+
+const poisoniumZ* = """
+Beedrill @ Poisonium Z
+- Poison Jab
+"""
+
+const ghostiumZ* = """
+Mimikyu @ Ghostium Z
+- Shadow Ball
+"""
+
+const normaliumZ* = """
+Snorlax @ Normalium Z
+- Body Slam
+"""
+
 const blazikenite* = """
 Blaziken @ Blazikenite
 - Fire Blast
