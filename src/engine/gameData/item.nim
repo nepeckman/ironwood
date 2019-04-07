@@ -1,10 +1,10 @@
 import strutils
-import poketype, fieldConditions, effects
+import poketype, fieldConditions, effects, pokemove
 
 type
 
   ItemKind* = enum
-    ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal,
+    ikResistBerry, ikGem, ikTypeBoost, ikPlate, ikMegaStone, ikZCrystal, ikCustomZCrystal,
     ikTerrainSeed, ikPinchBerry , ikLifeOrb, ikLeftovers, ikShellBell, ikPokemonExclusive, ikFocusSash,
     ikEviolite, ikAssaultVest, ikRingTarget, ikRedCard, ikWhiteHerb, ikPowerHerb, ikRockyHelmet,
     ikDrive, ikMemory, ikSafetyGoggles, ikEjectButton, ikExpertBelt, ikUnique
@@ -16,6 +16,9 @@ type
     case kind: ItemKind
     of ikGem, ikTypeBoost, ikResistBerry, ikZCrystal,
       ikDrive, ikMemory, ikPlate: associatedType: PokeType
+    of ikCustomZCrystal:
+      associatedMoveName, specificPokemonName: string
+      zMove: PokeMove
     of ikTerrainSeed: associatedTerrain: FieldTerrainKind
     of ikPinchBerry: activationPercent: int
     of ikPokemonExclusive: associatedPokemonName: string
@@ -29,6 +32,9 @@ func newUniqueItem*(name: string, effect: Effect = nil, consumable = false): Ite
 
 func newZCrystal*(name: string, associatedType: PokeType): Item =
   Item(name: name, consumable: false, kind: ikZCrystal, associatedType: associatedType)
+
+func newCustomZCrystal*(name: string, zMove: PokeMove, associatedMoveName, specificPokemonName: string): Item =
+  Item(name: name, consumable: false, kind: ikCustomZCrystal, associatedMoveName: associatedMoveName, specificPokemonName: specificPokemonName, zMove: zMove)
 
 func newMegaStone*(name, basePokemonName, megaPokemonName: string): Item =
   Item(name: name, consumable: false, kind: ikMegaStone, basePokemonName: basePokemonName, megaPokemonName: megaPokemonName)
@@ -52,6 +58,9 @@ func effect*(item: Item): Effect =
   if isNil(item): nil else: item.effect
 
 func associatedType*(item: Item): PokeType = item.associatedType
+func zMove*(item: Item): PokeMove = item.zMove
+func associatedMoveName*(item: Item): string = item.associatedMoveName
+func specificPokemonName*(item: Item): string = item.specificPokemonName
 func associatedTerrain*(item: Item): FieldTerrainKind = item.associatedTerrain
 func activationPercent*(item: Item): int = item.activationPercent
 func restorePercent*(item: Item): int = item.restorePercent
@@ -89,11 +98,3 @@ func getFlingPower*(item: Item): int =
   "Reaper Cloth", "Red Card", "Ring Target", "Shed Shell", "Silk Scarf", "Silver Powder",
   "Smooth Rock", "Soft Sand", "Soothe Bell", "White Herb", "Wide Lens", "Wise Glasses", "Zoom Lens"]: 10
   else: 0
-
-func isCustomZCrystal*(item: Item): bool =
-  item in ["Eeveeium Z"]
-
-func customZInfo*(item: Item): tuple[pokemonName: string, moveName: string] =
-  case item.name
-  of "Eeveeium Z": (pokemonName: "Eevee", moveName: "Last Resort")
-  else: (pokemonName: "", moveName: "")

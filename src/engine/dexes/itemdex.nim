@@ -1,7 +1,7 @@
 import
   json, os, strutils,
-  ../gameData/[item, poketype],
-  dexutils, effectParser
+  ../gameData/[item, poketype, pokemove],
+  dexutils, effectParser, movedex
 
 const itemdexstring = staticRead("rawdata/itemdex" & fileSuffix)
 
@@ -22,6 +22,7 @@ proc getItem*(name: string): Item =
 
   return case kind
   of ikZCrystal: newZCrystal(name, toPokeType(itemData["type"].getStr()))
+  of ikCustomZCrystal: newCustomZCrystal(name, getPokeMove(itemData["zMove"].getStr()), itemData["associatedMove"].getStr(), itemData["pokemon"].getStr())
   of ikPinchBerry: newPinchBerry(name, itemData["activationPercent"].getInt(), effect)
   of ikResistBerry: newResistBerry(name, toPokeType(itemData["associatedType"].getStr()))
   of ikMegaStone: newMegaStone(name, itemData["basePokemon"].getStr(), itemData["megaPokemon"].getStr())

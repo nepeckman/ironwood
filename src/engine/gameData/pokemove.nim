@@ -1,4 +1,4 @@
-import poketype, item, effects
+import sequtils, poketype, effects
 
 type
 
@@ -22,6 +22,7 @@ type
     pokeType*: PokeType
     priority: int
     modifiers*: set[PokeMoveModifiers]
+    isZ: bool
     zPower: int
     zEffect: Effect
 
@@ -36,13 +37,14 @@ func copy*(move: PokeMove): PokeMove =
     pokeType: move.pokeType,
     priority: move.priority,
     modifiers: move.modifiers,
+    isZ: move.isZ,
     zPower: move.zPower,
     zEffect: move.zEffect
   )
 
 func newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, basePower: int,
               effect: Effect, pokeType: Poketype, priority: int, modifiers: set[PokeMoveModifiers],
-              zPower: int, zEffect: Effect): PokeMove =
+              zPower: int, zEffect: Effect, isZ = false): PokeMove =
   PokeMove(
     name: name,
     category: category,
@@ -52,6 +54,7 @@ func newMove*(name: string, category: PokeMoveCategory, target: PokeMoveTarget, 
     pokeType: pokeType,
     priority: priority,
     modifiers: modifiers,
+    isZ: isZ,
     zPower: zPower,
     zEffect: zEffect
   )
@@ -67,6 +70,7 @@ func regularZMove*(move: PokeMove): PokeMove =
     basePower: move.zPower,
     effect: move.zEffect,
     pokeType: move.pokeType,
+    isZ: true,
     priority: priority,
     modifiers: {}
   )
@@ -81,7 +85,7 @@ func priority*(move: PokeMove): int = move.priority
 func modifiers*(move: PokeMove): set[PokeMoveModifiers] = move.modifiers
 func zPower*(move: PokeMove): int = move.zPower
 func zEffect*(move: PokeMove): Effect = move.zEffect
-func isZ*(move: PokeMove): bool = move.name[0..1] == "Z-"
+func isZ*(move: PokeMove): bool = move.isZ
 #TODO: For all flags and modifier sets: provide methods to check them, don't export enums
 
 func `==`*(move: PokeMove, s: string): bool = move.name == s
@@ -89,3 +93,4 @@ func `==`*(move: PokeMove, s: string): bool = move.name == s
 func `==`*(s: string, move: PokeMove): bool = move.name == s
 
 func `contains`*(arr: openArray[string], move: PokeMove): bool = find(arr, move.name) >= 0
+func `contains`*(arr: openArray[PokeMove], move: string): bool = find(arr.mapIt(it.name), move) >= 0

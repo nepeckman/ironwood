@@ -618,6 +618,21 @@
     "hasPriority": true,
     "zp": 160
   },
+  "Extreme Evoboost": {
+    "bp": 0,
+    "type": "Normal",
+    "effect": {
+        "boostChange": {
+          "atk": 2,
+          "def": 2,
+          "spa": 2,
+          "spd": 2,
+          "spe": 2
+        },
+        "effectTargets": "Self",
+        "activation": "AfterAttack"
+    }
+  },
   "Feint Attack": {
     "bp": 60,
     "type": "Dark",

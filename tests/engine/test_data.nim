@@ -168,6 +168,22 @@ Snorlax @ Normalium Z
 - Body Slam
 """
 
+const aloraichiumZ* = """
+Raichu-Alola @ Aloraichium Z
+- Thunderbolt
+"""
+
+const noZRaichu* = """
+Raichu-Alola @ Aloraichium Z
+- Discharge
+"""
+
+const eeviumZ* = """
+Eevee @ Eevium Z
+- Last Resort
+- Hyper Voice
+"""
+
 const blazikenite* = """
 Blaziken @ Blazikenite
 - Fire Blast

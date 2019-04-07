@@ -18,7 +18,7 @@ proc getPokemonData*(name: string): PokemonData =
     spd: statsJson["sd"].getInt(),
     spe: statsJson["sp"].getInt()
   )
-  let pokeType1 = 
+  let pokeType1 =
     if pokeData.hasKey("t1"): toPokeType(pokeData["t1"].getStr())
     else: ptNull
   let pokeType2 =

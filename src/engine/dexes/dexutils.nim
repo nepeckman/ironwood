@@ -87,6 +87,7 @@ func toPokeType*(typeString: string): PokeType =
 func toItemKind*(kind: string): ItemKind =
   case kind
   of "Z Crystal": ikZCrystal
+  of "Custom Z Crystal": ikCustomZCrystal
   of "Pinch Berry": ikPinchBerry
   of "Resist Berry": ikResistBerry
   of "Mega Stone": ikMegaStone

@@ -72,14 +72,18 @@ func ability*(mon: Pokemon): Ability = mon.currentAbility
 proc `ability=`*(mon: Pokemon, ability: Ability) = mon.currentAbility = ability
 
 func zMoves(mon: Pokemon): seq[PokeMove] =
-  if not mon.item.isCustomZCrystal:
+  if mon.item.kind == ikZCrystal:
     mon.pokeSet.moves
       .filter((move) => move.pokeType == mon.item.associatedType)
       .map((move) => regularZMove(move))
+  elif mon.item.kind == ikCustomZCrystal and 
+    mon.item.specificPokemonName == mon.name and
+    mon.item.associatedMoveName in mon.pokeSet.moves:
+    @[mon.item.zMove]
   else: @[]
 
 func moves*(mon: Pokemon): seq[PokeMove] =
-  if mon.item.kind == ikZCrystal: concat(mon.pokeSet.moves, mon.zMoves)
+  if mon.item.kind in {ikZCrystal, ikCustomZCrystal}: concat(mon.pokeSet.moves, mon.zMoves)
   else: mon.pokeSet.moves
 
 func getModifiedStat(stat: int, boost: int): int =

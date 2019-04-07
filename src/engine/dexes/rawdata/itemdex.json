@@ -79,6 +79,18 @@
         "kind": "Z Crystal",
         "type": "Normal"
     },
+    "Aloraichium Z": {
+        "kind": "Custom Z Crystal",
+        "zMove": "Stoked Sparksurfer",
+        "associatedMove": "Thunderbolt",
+        "pokemon": "Raichu-Alola"
+    },
+    "Eevium Z": {
+        "kind": "Custom Z Crystal",
+        "zMove": "Extreme Evoboost",
+        "associatedMove": "Last Resort",
+        "pokemon": "Eevee"
+    },
     "Blazikenite": {
         "kind": "Mega Stone",
         "basePokemon": "Blaziken",

@@ -694,6 +694,18 @@ suite "Items":
     ]
     state = turn(state, action)
 
+  test "Custom Z moves - need specific move":
+    var state = newGame(aloraichiumZ, noZRaichu)
+    let zchu = state.getPokemonID(tskHome, 0)
+    let chu = state.getPokemonID(tskAway, 0)
+    var action = @[state.attack(zchu, "Stoked Sparksurfer")]
+    state = turn(state, action)
+    expect UnpackError:
+      discard state.attack(chu, "Stoked Sparksurfer")
+    expect UnpackError:
+      discard state.attack(zchu, "Stoked Sparksurfer")
+    check(state.getPokemonState(chu).currentHP == 149)
+
   test "Firium Z":
     var (state, blazeH, blazeA) = gameSetup(firiumZ, firiumZ)
     var action = @[state.attack(blazeH, "Z-Fire Blast")]
@@ -801,6 +813,20 @@ suite "Items":
     var action = @[state.attack(snorlaxH, "Z-Body Slam")]
     state = turn(state, action)
     check(state.getPokemonState(snorlaxA).currentHP == 172)
+
+  test "Aloraichium Z":
+    var (state, zchu, chu) = gameSetup(aloraichiumZ, noZRaichu)
+    var action = @[state.attack(zchu, "Stoked Sparksurfer")]
+    state = turn(state, action)
+    check(state.getPokemonState(chu).currentHP == 149)
+
+  test "Eevium Z":
+    var (state, zeevee, eevee) = gameSetup(eeviumZ, eeviumZ)
+    var action = @[state.attack(zeevee, "Extreme Evoboost")]
+    state = turn(state, action)
+    action = @[state.attack(zeevee, "Hyper Voice")]
+    state = turn(state, action)
+    check(state.getPokemonState(eevee).currentHP == 91)
 
   test "Blazikenite":
     var (state, blazeH, blazeA) = gameSetup(blazikenite, blazikenite)
