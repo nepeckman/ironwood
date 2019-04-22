@@ -1,0 +1,156 @@
+# Engine
+
+## Mechanics
+- Status
+- Doubles
+- Luck
+
+## Abilities
+
+### High Priority
+- Arena Trap / Magnet Pull / Shadow Tag
+- Bulletproof
+- Clear Body / Full Metal Body / White Smoke
+- Competitive / Defiant
+- Contrary
+- Dazzling / Queenly Majesty
+- Disguise
+- Dry Skin
+- Filter / Prism Armor / Solid Rock
+- Flash Fire
+- Fluffy
+- Fur Coat
+- Gale Wings
+- Galvanize
+- Gluttony
+- Gooey
+- Guts
+- Heatproof
+- Huge Power / Pure Power
+- Hustle
+- Hyper Cutter
+- Immunity
+- Insomnia
+- Iron Barbs
+- Iron Fist
+- Justified
+- Levitate
+- Lightning Rod
+- Limber
+- Magic Bounce
+- Magic Guard
+- Mega Launcher
+- Mold Breaker / Teravolt / Turboblaze
+- Moxie
+- Multiscale / Shadow Shield
+- Natrual Cure
+- Parental Bond
+- Pixilate
+- Poison Heal
+- Prankster
+- Protean
+- Reckless
+- Refrigerate
+- Regenerator
+- Rough Skin
+- Sand Force
+- Sap Sipper
+- Scrappy
+- Sheer Force
+- Skill Link
+- Solar Power
+- Soul Heart
+- Soundproof
+- Speed Boost
+- Stance Change
+- Storm Drain
+- Strong Jaw
+- Sturdy
+- Technician
+- Thick Fat
+- Tough Claws
+- Unaware
+- Vital Spirit
+- Volt Absorb
+- Water Absorb
+- Water Bubble
+
+### Mid Priority
+- Aroma Veil
+- Comatose
+- Dancer
+- Defeatist
+- Download
+- Flare Boost
+- Grass Pelt
+- Heavy Metal
+- Icy Body
+- Imposter
+- Infiltrator
+- Inner Focus
+- Leaf Guard
+- Liquid Voice
+- Long Reach
+- Magician / Pickpocket
+- Marvel Scale
+- Motor Drive
+- Neuroforce
+- Normalize
+- Oblivious
+- Power Construct
+- Rock Head
+- Schooling
+- Shield Dust
+- Shield's Down
+- Simple
+- Stakeout
+- Stamina
+- Steel worker
+- Sticky Hold
+- Sweet Veil
+- Synchronize
+- Tinted Lens
+- Toxic Boost
+- Trace
+- Triage
+- Unburden
+- Unnerve
+- Water Veil
+- Weak Armor
+- Wonder Guard
+
+### Low Priority
+- Aftermath
+- Anger Point
+- Battery
+- Berserk
+- Big Pecks
+- Blaze
+- Cheek Pouch
+- Color Change
+- Corrosion
+- Damp
+- Emergency Exit
+- Flower Veil
+- Klutz
+- Light Metal
+- Multitype
+- Overgrow
+- Power of Alchemy / Receiver
+- Pressure
+- Quick Feet
+- Rain Dish
+- Rattled
+- Rivalry
+- RKS System
+- Slow Start
+- Stall
+- Steadfast
+- Suction Cups
+- Swarm
+- Symbiosis
+- Tangling Hair
+- Torrent
+- Truant
+- Water Compaction
+- Wimp Out
